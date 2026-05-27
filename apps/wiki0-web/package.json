@@ -1,0 +1,36 @@
+{
+	"name": "wiki0-web",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vp dev",
+		"build": "vp build",
+		"preview": "vp preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"lint": "vp lint",
+		"check": "svelte-kit sync && vp check && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test:unit": "vitest",
+		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"test:e2e": "playwright install && playwright test"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.59.1",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tailwindcss/vite": "^4.2.2",
+		"@vitest/browser-playwright": "^4.1.3",
+		"mdsvex": "^0.12.7",
+		"playwright": "^1.59.1",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"tailwindcss": "^4.2.2",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vite-plus": "catalog:",
+		"vitest": "^4.1.3",
+		"vitest-browser-svelte": "^2.1.0"
+	}
+}

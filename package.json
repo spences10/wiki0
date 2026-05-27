@@ -24,10 +24,13 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "pnpm --filter \"./packages/*\" run build:self",
-		"check": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter \"./packages/*\" run check:self",
-		"format": "prettier --write .",
-		"test": "pnpm --filter \"./packages/*\" --if-present run test:self"
+		"build": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter wiki0-web run build",
+		"check": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter \"./packages/*\" run check:self && pnpm --filter wiki0-web run check",
+		"dev:web": "pnpm --filter wiki0-web run dev",
+		"format": "pnpm --filter wiki0-web exec vp check --fix && prettier --write .",
+		"lint": "pnpm --filter wiki0-web run lint",
+		"preview:web": "pnpm --filter wiki0-web run preview",
+		"test": "pnpm --filter \"./packages/*\" --if-present run test:self && pnpm --filter wiki0-web run test"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",
