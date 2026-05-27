@@ -7,3 +7,7 @@ A local-first Markdown wiki for humans and agents.
 - [[topics/llm-wikis]]
 - [[projects/wiki0]]
 - [[decisions/local-first-storage]]
+
+## Active work
+
+- [[projects/building-wiki0]]

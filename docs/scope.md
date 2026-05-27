@@ -2,9 +2,11 @@
 
 ## Product layers
 
-1. **Knowledge format**: Markdown wiki with Obsidian-style `[[WikiLinks]]`.
+1. **Knowledge format**: Markdown wiki with Obsidian-style
+   `[[WikiLinks]]`.
 2. **Agent/index layer**: CLI, MCP, and SQLite/FTS index.
-3. **Human interface**: SvelteKit site for browsing, review, backlinks, search, and graph views.
+3. **Human interface**: SvelteKit site for browsing, review,
+   backlinks, search, and graph views.
 
 ## MVP boundary
 

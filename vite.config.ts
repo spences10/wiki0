@@ -47,12 +47,6 @@ const config = {
 		svelte: true,
 	},
 	lint: {
-		ignorePatterns: [
-			'apps/wiki0-web/.svelte-kit/**',
-			'apps/wiki0-web/build/**',
-			'dist/**',
-			'worker-configuration.d.ts',
-		],
 		options: {
 			typeAware: true,
 			typeCheck: true,

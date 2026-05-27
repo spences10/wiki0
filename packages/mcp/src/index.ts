@@ -2,7 +2,14 @@
 
 import { ValibotJsonSchemaAdapter } from '@tmcp/adapter-valibot';
 import { StdioTransport } from '@tmcp/transport-stdio';
-import { parse_wikilinks, slugify_title } from '@wiki0/core';
+import {
+	append_page,
+	create_page,
+	parse_markdown,
+	parse_wikilinks,
+	read_page,
+	slugify_title,
+} from '@wiki0/core';
 import { McpServer } from 'tmcp';
 import * as v from 'valibot';
 
@@ -10,15 +17,38 @@ const ParseWikilinksSchema = v.object({
 	markdown: v.string(),
 });
 
+const ParseMarkdownSchema = v.object({
+	markdown: v.string(),
+});
+
 const SlugifyTitleSchema = v.object({
 	title: v.string(),
+});
+
+const CreatePageSchema = v.object({
+	title: v.string(),
+	body: v.string(),
+	root: v.optional(v.string(), '.'),
+	overwrite: v.optional(v.boolean(), false),
+});
+
+const ReadPageSchema = v.object({
+	title: v.string(),
+	root: v.optional(v.string(), '.'),
+});
+
+const AppendPageSchema = v.object({
+	title: v.string(),
+	body: v.string(),
+	root: v.optional(v.string(), '.'),
 });
 
 const server = new McpServer(
 	{
 		name: 'wiki0',
 		version: '0.0.0',
-		description: 'Local-first Markdown wiki memory for humans and agents',
+		description:
+			'Local-first Markdown wiki memory for humans and agents',
 	},
 	{
 		adapter: new ValibotJsonSchemaAdapter(),
@@ -31,7 +61,8 @@ const server = new McpServer(
 server.tool<typeof ParseWikilinksSchema>(
 	{
 		name: 'parse_wikilinks',
-		description: 'Parse Obsidian-style [[WikiLinks]] from Markdown text',
+		description:
+			'Parse Obsidian-style [[WikiLinks]] from Markdown text',
 		schema: ParseWikilinksSchema,
 	},
 	async ({ markdown }) => ({
@@ -39,6 +70,23 @@ server.tool<typeof ParseWikilinksSchema>(
 			{
 				type: 'text' as const,
 				text: JSON.stringify(parse_wikilinks(markdown), null, 2),
+			},
+		],
+	}),
+);
+
+server.tool<typeof ParseMarkdownSchema>(
+	{
+		name: 'parse_markdown',
+		description:
+			'Parse optional YAML frontmatter and Markdown content',
+		schema: ParseMarkdownSchema,
+	},
+	async ({ markdown }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(parse_markdown(markdown), null, 2),
 			},
 		],
 	}),
@@ -55,6 +103,58 @@ server.tool<typeof SlugifyTitleSchema>(
 			{
 				type: 'text' as const,
 				text: slugify_title(title),
+			},
+		],
+	}),
+);
+
+server.tool<typeof CreatePageSchema>(
+	{
+		name: 'create_page',
+		description: 'Create a Markdown page in a wiki0 wiki',
+		schema: CreatePageSchema,
+	},
+	async ({ title, body, root, overwrite }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(
+					create_page(title, body, { root, overwrite }),
+					null,
+					2,
+				),
+			},
+		],
+	}),
+);
+
+server.tool<typeof ReadPageSchema>(
+	{
+		name: 'read_page',
+		description: 'Read a Markdown page from a wiki0 wiki',
+		schema: ReadPageSchema,
+	},
+	async ({ title, root }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(read_page(title, root), null, 2),
+			},
+		],
+	}),
+);
+
+server.tool<typeof AppendPageSchema>(
+	{
+		name: 'append_page',
+		description: 'Append Markdown to a page in a wiki0 wiki',
+		schema: AppendPageSchema,
+	},
+	async ({ title, body, root }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(append_page(title, body, root), null, 2),
 			},
 		],
 	}),

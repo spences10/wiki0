@@ -1,6 +1,8 @@
 # wiki0-web
 
-SvelteKit web app for wiki0. This is the human-facing UI layer for browsing and working with wiki0 content; shared parsing/indexing logic should live in the workspace packages rather than in the app.
+SvelteKit web app for wiki0. This is the human-facing UI layer for
+browsing and working with wiki0 content; shared parsing/indexing logic
+should live in the workspace packages rather than in the app.
 
 ## Development
 
@@ -34,4 +36,6 @@ pnpm --filter wiki0-web test      # run unit/component and e2e tests
 
 ## Notes
 
-This app is part of the wiki0 pnpm workspace. Prefer adding reusable wiki behavior to `packages/*` and importing it here, rather than coupling core logic to the web UI.
+This app is part of the wiki0 pnpm workspace. Prefer adding reusable
+wiki behavior to `packages/*` and importing it here, rather than
+coupling core logic to the web UI.

@@ -1,6 +1,7 @@
 # LLM Wikis
 
-LLM wikis are explicit knowledge bases that agents can create, search, lint, and cite.
+LLM wikis are explicit knowledge bases that agents can create, search,
+lint, and cite.
 
 ## Notes
 

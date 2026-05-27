@@ -2,10 +2,10 @@
 	"name": "@wiki0/cli",
 	"version": "0.0.0",
 	"description": "wiki0 command line interface",
-	"type": "module",
 	"bin": {
 		"wiki0": "./dist/index.js"
 	},
+	"type": "module",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
