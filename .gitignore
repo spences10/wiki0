@@ -1,0 +1,9 @@
+node_modules
+dist
+/.svelte-kit
+/.vite
+.wiki0/*.sqlite
+.wiki0/*.sqlite-*
+.env
+.env.*
+!.env.example

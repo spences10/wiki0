@@ -1,0 +1,26 @@
+{
+	"name": "@wiki0/core",
+	"version": "0.0.0",
+	"description": "Core wiki0 Markdown wiki indexing and retrieval primitives",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build:self": "vp exec tsc -p tsconfig.build.json",
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"better-sqlite3": "^12.5.0"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.13",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
+	}
+}

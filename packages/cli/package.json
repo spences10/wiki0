@@ -1,0 +1,29 @@
+{
+	"name": "@wiki0/cli",
+	"version": "0.0.0",
+	"description": "wiki0 command line interface",
+	"type": "module",
+	"bin": {
+		"wiki0": "./dist/index.js"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"@wiki0/core": "workspace:*",
+		"citty": "^0.2.2"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
+	}
+}
