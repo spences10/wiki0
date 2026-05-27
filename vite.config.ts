@@ -1,9 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { playwright } from '@vitest/browser-playwright';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite-plus';
 
+const web_root = fileURLToPath(
+	new URL('apps/wiki0-web', import.meta.url),
+);
+
 const config = {
+	root: web_root,
 	plugins: [tailwindcss(), sveltekit()],
 	test: {
 		expect: { requireAssertions: true },
@@ -15,11 +21,11 @@ const config = {
 					browser: {
 						enabled: true,
 						provider: playwright(),
-						instances: [{ browser: 'chromium', headless: true }]
+						instances: [{ browser: 'chromium', headless: true }],
 					},
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/server/**']
-				}
+					exclude: ['src/lib/server/**'],
+				},
 			},
 			{
 				extends: './vite.config.ts',
@@ -27,25 +33,31 @@ const config = {
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
-				}
-			}
-		]
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+				},
+			},
+		],
 	},
 	fmt: {
-		ignorePatterns: ['.svelte-kit/**', 'build/**', 'dist/**', 'worker-configuration.d.ts'],
 		useTabs: true,
 		singleQuote: true,
-		printWidth: 100,
-		trailingComma: 'none'
+		printWidth: 70,
+		trailingComma: 'all',
+		proseWrap: 'always',
+		svelte: true,
 	},
 	lint: {
-		ignorePatterns: ['.svelte-kit/**', 'build/**', 'dist/**', 'worker-configuration.d.ts'],
+		ignorePatterns: [
+			'apps/wiki0-web/.svelte-kit/**',
+			'apps/wiki0-web/build/**',
+			'dist/**',
+			'worker-configuration.d.ts',
+		],
 		options: {
 			typeAware: true,
-			typeCheck: true
-		}
-	}
+			typeCheck: true,
+		},
+	},
 };
 
 export default defineConfig(config as never);

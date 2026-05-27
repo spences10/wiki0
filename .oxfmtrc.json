@@ -1,0 +1,14 @@
+{
+	"useTabs": true,
+	"singleQuote": true,
+	"printWidth": 70,
+	"trailingComma": "all",
+	"proseWrap": "always",
+	"svelte": true,
+	"ignorePatterns": [
+		"apps/wiki0-web/.svelte-kit/**",
+		"apps/wiki0-web/build/**",
+		"dist/**",
+		"worker-configuration.d.ts"
+	]
+}
