@@ -24,13 +24,13 @@
 	},
 	"type": "module",
 	"scripts": {
-		"build": "pnpm --filter \"./packages/*\" run build:self && vp build",
-		"check": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter \"./packages/*\" run check:self && pnpm --dir apps/wiki0-web exec svelte-kit sync && vp check && pnpm --dir apps/wiki0-web exec svelte-check --tsconfig ./tsconfig.json",
-		"dev:web": "vp dev",
-		"format": "vp check --fix && prettier --write .",
-		"lint": "vp lint",
-		"preview:web": "vp preview",
-		"test": "pnpm --filter \"./packages/*\" --if-present run test:self && vp test"
+		"build": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter wiki0-web run build",
+		"check": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter \"./packages/*\" run check:self && pnpm --filter wiki0-web run check",
+		"dev:web": "pnpm --filter wiki0-web run dev",
+		"format": "vp check --fix && pnpm --filter wiki0-web exec vp check --fix",
+		"lint": "vp lint && pnpm --filter wiki0-web run lint",
+		"preview:web": "pnpm --filter wiki0-web run preview",
+		"test": "pnpm --filter \"./packages/*\" --if-present run test:self && pnpm --filter wiki0-web run test"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",

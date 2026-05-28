@@ -60,6 +60,9 @@ Initial supported fields:
 
 ## Implementation notes
 
-Initial support has been added to [[packages/core]] and exposed through the MCP `parse_markdown` tool. Page reads now return both raw `body` and frontmatter-stripped `content`.
+Initial support has been added to [[packages/core]] and exposed
+through the MCP `parse_markdown` tool. Page reads now return both raw
+`body` and frontmatter-stripped `content`.
 
-Wikilink parsing now ignores frontmatter and fenced code blocks, so examples do not become graph edges.
+Wikilink parsing now ignores frontmatter and fenced code blocks, so
+examples do not become graph edges.

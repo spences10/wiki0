@@ -1,10 +1,14 @@
+import Database from 'better-sqlite3';
+import { createHash } from 'node:crypto';
 import {
 	existsSync,
 	mkdirSync,
+	readdirSync,
 	readFileSync,
+	statSync,
 	writeFileSync,
 } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 
 export type WikiConfig = {
 	root: string;
@@ -40,6 +44,20 @@ export type WikiPage = {
 export type PageWriteOptions = {
 	root?: string;
 	overwrite?: boolean;
+};
+
+export type IndexResult = {
+	root: string;
+	dbPath: string;
+	pageCount: number;
+	linkCount: number;
+};
+
+export type SearchResult = {
+	path: string;
+	title: string;
+	snippet: string;
+	rank: number;
 };
 
 export function parse_wikilinks(markdown: string): WikiLink[] {
@@ -269,6 +287,171 @@ export function append_page(
 		},
 	);
 	return read_page(title, root);
+}
+
+export function wiki_db_path(root = '.'): string {
+	return join(resolve_wiki_root(root), '.wiki0', 'wiki0.sqlite');
+}
+
+export function list_markdown_page_paths(root = '.'): string[] {
+	const wiki_root = resolve_wiki_root(root);
+	const wiki_dir = join(wiki_root, 'wiki');
+	if (!existsSync(wiki_dir)) return [];
+
+	const page_paths: string[] = [];
+	const visit_dir = (dir_path: string) => {
+		for (const entry of readdirSync(dir_path, {
+			withFileTypes: true,
+		})) {
+			const entry_path = join(dir_path, entry.name);
+			if (entry.isDirectory()) {
+				visit_dir(entry_path);
+				continue;
+			}
+			if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+			page_paths.push(relative(wiki_dir, entry_path));
+		}
+	};
+
+	visit_dir(wiki_dir);
+	return page_paths.sort();
+}
+
+function read_page_by_path(page_path: string, root = '.'): WikiPage {
+	const wiki_root = resolve_wiki_root(root);
+	const file_path = join(wiki_root, 'wiki', page_path);
+	const body = readFileSync(file_path, 'utf-8');
+	const title_fallback = display_page_title(
+		page_path.replace(/\.md$/u, ''),
+	);
+	const parsed_markdown = parse_markdown(body);
+
+	return {
+		path: page_path,
+		title: page_title_from_markdown(body, title_fallback),
+		body,
+		content: parsed_markdown.content,
+		frontmatter: parsed_markdown.frontmatter,
+		links: parse_wikilinks(body),
+	};
+}
+
+export function open_wiki_database(root = '.'): Database.Database {
+	const wiki_root = resolve_wiki_root(root);
+	const db_path = wiki_db_path(wiki_root);
+	mkdirSync(dirname(db_path), { recursive: true });
+	const db = new Database(db_path);
+	db.exec(schema_sql);
+	return db;
+}
+
+export function index_wiki(root = '.'): IndexResult {
+	const wiki_root = resolve_wiki_root(root);
+	const db_path = wiki_db_path(wiki_root);
+	const db = open_wiki_database(wiki_root);
+	let page_count = 0;
+	let link_count = 0;
+
+	const upsert_page = db.prepare(`
+		INSERT INTO pages (path, title, body, content_hash, modified_at)
+		VALUES (@path, @title, @body, @content_hash, @modified_at)
+		ON CONFLICT(path) DO UPDATE SET
+			title = excluded.title,
+			body = excluded.body,
+			content_hash = excluded.content_hash,
+			modified_at = excluded.modified_at,
+			updated_at = datetime('now')
+	`);
+	const page_id_query = db.prepare(
+		'SELECT id FROM pages WHERE path = ?',
+	);
+	const delete_links = db.prepare(
+		'DELETE FROM page_links WHERE from_page_id = ?',
+	);
+	const insert_link = db.prepare(`
+		INSERT INTO page_links (from_page_id, raw_text, target, alias, embed, status)
+		VALUES (?, ?, ?, ?, ?, 'unresolved')
+	`);
+	const clear_fts = db.prepare('DELETE FROM fts_pages');
+	const insert_fts = db.prepare(
+		'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
+	);
+	const known_paths = new Set<string>();
+
+	const transaction = db.transaction(() => {
+		clear_fts.run();
+		for (const page_path of list_markdown_page_paths(wiki_root)) {
+			const file_path = join(wiki_root, 'wiki', page_path);
+			const page = read_page_by_path(page_path, wiki_root);
+			const modified_at = statSync(file_path).mtime.toISOString();
+			const content_hash = createHash('sha256')
+				.update(page.body)
+				.digest('hex');
+
+			upsert_page.run({
+				path: page.path,
+				title: page.title,
+				body: page.body,
+				content_hash,
+				modified_at,
+			});
+			known_paths.add(page.path);
+
+			const row = page_id_query.get(page.path) as { id: number };
+			delete_links.run(row.id);
+			for (const link of page.links) {
+				insert_link.run(
+					row.id,
+					link.raw,
+					link.target,
+					link.alias ?? null,
+					link.embed ? 1 : 0,
+				);
+				link_count += 1;
+			}
+			insert_fts.run(page.path, page.title, page.content);
+			page_count += 1;
+		}
+
+		const placeholders = [...known_paths].map(() => '?').join(', ');
+		if (known_paths.size > 0) {
+			db.prepare(
+				`DELETE FROM pages WHERE path NOT IN (${placeholders})`,
+			).run(...known_paths);
+		} else {
+			db.prepare('DELETE FROM pages').run();
+		}
+	});
+
+	transaction();
+	db.close();
+	return {
+		root: wiki_root,
+		dbPath: db_path,
+		pageCount: page_count,
+		linkCount: link_count,
+	};
+}
+
+export function search_wiki(
+	query: string,
+	root = '.',
+	limit = 10,
+): SearchResult[] {
+	const db = open_wiki_database(root);
+	const rows = db
+		.prepare(
+			`SELECT path, title,
+				snippet(fts_pages, 2, '[', ']', '…', 12) AS snippet,
+				bm25(fts_pages) AS rank
+			FROM fts_pages
+			WHERE fts_pages MATCH ?
+			ORDER BY rank
+			LIMIT ?`,
+		)
+		.all(query, limit) as SearchResult[];
+	db.close();
+	return rows;
 }
 
 export const schema_sql = `

@@ -3,8 +3,10 @@
 import {
 	append_page,
 	create_page,
+	index_wiki,
 	read_page,
 	schema_sql,
+	search_wiki,
 } from '@wiki0/core';
 import { defineCommand, runMain } from 'citty';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -143,21 +145,44 @@ const main = defineCommand({
 			},
 		}),
 		index: defineCommand({
-			meta: {
-				description: 'Index Markdown pages into SQLite (planned)',
+			meta: { description: 'Index Markdown pages into SQLite' },
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
 			},
-			run() {
-				console.log('index: planned');
+			run({ args }) {
+				const result = index_wiki(String(args.root ?? '.'));
+				console.log(JSON.stringify(result, null, 2));
 			},
 		}),
 		search: defineCommand({
-			meta: { description: 'Search indexed wiki pages (planned)' },
-			args: { query: { type: 'positional', required: true } },
+			meta: { description: 'Search indexed wiki pages' },
+			args: {
+				query: { type: 'positional', required: true },
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				limit: {
+					type: 'string',
+					description: 'Maximum number of results',
+					default: '10',
+				},
+			},
 			run({ args }) {
-				console.log(`search: planned for ${args.query}`);
+				const results = search_wiki(
+					String(args.query),
+					String(args.root ?? '.'),
+					Number(args.limit ?? 10),
+				);
+				console.log(JSON.stringify(results, null, 2));
 			},
 		}),
 	},
 });
 
-void void runMain(main);
+void runMain(main);

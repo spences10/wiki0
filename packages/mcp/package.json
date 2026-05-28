@@ -1,32 +1,32 @@
 {
-  "name": "@wiki0/mcp",
-  "version": "0.0.0",
-  "description": "MCP server for wiki0 local-first Markdown memory",
-  "bin": {
-    "wiki0-mcp": "./dist/index.js"
-  },
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "scripts": {
-    "build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
-    "check:self": "vp exec tsc --noEmit -p tsconfig.json"
-  },
-  "dependencies": {
-    "@tmcp/adapter-valibot": "^0.1.5",
-    "@tmcp/transport-stdio": "^0.4.1",
-    "@wiki0/core": "workspace:*",
-    "tmcp": "^1.18.1",
-    "valibot": "^1.2.0"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
-  }
+	"name": "@wiki0/mcp",
+	"version": "0.0.0",
+	"description": "MCP server for wiki0 local-first Markdown memory",
+	"bin": {
+		"wiki0-mcp": "./dist/index.js"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"@tmcp/adapter-valibot": "^0.1.5",
+		"@tmcp/transport-stdio": "^0.4.1",
+		"@wiki0/core": "workspace:*",
+		"tmcp": "^1.18.1",
+		"valibot": "^1.2.0"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
+	}
 }

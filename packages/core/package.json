@@ -11,7 +11,8 @@
 	},
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json",
-		"check:self": "vp exec tsc --noEmit -p tsconfig.json"
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
+		"test:self": "vitest run src/index.test.ts"
 	},
 	"dependencies": {
 		"better-sqlite3": "^12.5.0"
