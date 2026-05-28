@@ -1,0 +1,13 @@
+{
+	"useTabs": true,
+	"singleQuote": true,
+	"printWidth": 70,
+	"trailingComma": "all",
+	"proseWrap": "always",
+	"overrides": [
+		{
+			"files": ["apps/wiki0-web/**/*.svelte"],
+			"options": { "svelte": true }
+		}
+	]
+}
