@@ -2,7 +2,9 @@
 
 import {
 	append_page,
+	backlinks_for_page,
 	create_page,
+	get_wiki_context,
 	index_wiki,
 	read_page,
 	schema_sql,
@@ -52,7 +54,9 @@ const main = defineCommand({
 			},
 		}),
 		page: defineCommand({
-			meta: { description: 'Create, read, append, and tag wiki pages' },
+			meta: {
+				description: 'Create, read, append, and tag wiki pages',
+			},
 			subCommands: {
 				create: defineCommand({
 					meta: { description: 'Create a wiki page' },
@@ -111,7 +115,9 @@ const main = defineCommand({
 					},
 				}),
 				frontmatter: defineCommand({
-					meta: { description: 'Set YAML frontmatter on a wiki page' },
+					meta: {
+						description: 'Set YAML frontmatter on a wiki page',
+					},
 					args: {
 						title: {
 							type: 'positional',
@@ -218,6 +224,50 @@ const main = defineCommand({
 					String(args.query),
 					String(args.root ?? '.'),
 					Number(args.limit ?? 10),
+				);
+				console.log(JSON.stringify(results, null, 2));
+			},
+		}),
+		context: defineCommand({
+			meta: {
+				description: 'Retrieve indexed context with citations',
+			},
+			args: {
+				query: { type: 'positional', required: true },
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				limit: {
+					type: 'string',
+					description: 'Maximum number of context results',
+					default: '5',
+				},
+			},
+			run({ args }) {
+				const result = get_wiki_context(
+					String(args.query),
+					String(args.root ?? '.'),
+					Number(args.limit ?? 5),
+				);
+				console.log(JSON.stringify(result, null, 2));
+			},
+		}),
+		backlinks: defineCommand({
+			meta: { description: 'List resolved backlinks for a page' },
+			args: {
+				title: { type: 'positional', required: true },
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+			},
+			run({ args }) {
+				const results = backlinks_for_page(
+					String(args.title),
+					String(args.root ?? '.'),
 				);
 				console.log(JSON.stringify(results, null, 2));
 			},

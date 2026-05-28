@@ -9,7 +9,9 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
 	append_page,
+	backlinks_for_page,
 	create_page,
+	get_wiki_context,
 	index_wiki,
 	page_relative_path,
 	page_title_from_markdown,
@@ -182,6 +184,35 @@ describe('index and search', () => {
 			}),
 		]);
 	});
+
+	it('retrieves context and resolved backlinks from the index', () => {
+		const root = make_wiki_root();
+		create_page(
+			'projects/wiki0',
+			'Local-first context points to [[topics/memory|memory]].',
+			{ root },
+		);
+		create_page('topics/memory', 'Inspectable agent memory.', {
+			root,
+		});
+
+		index_wiki(root);
+
+		expect(get_wiki_context('agent', root, 1)).toEqual({
+			query: 'agent',
+			results: [
+				expect.objectContaining({ path: 'topics/memory.md' }),
+			],
+		});
+		expect(backlinks_for_page('topics/memory', root)).toEqual([
+			expect.objectContaining({
+				path: 'projects/wiki0.md',
+				rawText: '[[topics/memory|memory]]',
+				alias: 'memory',
+				embed: false,
+			}),
+		]);
+	});
 });
 
 describe('page IO', () => {
@@ -217,7 +248,9 @@ describe('page IO', () => {
 
 	it('sets and merges page frontmatter', () => {
 		const root = make_wiki_root();
-		create_page('interfaces/mcp', '# MCP\n\nAgent interface.', { root });
+		create_page('interfaces/mcp', '# MCP\n\nAgent interface.', {
+			root,
+		});
 
 		const page = set_page_frontmatter(
 			'interfaces/mcp',

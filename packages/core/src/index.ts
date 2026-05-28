@@ -65,6 +65,19 @@ export type SearchResult = {
 	rank: number;
 };
 
+export type ContextResult = {
+	query: string;
+	results: SearchResult[];
+};
+
+export type BacklinkResult = {
+	path: string;
+	title: string;
+	rawText: string;
+	alias: string | null;
+	embed: boolean;
+};
+
 export function parse_wikilinks(markdown: string): WikiLink[] {
 	const links: WikiLink[] = [];
 	const pattern = /(!?)\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gu;
@@ -254,6 +267,11 @@ export function page_file_path(title: string, root = '.'): string {
 	);
 }
 
+export function wikilink_target_path(target: string): string {
+	const clean_target = target.split('#')[0]?.trim() ?? '';
+	return page_relative_path(clean_target);
+}
+
 export function display_page_title(title: string): string {
 	return title.split('/').filter(Boolean).at(-1)?.trim() ?? title;
 }
@@ -307,7 +325,10 @@ export function set_page_frontmatter(
 		? { ...parsed_markdown.frontmatter, ...frontmatter }
 		: frontmatter;
 	const next_body = `${serialize_frontmatter(next_frontmatter)}${parsed_markdown.content}`;
-	writeFileSync(file_path, next_body.endsWith('\n') ? next_body : `${next_body}\n`);
+	writeFileSync(
+		file_path,
+		next_body.endsWith('\n') ? next_body : `${next_body}\n`,
+	);
 	return read_page(title, options.root);
 }
 
@@ -408,18 +429,19 @@ export function index_wiki(root = '.'): IndexResult {
 		'DELETE FROM page_links WHERE from_page_id = ?',
 	);
 	const insert_link = db.prepare(`
-		INSERT INTO page_links (from_page_id, raw_text, target, alias, embed, status)
-		VALUES (?, ?, ?, ?, ?, 'unresolved')
+		INSERT INTO page_links (from_page_id, to_path, raw_text, target, alias, embed, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`);
 	const clear_fts = db.prepare('DELETE FROM fts_pages');
 	const insert_fts = db.prepare(
 		'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
 	);
-	const known_paths = new Set<string>();
+	const page_paths = list_markdown_page_paths(wiki_root);
+	const known_paths = new Set(page_paths);
 
 	const transaction = db.transaction(() => {
 		clear_fts.run();
-		for (const page_path of list_markdown_page_paths(wiki_root)) {
+		for (const page_path of page_paths) {
 			const file_path = join(wiki_root, 'wiki', page_path);
 			const page = read_page_by_path(page_path, wiki_root);
 			const modified_at = statSync(file_path).mtime.toISOString();
@@ -434,17 +456,19 @@ export function index_wiki(root = '.'): IndexResult {
 				content_hash,
 				modified_at,
 			});
-			known_paths.add(page.path);
-
 			const row = page_id_query.get(page.path) as { id: number };
 			delete_links.run(row.id);
 			for (const link of page.links) {
+				const to_path = wikilink_target_path(link.target);
+				const is_resolved = known_paths.has(to_path);
 				insert_link.run(
 					row.id,
+					is_resolved ? to_path : null,
 					link.raw,
 					link.target,
 					link.alias ?? null,
 					link.embed ? 1 : 0,
+					is_resolved ? 'resolved' : 'unresolved',
 				);
 				link_count += 1;
 			}
@@ -491,6 +515,37 @@ export function search_wiki(
 		.all(query, limit) as SearchResult[];
 	db.close();
 	return rows;
+}
+
+export function get_wiki_context(
+	query: string,
+	root = '.',
+	limit = 5,
+): ContextResult {
+	return {
+		query,
+		results: search_wiki(query, root, limit),
+	};
+}
+
+export function backlinks_for_page(
+	title: string,
+	root = '.',
+): BacklinkResult[] {
+	const db = open_wiki_database(root);
+	const page_path = wikilink_target_path(title);
+	const rows = db
+		.prepare(
+			`SELECT pages.path, pages.title, page_links.raw_text AS rawText,
+				page_links.alias, page_links.embed
+			FROM page_links
+			JOIN pages ON pages.id = page_links.from_page_id
+			WHERE page_links.to_path = ?
+			ORDER BY pages.path`,
+		)
+		.all(page_path) as BacklinkResult[];
+	db.close();
+	return rows.map((row) => ({ ...row, embed: Boolean(row.embed) }));
 }
 
 export const schema_sql = `

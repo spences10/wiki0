@@ -4,7 +4,9 @@ import { ValibotJsonSchemaAdapter } from '@tmcp/adapter-valibot';
 import { StdioTransport } from '@tmcp/transport-stdio';
 import {
 	append_page,
+	backlinks_for_page,
 	create_page,
+	get_wiki_context,
 	index_wiki,
 	parse_markdown,
 	parse_wikilinks,
@@ -56,6 +58,17 @@ const SearchWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),
 	limit: v.optional(v.number(), 10),
+});
+
+const ContextWikiSchema = v.object({
+	query: v.string(),
+	root: v.optional(v.string(), '.'),
+	limit: v.optional(v.number(), 5),
+});
+
+const BacklinksForPageSchema = v.object({
+	title: v.string(),
+	root: v.optional(v.string(), '.'),
 });
 
 const AppendPageSchema = v.object({
@@ -217,6 +230,46 @@ server.tool<typeof SearchWikiSchema>(
 				type: 'text' as const,
 				text: JSON.stringify(
 					search_wiki(query, root, limit),
+					null,
+					2,
+				),
+			},
+		],
+	}),
+);
+
+server.tool<typeof ContextWikiSchema>(
+	{
+		name: 'get_wiki_context',
+		description: 'Retrieve indexed wiki0 context with citations',
+		schema: ContextWikiSchema,
+	},
+	async ({ query, root, limit }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(
+					get_wiki_context(query, root, limit),
+					null,
+					2,
+				),
+			},
+		],
+	}),
+);
+
+server.tool<typeof BacklinksForPageSchema>(
+	{
+		name: 'backlinks_for_page',
+		description: 'List resolved backlinks for a wiki0 page',
+		schema: BacklinksForPageSchema,
+	},
+	async ({ title, root }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(
+					backlinks_for_page(title, root),
 					null,
 					2,
 				),
