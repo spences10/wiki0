@@ -1,3 +1,14 @@
+---
+title: LLM Wikis
+aliases:
+  - AI wikis
+  - agent wikis
+tags:
+  - topic
+  - ai-memory
+  - knowledge-base
+---
+
 # LLM Wikis
 
 LLM wikis are explicit knowledge bases that agents can create, search,

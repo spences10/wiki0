@@ -1,3 +1,14 @@
+---
+title: Web app
+aliases:
+  - wiki0 web
+  - apps/wiki0-web
+tags:
+  - interface
+  - web
+  - human-facing
+---
+
 # Web app
 
 The wiki0 web app is the optional human-facing interface for

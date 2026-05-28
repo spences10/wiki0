@@ -1,3 +1,13 @@
+---
+title: wiki0
+tags:
+  - project
+  - product
+  - ai-memory
+aliases:
+  - wiki zero
+---
+
 # wiki0
 
 wiki0 is a local-first AI memory project.

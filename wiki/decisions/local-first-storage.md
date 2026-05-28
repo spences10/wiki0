@@ -1,3 +1,12 @@
+---
+title: Local-first storage
+status: proposed
+tags:
+  - decision
+  - storage
+  - local-first
+---
+
 # Local-first storage
 
 Status: proposed

@@ -1,3 +1,13 @@
+---
+title: Core package
+aliases:
+  - @wiki0/core
+  - packages/core
+tags:
+  - package
+  - core
+---
+
 # Core package
 
 `@wiki0/core` is the shared engine for wiki0.

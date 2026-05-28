@@ -1,3 +1,14 @@
+---
+title: Building wiki0
+status: active
+tags:
+  - project
+  - dogfood
+  - architecture
+aliases:
+  - wiki0 build log
+---
+
 # Building wiki0
 
 Status: active

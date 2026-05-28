@@ -1,3 +1,12 @@
+---
+title: Optional frontmatter
+status: proposed
+tags:
+  - decision
+  - metadata
+  - frontmatter
+---
+
 # Optional frontmatter
 
 Status: proposed

@@ -5,9 +5,11 @@ import { StdioTransport } from '@tmcp/transport-stdio';
 import {
 	append_page,
 	create_page,
+	index_wiki,
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
+	search_wiki,
 	set_page_frontmatter,
 	slugify_title,
 	type WikiFrontmatter,
@@ -44,6 +46,16 @@ const SetPageFrontmatterSchema = v.object({
 	frontmatter: v.record(v.string(), v.unknown()),
 	root: v.optional(v.string(), '.'),
 	merge: v.optional(v.boolean(), false),
+});
+
+const IndexWikiSchema = v.object({
+	root: v.optional(v.string(), '.'),
+});
+
+const SearchWikiSchema = v.object({
+	query: v.string(),
+	root: v.optional(v.string(), '.'),
+	limit: v.optional(v.number(), 10),
 });
 
 const AppendPageSchema = v.object({
@@ -169,6 +181,42 @@ server.tool<typeof SetPageFrontmatterSchema>(
 						frontmatter as WikiFrontmatter,
 						{ root, merge },
 					),
+					null,
+					2,
+				),
+			},
+		],
+	}),
+);
+
+server.tool<typeof IndexWikiSchema>(
+	{
+		name: 'index_wiki',
+		description: 'Rebuild the SQLite index for a wiki0 wiki',
+		schema: IndexWikiSchema,
+	},
+	async ({ root }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(index_wiki(root), null, 2),
+			},
+		],
+	}),
+);
+
+server.tool<typeof SearchWikiSchema>(
+	{
+		name: 'search_wiki',
+		description: 'Search indexed wiki0 pages with SQLite FTS',
+		schema: SearchWikiSchema,
+	},
+	async ({ query, root, limit }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(
+					search_wiki(query, root, limit),
 					null,
 					2,
 				),
