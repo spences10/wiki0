@@ -1,3 +1,13 @@
+---
+title: CLI
+aliases:
+  - wiki0 CLI
+  - packages/cli
+tags:
+  - interface
+  - package
+---
+
 # CLI
 
 The wiki0 CLI is the local command interface for a wiki.

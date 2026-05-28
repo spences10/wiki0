@@ -1,3 +1,13 @@
+---
+title: MCP
+aliases:
+  - MCP server
+  - packages/mcp
+tags:
+  - interface
+  - package
+---
+
 # MCP
 
 The wiki0 MCP server is the agent-facing interface for reading,

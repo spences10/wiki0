@@ -17,6 +17,7 @@ import {
 	parse_wikilinks,
 	read_page,
 	search_wiki,
+	set_page_frontmatter,
 	slugify_title,
 } from './index.js';
 
@@ -212,6 +213,37 @@ describe('page IO', () => {
 				'utf-8',
 			),
 		).toBe(read.body);
+	});
+
+	it('sets and merges page frontmatter', () => {
+		const root = make_wiki_root();
+		create_page('interfaces/mcp', '# MCP\n\nAgent interface.', { root });
+
+		const page = set_page_frontmatter(
+			'interfaces/mcp',
+			{
+				title: 'MCP',
+				aliases: ['MCP server', 'packages/mcp'],
+				tags: ['interface', 'package'],
+			},
+			{ root },
+		);
+
+		expect(page.frontmatter).toEqual({
+			title: 'MCP',
+			aliases: ['MCP server', 'packages/mcp'],
+			tags: ['interface', 'package'],
+		});
+		expect(page.content).toBe('# MCP\n\nAgent interface.\n');
+		expect(page.body).toContain('aliases:\n  - MCP server\n');
+
+		const merged = set_page_frontmatter(
+			'interfaces/mcp',
+			{ updated: '2026-05-28' },
+			{ root, merge: true },
+		);
+		expect(merged.frontmatter.updated).toBe('2026-05-28');
+		expect(merged.frontmatter.title).toBe('MCP');
 	});
 
 	it('returns parsed frontmatter and content when reading pages', () => {

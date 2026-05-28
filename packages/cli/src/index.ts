@@ -7,6 +7,8 @@ import {
 	read_page,
 	schema_sql,
 	search_wiki,
+	set_page_frontmatter,
+	type WikiFrontmatter,
 } from '@wiki0/core';
 import { defineCommand, runMain } from 'citty';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -50,7 +52,7 @@ const main = defineCommand({
 			},
 		}),
 		page: defineCommand({
-			meta: { description: 'Create, read, and append wiki pages' },
+			meta: { description: 'Create, read, append, and tag wiki pages' },
 			subCommands: {
 				create: defineCommand({
 					meta: { description: 'Create a wiki page' },
@@ -104,6 +106,44 @@ const main = defineCommand({
 						const page = read_page(
 							String(args.title),
 							String(args.root ?? '.'),
+						);
+						console.log(JSON.stringify(page, null, 2));
+					},
+				}),
+				frontmatter: defineCommand({
+					meta: { description: 'Set YAML frontmatter on a wiki page' },
+					args: {
+						title: {
+							type: 'positional',
+							required: true,
+							description: 'Page title or path',
+						},
+						data: {
+							type: 'string',
+							required: true,
+							description: 'Frontmatter as a JSON object',
+						},
+						root: {
+							type: 'string',
+							description: 'Wiki root path',
+							default: '.',
+						},
+						merge: {
+							type: 'boolean',
+							description: 'Merge with existing frontmatter',
+						},
+					},
+					run({ args }) {
+						const frontmatter = JSON.parse(
+							String(args.data),
+						) as WikiFrontmatter;
+						const page = set_page_frontmatter(
+							String(args.title),
+							frontmatter,
+							{
+								root: String(args.root ?? '.'),
+								merge: Boolean(args.merge),
+							},
 						);
 						console.log(JSON.stringify(page, null, 2));
 					},

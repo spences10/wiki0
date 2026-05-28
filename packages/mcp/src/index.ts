@@ -8,7 +8,9 @@ import {
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
+	set_page_frontmatter,
 	slugify_title,
+	type WikiFrontmatter,
 } from '@wiki0/core';
 import { McpServer } from 'tmcp';
 import * as v from 'valibot';
@@ -35,6 +37,13 @@ const CreatePageSchema = v.object({
 const ReadPageSchema = v.object({
 	title: v.string(),
 	root: v.optional(v.string(), '.'),
+});
+
+const SetPageFrontmatterSchema = v.object({
+	title: v.string(),
+	frontmatter: v.record(v.string(), v.unknown()),
+	root: v.optional(v.string(), '.'),
+	merge: v.optional(v.boolean(), false),
 });
 
 const AppendPageSchema = v.object({
@@ -139,6 +148,30 @@ server.tool<typeof ReadPageSchema>(
 			{
 				type: 'text' as const,
 				text: JSON.stringify(read_page(title, root), null, 2),
+			},
+		],
+	}),
+);
+
+server.tool<typeof SetPageFrontmatterSchema>(
+	{
+		name: 'set_page_frontmatter',
+		description: 'Set or merge YAML frontmatter on a wiki page',
+		schema: SetPageFrontmatterSchema,
+	},
+	async ({ title, frontmatter, root, merge }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(
+					set_page_frontmatter(
+						title,
+						frontmatter as WikiFrontmatter,
+						{ root, merge },
+					),
+					null,
+					2,
+				),
 			},
 		],
 	}),

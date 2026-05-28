@@ -46,6 +46,11 @@ export type PageWriteOptions = {
 	overwrite?: boolean;
 };
 
+export type PageFrontmatterOptions = {
+	root?: string;
+	merge?: boolean;
+};
+
 export type IndexResult = {
 	root: string;
 	dbPath: string;
@@ -140,6 +145,24 @@ export function parse_frontmatter(source: string): WikiFrontmatter {
 	}
 
 	return frontmatter;
+}
+
+export function serialize_frontmatter(
+	frontmatter: WikiFrontmatter,
+): string {
+	const lines = ['---'];
+
+	for (const [key, value] of Object.entries(frontmatter)) {
+		if (Array.isArray(value)) {
+			lines.push(`${key}:`);
+			for (const item of value) lines.push(`  - ${item}`);
+			continue;
+		}
+		lines.push(`${key}: ${String(value)}`);
+	}
+
+	lines.push('---', '');
+	return `${lines.join('\n')}\n`;
 }
 
 function parse_frontmatter_scalar(value: string): FrontmatterValue {
@@ -270,6 +293,22 @@ export function read_page(title: string, root = '.'): WikiPage {
 		frontmatter: parsed_markdown.frontmatter,
 		links: parse_wikilinks(body),
 	};
+}
+
+export function set_page_frontmatter(
+	title: string,
+	frontmatter: WikiFrontmatter,
+	options: PageFrontmatterOptions = {},
+): WikiPage {
+	const file_path = page_file_path(title, options.root);
+	const body = readFileSync(file_path, 'utf-8');
+	const parsed_markdown = parse_markdown(body);
+	const next_frontmatter = options.merge
+		? { ...parsed_markdown.frontmatter, ...frontmatter }
+		: frontmatter;
+	const next_body = `${serialize_frontmatter(next_frontmatter)}${parsed_markdown.content}`;
+	writeFileSync(file_path, next_body.endsWith('\n') ? next_body : `${next_body}\n`);
+	return read_page(title, options.root);
 }
 
 export function append_page(
