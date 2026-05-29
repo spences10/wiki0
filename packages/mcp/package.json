@@ -14,7 +14,8 @@
 	},
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
-		"check:self": "vp exec tsc --noEmit -p tsconfig.json"
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
+		"test:self": "vitest run"
 	},
 	"dependencies": {
 		"@tmcp/adapter-valibot": "^0.1.5",
