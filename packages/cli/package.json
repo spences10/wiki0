@@ -1,5 +1,5 @@
 {
-	"name": "wiki0",
+	"name": "@wiki0/cli",
 	"version": "0.0.1",
 	"description": "wiki0 command line interface",
 	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/cli#readme",
