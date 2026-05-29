@@ -1,9 +1,7 @@
 ---
+# prettier-ignore
 name: wiki0-wiki-maintainer
-description:
-  Maintain a wiki0 LLM wiki. Use when creating a new wiki, ingesting
-  sources, updating linked Markdown pages, answering from wiki
-  context, or reviewing wiki health.
+description: Maintain a wiki0 LLM wiki. Use when creating a new wiki, ingesting sources, updating linked Markdown pages, answering from wiki context, or reviewing wiki health.
 ---
 
 # wiki0 Wiki Maintainer

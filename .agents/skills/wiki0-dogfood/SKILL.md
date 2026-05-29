@@ -1,9 +1,7 @@
 ---
+# prettier-ignore
 name: wiki0-dogfood
-description:
-  Use wiki0 itself before direct Markdown edits. Trigger when editing
-  wiki docs, adding frontmatter, reading project memory, or updating
-  dogfooding documentation.
+description: Use wiki0 itself before direct Markdown edits. Trigger when editing wiki docs, adding frontmatter, reading project memory, or updating dogfooding documentation.
 ---
 
 # wiki0 dogfooding

@@ -1,9 +1,7 @@
 ---
+# prettier-ignore
 name: wiki0-package-workflow
-description:
-  Build and validate wiki0 package changes. Trigger when editing
-  packages/core, packages/cli, packages/mcp, or exposing behavior
-  through CLI and MCP.
+description: Build and validate wiki0 package changes. Trigger when editing packages/core, packages/cli, packages/mcp, or exposing behavior through CLI and MCP.
 ---
 
 # wiki0 package workflow
