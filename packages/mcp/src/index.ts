@@ -11,6 +11,7 @@ import {
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
+	review_wiki,
 	search_wiki,
 	set_page_frontmatter,
 	slugify_title,
@@ -68,6 +69,10 @@ const ContextWikiSchema = v.object({
 
 const BacklinksForPageSchema = v.object({
 	title: v.string(),
+	root: v.optional(v.string(), '.'),
+});
+
+const ReviewWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
 });
 
@@ -273,6 +278,22 @@ server.tool<typeof BacklinksForPageSchema>(
 					null,
 					2,
 				),
+			},
+		],
+	}),
+);
+
+server.tool<typeof ReviewWikiSchema>(
+	{
+		name: 'review_wiki',
+		description: 'List wiki0 pages marked for review',
+		schema: ReviewWikiSchema,
+	},
+	async ({ root }) => ({
+		content: [
+			{
+				type: 'text' as const,
+				text: JSON.stringify(review_wiki(root), null, 2),
 			},
 		],
 	}),

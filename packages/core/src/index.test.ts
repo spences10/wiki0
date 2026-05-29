@@ -18,6 +18,7 @@ import {
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
+	review_wiki,
 	search_wiki,
 	set_page_frontmatter,
 	slugify_title,
@@ -198,11 +199,15 @@ describe('index and search', () => {
 
 		index_wiki(root);
 
-		expect(get_wiki_context('agent', root, 1)).toEqual({
+		const context = get_wiki_context('agent', root, 1);
+		expect(context).toEqual({
 			query: 'agent',
 			results: [
 				expect.objectContaining({ path: 'topics/memory.md' }),
 			],
+			markdown: expect.stringContaining(
+				'Source: `wiki/topics/memory.md`',
+			),
 		});
 		expect(backlinks_for_page('topics/memory', root)).toEqual([
 			expect.objectContaining({
@@ -210,6 +215,32 @@ describe('index and search', () => {
 				rawText: '[[topics/memory|memory]]',
 				alias: 'memory',
 				embed: false,
+			}),
+		]);
+	});
+
+	it('lists pages marked for review by status or tag', () => {
+		const root = make_wiki_root();
+		create_page(
+			'decisions/storage',
+			'---\ntitle: Storage\nstatus: proposed\n---\n# Storage\n',
+			{ root },
+		);
+		create_page(
+			'patterns/api',
+			'---\ntitle: API\ntags: [needs-review]\n---\n# API\n',
+			{ root },
+		);
+		create_page('patterns/done', '# Done\n\nVerified.', { root });
+
+		expect(review_wiki(root)).toEqual([
+			expect.objectContaining({
+				path: 'decisions/storage.md',
+				reason: 'status:proposed',
+			}),
+			expect.objectContaining({
+				path: 'patterns/api.md',
+				reason: 'tag:needs-review',
 			}),
 		]);
 	});

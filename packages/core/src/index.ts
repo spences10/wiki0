@@ -68,6 +68,7 @@ export type SearchResult = {
 export type ContextResult = {
 	query: string;
 	results: SearchResult[];
+	markdown: string;
 };
 
 export type BacklinkResult = {
@@ -76,6 +77,14 @@ export type BacklinkResult = {
 	rawText: string;
 	alias: string | null;
 	embed: boolean;
+};
+
+export type ReviewResult = {
+	path: string;
+	title: string;
+	status: string | null;
+	tags: string[];
+	reason: string;
 };
 
 export function parse_wikilinks(markdown: string): WikiLink[] {
@@ -522,10 +531,36 @@ export function get_wiki_context(
 	root = '.',
 	limit = 5,
 ): ContextResult {
+	const results = search_wiki(query, root, limit);
 	return {
 		query,
-		results: search_wiki(query, root, limit),
+		results,
+		markdown: format_context_markdown(query, results),
 	};
+}
+
+export function format_context_markdown(
+	query: string,
+	results: SearchResult[],
+): string {
+	const lines = [`# wiki0 context: ${query}`, ''];
+
+	if (results.length === 0) {
+		lines.push('No indexed wiki context found.');
+		return `${lines.join('\n')}\n`;
+	}
+
+	for (const [index, result] of results.entries()) {
+		lines.push(
+			`## ${index + 1}. ${result.title}`,
+			`Source: \`wiki/${result.path}\``,
+			'',
+			result.snippet.replace(/\s+/gu, ' ').trim(),
+			'',
+		);
+	}
+
+	return `${lines.join('\n').trimEnd()}\n`;
 }
 
 export function backlinks_for_page(
@@ -546,6 +581,57 @@ export function backlinks_for_page(
 		.all(page_path) as BacklinkResult[];
 	db.close();
 	return rows.map((row) => ({ ...row, embed: Boolean(row.embed) }));
+}
+
+export function review_wiki(root = '.'): ReviewResult[] {
+	const review_statuses = new Set([
+		'draft',
+		'proposed',
+		'review',
+		'stale',
+		'unverified',
+	]);
+	const review_tags = new Set([
+		'review',
+		'needs-review',
+		'unverified',
+		'stale',
+	]);
+	const results: ReviewResult[] = [];
+
+	for (const page_path of list_markdown_page_paths(root)) {
+		const page = read_page_by_path(page_path, root);
+		const status = page.frontmatter.status;
+		const tags = page.frontmatter.tags;
+		const status_text = typeof status === 'string' ? status : null;
+		const tag_list = Array.isArray(tags) ? tags : [];
+		const matching_tag = tag_list.find((tag) => review_tags.has(tag));
+
+		if (status_text && review_statuses.has(status_text)) {
+			results.push({
+				path: page.path,
+				title: page.title,
+				status: status_text,
+				tags: tag_list,
+				reason: `status:${status_text}`,
+			});
+			continue;
+		}
+
+		if (matching_tag) {
+			results.push({
+				path: page.path,
+				title: page.title,
+				status: status_text,
+				tags: tag_list,
+				reason: `tag:${matching_tag}`,
+			});
+		}
+	}
+
+	return results.sort((left, right) =>
+		left.path.localeCompare(right.path),
+	);
 }
 
 export const schema_sql = `

@@ -7,6 +7,7 @@ import {
 	get_wiki_context,
 	index_wiki,
 	read_page,
+	review_wiki,
 	schema_sql,
 	search_wiki,
 	set_page_frontmatter,
@@ -244,6 +245,10 @@ const main = defineCommand({
 					description: 'Maximum number of context results',
 					default: '5',
 				},
+				json: {
+					type: 'boolean',
+					description: 'Output structured JSON instead of Markdown',
+				},
 			},
 			run({ args }) {
 				const result = get_wiki_context(
@@ -251,7 +256,11 @@ const main = defineCommand({
 					String(args.root ?? '.'),
 					Number(args.limit ?? 5),
 				);
-				console.log(JSON.stringify(result, null, 2));
+				console.log(
+					args.json
+						? JSON.stringify(result, null, 2)
+						: result.markdown,
+				);
 			},
 		}),
 		backlinks: defineCommand({
@@ -269,6 +278,22 @@ const main = defineCommand({
 					String(args.title),
 					String(args.root ?? '.'),
 				);
+				console.log(JSON.stringify(results, null, 2));
+			},
+		}),
+		review: defineCommand({
+			meta: {
+				description: 'List pages marked for review',
+			},
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+			},
+			run({ args }) {
+				const results = review_wiki(String(args.root ?? '.'));
 				console.log(JSON.stringify(results, null, 2));
 			},
 		}),
