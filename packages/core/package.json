@@ -10,9 +10,9 @@
 		}
 	},
 	"scripts": {
-		"build:self": "vp exec tsc -p tsconfig.build.json",
+		"build:self": "vp exec tsc -p tsconfig.build.json && cp src/schema.sql dist/schema.sql",
 		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
-		"test:self": "vitest run src/index.test.ts"
+		"test:self": "vitest run"
 	},
 	"dependencies": {
 		"better-sqlite3": "^12.5.0"

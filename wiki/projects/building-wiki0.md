@@ -67,6 +67,10 @@ behavior.
 
 ## Index and search
 
-Implemented initial SQLite indexing and FTS search for Markdown pages. The CLI now supports real `wiki0 index` and `wiki0 search` commands backed by [[packages/core]].
+Implemented initial SQLite indexing and FTS search for Markdown pages.
+The CLI now supports real `wiki0 index` and `wiki0 search` commands
+backed by [[packages/core]].
 
-Current index behavior stores pages, page links, content hashes, modification times, and FTS rows. Search returns path, title, snippet, and rank.
+Current index behavior stores pages, page links, content hashes,
+modification times, and FTS rows. Search returns path, title, snippet,
+and rank.

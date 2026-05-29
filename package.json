@@ -30,7 +30,10 @@
 		"format": "vp check --fix && pnpm --filter wiki0-web exec vp check --fix",
 		"lint": "vp lint && pnpm --filter wiki0-web run lint",
 		"preview:web": "pnpm --filter wiki0-web run preview",
-		"test": "pnpm --filter \"./packages/*\" --if-present run test:self && pnpm --filter wiki0-web run test"
+		"test": "pnpm --filter \"./packages/*\" --if-present run test:self && pnpm --filter wiki0-web run test",
+		"changeset": "changeset",
+		"version": "changeset version",
+		"release": "pnpm run build && changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",

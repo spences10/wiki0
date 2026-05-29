@@ -1,6 +1,9 @@
 ---
 name: wiki0-dogfood
-description: Use wiki0 itself before direct Markdown edits. Trigger when editing wiki docs, adding frontmatter, reading project memory, or updating dogfooding documentation.
+description:
+  Use wiki0 itself before direct Markdown edits. Trigger when editing
+  wiki docs, adding frontmatter, reading project memory, or updating
+  dogfooding documentation.
 ---
 
 # wiki0 dogfooding
@@ -18,8 +21,10 @@ When changing project memory in `wiki/`, use wiki0 interfaces first.
    - `node packages/cli/dist/index.js page frontmatter ...`
    - `node packages/cli/dist/index.js page read ...`
    - `node packages/cli/dist/index.js index --root .`
-3. Only use direct file edits when the needed wiki0 interface is missing or broken.
-4. If direct edits are necessary, say why and consider adding the missing CLI/MCP capability.
+3. Only use direct file edits when the needed wiki0 interface is
+   missing or broken.
+4. If direct edits are necessary, say why and consider adding the
+   missing CLI/MCP capability.
 
 ## Frontmatter conventions
 
@@ -34,4 +39,5 @@ tags:
   - interface
 ```
 
-Keep wiki links in Markdown content, not frontmatter, unless deliberately testing parser behavior.
+Keep wiki links in Markdown content, not frontmatter, unless
+deliberately testing parser behavior.
