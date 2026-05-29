@@ -2,12 +2,29 @@
 	"name": "@wiki0/core",
 	"version": "0.0.0",
 	"description": "Core wiki0 Markdown wiki indexing and retrieval primitives",
+	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/core#readme",
+	"license": "MIT",
+	"author": "Scott Spence <me@scottspence.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/spences10/wiki0.git",
+		"directory": "packages/core"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
 	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
 		}
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && cp src/schema.sql dist/schema.sql",
@@ -23,5 +40,8 @@
 		"typescript": "catalog:",
 		"vite-plus": "catalog:",
 		"vitest": "catalog:"
+	},
+	"engines": {
+		"node": ">=24.15.0"
 	}
 }

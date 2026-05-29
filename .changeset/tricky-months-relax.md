@@ -1,5 +1,5 @@
 ---
-'@wiki0/cli': patch
+'wiki0': patch
 '@wiki0/mcp': patch
 ---
 

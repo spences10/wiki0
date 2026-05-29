@@ -2,15 +2,32 @@
 	"name": "@wiki0/mcp",
 	"version": "0.0.0",
 	"description": "MCP server for wiki0 local-first Markdown memory",
+	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/mcp#readme",
+	"license": "MIT",
+	"author": "Scott Spence <me@scottspence.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/spences10/wiki0.git",
+		"directory": "packages/mcp"
+	},
 	"bin": {
 		"wiki0-mcp": "./dist/index.js"
 	},
+	"files": [
+		"dist",
+		"README.md"
+	],
 	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
 		}
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
@@ -29,5 +46,8 @@
 		"typescript": "catalog:",
 		"vite-plus": "catalog:",
 		"vitest": "catalog:"
+	},
+	"engines": {
+		"node": ">=24.15.0"
 	}
 }
