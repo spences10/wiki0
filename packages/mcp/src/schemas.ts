@@ -31,6 +31,23 @@ export const SetPageFrontmatterSchema = v.object({
 	merge: v.optional(v.boolean(), false),
 });
 
+export const AddFactSchema = v.object({
+	category: v.string(),
+	summary: v.string(),
+	body: v.optional(v.string()),
+	confidence: v.optional(
+		v.picklist(['unknown', 'low', 'medium', 'high', 'verified']),
+		'unknown',
+	),
+	page: v.optional(v.string()),
+	root: v.optional(v.string(), '.'),
+});
+
+export const ListFactsSchema = v.object({
+	root: v.optional(v.string(), '.'),
+	category: v.optional(v.string()),
+});
+
 export const IndexWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
 });

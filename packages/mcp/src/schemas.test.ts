@@ -1,10 +1,12 @@
 import { parse } from 'valibot';
 import { describe, expect, it } from 'vitest';
 import {
+	AddFactSchema,
 	CreatePageSchema,
 	GraphWikiSchema,
 	IndexWikiSchema,
 	LintWikiSchema,
+	ListFactsSchema,
 	SearchWikiSchema,
 } from './schemas.js';
 
@@ -18,6 +20,21 @@ describe('MCP schemas', () => {
 			root: '.',
 			overwrite: false,
 		});
+	});
+
+	it('applies defaults for facts', () => {
+		expect(
+			parse(AddFactSchema, {
+				category: 'decision',
+				summary: 'Local first',
+			}),
+		).toEqual({
+			category: 'decision',
+			summary: 'Local first',
+			confidence: 'unknown',
+			root: '.',
+		});
+		expect(parse(ListFactsSchema, {})).toEqual({ root: '.' });
 	});
 
 	it('applies defaults for indexing and search', () => {

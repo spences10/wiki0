@@ -88,6 +88,32 @@ export type GraphResult = {
 	edges: GraphEdge[];
 };
 
+export type FactConfidence =
+	| 'unknown'
+	| 'low'
+	| 'medium'
+	| 'high'
+	| 'verified';
+
+export type Fact = {
+	id: number;
+	pagePath: string | null;
+	category: string;
+	summary: string;
+	body: string | null;
+	confidence: FactConfidence;
+	createdAt: string;
+};
+
+export type FactWriteOptions = {
+	root?: string;
+	page?: string;
+	category: string;
+	summary: string;
+	body?: string;
+	confidence?: FactConfidence;
+};
+
 export type ReviewResult = {
 	path: string;
 	title: string;
