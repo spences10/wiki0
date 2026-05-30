@@ -1,4 +1,5 @@
 export { open_wiki_database, wiki_db_path } from './database.js';
+export { graph_wiki } from './graph.js';
 export { index_wiki } from './indexer.js';
 export { lint_wiki } from './lint.js';
 export {

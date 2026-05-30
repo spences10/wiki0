@@ -3,6 +3,7 @@ import {
 	backlinks_for_page,
 	create_page,
 	get_wiki_context,
+	graph_wiki,
 	index_wiki,
 	lint_wiki,
 	parse_markdown,
@@ -21,6 +22,7 @@ import {
 	BacklinksForPageSchema,
 	ContextWikiSchema,
 	CreatePageSchema,
+	GraphWikiSchema,
 	IndexWikiSchema,
 	LintWikiSchema,
 	ParseMarkdownSchema,
@@ -41,6 +43,7 @@ type SetPageFrontmatterInput = InferInput<
 	typeof SetPageFrontmatterSchema
 >;
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
+type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type SearchWikiInput = InferInput<typeof SearchWikiSchema>;
 type ContextWikiInput = InferInput<typeof ContextWikiSchema>;
@@ -133,6 +136,16 @@ export function register_wiki_tools(server: {
 		},
 		async ({ root }: IndexWikiInput) =>
 			json_response(index_wiki(root)),
+	);
+
+	server.tool(
+		{
+			name: 'graph_wiki',
+			description: 'Return indexed wiki graph nodes and edges',
+			schema: GraphWikiSchema,
+		},
+		async ({ root }: GraphWikiInput) =>
+			json_response(graph_wiki(root)),
 	);
 
 	server.tool(
