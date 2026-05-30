@@ -74,3 +74,26 @@ or a product improvement issue.
 - Added stopword filtering for the relaxed query path.
 - Dogfooding through the local CLI after rebuilding core returned a
   result for the previously failing broad workflow search.
+
+## Search fallback MCP version gap
+
+- After committing relaxed broad search locally, MCP
+  `get_wiki_context` for
+  `version capability structuredContent isError bootstrap_wiki templates YAML frontmatter root sandbox read-only workflow`
+  failed with `no such column: only`.
+- This suggests the active published MCP server has not picked up the
+  local search fallback yet, reinforcing the need for a
+  version/capability tool and clearer dev-vs-published MCP dogfood
+  checks.
+
+## MCP info and response ergonomics implementation
+
+- Added a `wiki0_info` MCP tool that reports package version, server
+  type, capabilities, and feature flags.
+- Updated JSON MCP responses to include `structuredContent` while
+  preserving text content for compatibility.
+- Wrapped MCP tool handlers so thrown execution errors return
+  `isError: true` with structured error details instead of surfacing
+  as opaque protocol failures.
+- Updated the MCP server metadata version to come from package
+  metadata instead of a hard-coded `0.0.0`.

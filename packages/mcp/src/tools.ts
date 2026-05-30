@@ -19,7 +19,12 @@ import {
 	type WikiFrontmatter,
 } from '@wiki0/core';
 import type { InferInput } from 'valibot';
-import { json_response, text_response } from './responses.js';
+import { wiki0_info } from './info.js';
+import {
+	json_response,
+	text_response,
+	with_tool_errors,
+} from './responses.js';
 import {
 	AddFactSchema,
 	AppendPageSchema,
@@ -38,6 +43,7 @@ import {
 	SearchWikiSchema,
 	SetPageFrontmatterSchema,
 	SlugifyTitleSchema,
+	Wiki0InfoSchema,
 } from './schemas.js';
 
 type ParseWikilinksInput = InferInput<typeof ParseWikilinksSchema>;
@@ -65,7 +71,22 @@ type PlanWikiInput = InferInput<typeof PlanWikiSchema>;
 export function register_wiki_tools(server: {
 	tool: (...args: any[]) => void;
 }): void {
-	server.tool(
+	const tool = (
+		definition: Parameters<typeof server.tool>[0],
+		handler: Parameters<typeof server.tool>[1],
+	) => server.tool(definition, with_tool_errors(handler));
+
+	tool(
+		{
+			name: 'wiki0_info',
+			description:
+				'Return wiki0 MCP server version, capabilities, and feature flags',
+			schema: Wiki0InfoSchema,
+		},
+		async () => json_response(wiki0_info()),
+	);
+
+	tool(
 		{
 			name: 'parse_wikilinks',
 			description:
@@ -76,7 +97,7 @@ export function register_wiki_tools(server: {
 			json_response(parse_wikilinks(markdown)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'parse_markdown',
 			description:
@@ -87,7 +108,7 @@ export function register_wiki_tools(server: {
 			json_response(parse_markdown(markdown)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'slugify_title',
 			description: 'Convert a page title into a wiki0 slug',
@@ -97,7 +118,7 @@ export function register_wiki_tools(server: {
 			text_response(slugify_title(title)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'create_page',
 			description: 'Create a Markdown page in a wiki0 wiki',
@@ -107,7 +128,7 @@ export function register_wiki_tools(server: {
 			json_response(create_page(title, body, { root, overwrite })),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'read_page',
 			description: 'Read a Markdown page from a wiki0 wiki',
@@ -117,7 +138,7 @@ export function register_wiki_tools(server: {
 			json_response(read_page(title, root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'set_page_frontmatter',
 			description: 'Set or merge YAML frontmatter on a wiki page',
@@ -137,7 +158,7 @@ export function register_wiki_tools(server: {
 			),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'add_fact',
 			description: 'Add a structured fact to the wiki0 fact index',
@@ -146,7 +167,7 @@ export function register_wiki_tools(server: {
 		async (input: AddFactInput) => json_response(add_fact(input)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'list_facts',
 			description: 'List structured facts from the wiki0 fact index',
@@ -156,7 +177,7 @@ export function register_wiki_tools(server: {
 			json_response(list_facts(root, category)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'index_wiki',
 			description: 'Rebuild the SQLite index for a wiki0 wiki',
@@ -166,7 +187,7 @@ export function register_wiki_tools(server: {
 			json_response(index_wiki(root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'graph_wiki',
 			description: 'Return indexed wiki graph nodes and edges',
@@ -176,7 +197,7 @@ export function register_wiki_tools(server: {
 			json_response(graph_wiki(root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'lint_wiki',
 			description: 'Lint wiki links and duplicate names',
@@ -185,7 +206,7 @@ export function register_wiki_tools(server: {
 		async ({ root }: LintWikiInput) => json_response(lint_wiki(root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'search_wiki',
 			description: 'Search indexed wiki0 pages with SQLite FTS',
@@ -195,7 +216,7 @@ export function register_wiki_tools(server: {
 			json_response(search_wiki(query, root, limit)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'get_wiki_context',
 			description: 'Retrieve indexed wiki0 context with citations',
@@ -205,7 +226,7 @@ export function register_wiki_tools(server: {
 			json_response(get_wiki_context(query, root, limit)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'backlinks_for_page',
 			description: 'List resolved backlinks for a wiki0 page',
@@ -215,7 +236,7 @@ export function register_wiki_tools(server: {
 			json_response(backlinks_for_page(title, root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'review_wiki',
 			description: 'List wiki0 pages marked for review',
@@ -225,7 +246,7 @@ export function register_wiki_tools(server: {
 			json_response(review_wiki(root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'append_page',
 			description: 'Append Markdown to a page in a wiki0 wiki',
@@ -235,7 +256,7 @@ export function register_wiki_tools(server: {
 			json_response(append_page(title, body, root)),
 	);
 
-	server.tool(
+	tool(
 		{
 			name: 'plan_wiki',
 			description:

@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 
+export const Wiki0InfoSchema = v.object({});
+
 export const ParseWikilinksSchema = v.object({
 	markdown: v.string(),
 });
