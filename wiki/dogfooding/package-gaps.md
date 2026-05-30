@@ -62,3 +62,13 @@ When a tool failure interrupts a wiki operation, record it here or in
 - After re-indexing, `wiki0 lint --root .` exits successfully with one
   warning for duplicate `wiki0` naming between the root index and
   project page.
+
+## Graph command dogfood
+
+- Added `graph_wiki` in core and exposed it as `wiki0 graph` plus an
+  MCP `graph_wiki` tool.
+- The graph output includes indexed page nodes and resolved/unresolved
+  wikilink edges, which gives the placeholder web app a concrete data
+  API later.
+- Dogfooding `node packages/cli/dist/index.js graph --root .` showed
+  the project wiki currently has 15 nodes and 24 edges after indexing.

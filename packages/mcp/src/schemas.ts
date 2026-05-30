@@ -47,6 +47,10 @@ export const ContextWikiSchema = v.object({
 	limit: v.optional(v.number(), 5),
 });
 
+export const GraphWikiSchema = v.object({
+	root: v.optional(v.string(), '.'),
+});
+
 export const LintWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
 });

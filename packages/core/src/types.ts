@@ -67,6 +67,27 @@ export type BacklinkResult = {
 	embed: boolean;
 };
 
+export type GraphNode = {
+	path: string;
+	title: string;
+};
+
+export type GraphEdge = {
+	from: string;
+	to: string;
+	target: string;
+	rawText: string;
+	alias: string | null;
+	embed: boolean;
+	status: 'resolved' | 'unresolved';
+};
+
+export type GraphResult = {
+	root: string;
+	nodes: GraphNode[];
+	edges: GraphEdge[];
+};
+
 export type ReviewResult = {
 	path: string;
 	title: string;

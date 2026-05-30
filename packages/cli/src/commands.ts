@@ -3,6 +3,7 @@ import {
 	backlinks_for_page,
 	create_page,
 	get_wiki_context,
+	graph_wiki,
 	index_wiki,
 	lint_wiki,
 	read_page,
@@ -238,6 +239,19 @@ export const main = defineCommand({
 						? JSON.stringify(result, null, 2)
 						: result.markdown,
 				);
+			},
+		}),
+		graph: defineCommand({
+			meta: { description: 'Output indexed wiki graph data' },
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+			},
+			run({ args }) {
+				print_json(graph_wiki(String(args.root ?? '.')));
 			},
 		}),
 		lint: defineCommand({
