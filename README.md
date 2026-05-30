@@ -1,5 +1,11 @@
 # wiki0
 
+[![CI](https://github.com/spences10/wiki0/actions/workflows/ci.yml/badge.svg)](https://github.com/spences10/wiki0/actions/workflows/ci.yml)
+[![Semgrep](https://github.com/spences10/wiki0/actions/workflows/semgrep.yml/badge.svg)](https://github.com/spences10/wiki0/actions/workflows/semgrep.yml)
+[![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com)
+[![built with vite+](https://img.shields.io/badge/built%20with-Vite+-646CFF?logo=vite&logoColor=white)](https://viteplus.dev)
+[![tested with vitest](https://img.shields.io/badge/tested%20with-Vitest-6E9F18?logo=vitest)](https://vitest.dev)
+
 Local-first AI memory as a Markdown wiki backed by SQLite search and
 MCP tools.
 
