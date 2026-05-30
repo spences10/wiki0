@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { index_wiki } from './indexer.js';
 import { create_page } from './pages.js';
-import { backlinks_for_page, get_wiki_context } from './search.js';
+import {
+	backlinks_for_page,
+	get_wiki_context,
+	plain_text_fts_query,
+	search_wiki,
+} from './search.js';
 import { make_wiki_root } from './test-utils.js';
 
 describe('context and backlinks', () => {
@@ -35,6 +40,19 @@ describe('context and backlinks', () => {
 				alias: 'memory',
 				embed: false,
 			}),
+		]);
+	});
+
+	it('treats user search text as plain text', () => {
+		const root = make_wiki_root();
+		create_page('packages/core', '@wiki0/core powers wiki0.', {
+			root,
+		});
+		index_wiki(root);
+
+		expect(plain_text_fts_query('@wiki0/core')).toBe('"wiki0/core"');
+		expect(search_wiki('@wiki0/core', root, 1)).toEqual([
+			expect.objectContaining({ path: 'packages/core.md' }),
 		]);
 	});
 });

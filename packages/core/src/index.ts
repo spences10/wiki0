@@ -14,6 +14,7 @@ export {
 	create_page,
 	list_markdown_page_paths,
 	read_page,
+	resolve_page_path,
 	set_page_frontmatter,
 } from './pages.js';
 export {

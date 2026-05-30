@@ -87,4 +87,20 @@ describe('page IO', () => {
 		});
 		expect(page.content).toBe('# Ignored heading\n\nBody.\n');
 	});
+
+	it('resolves pages by frontmatter title and alias', () => {
+		const root = make_wiki_root();
+		create_page(
+			'packages/core',
+			'---\ntitle: Core package\naliases: [@wiki0/core]\n---\n# Core\n',
+			{ root },
+		);
+
+		expect(read_page('Core package', root).path).toBe(
+			'packages/core.md',
+		);
+		expect(read_page('@wiki0/core', root).path).toBe(
+			'packages/core.md',
+		);
+	});
 });
