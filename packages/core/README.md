@@ -11,6 +11,8 @@ Core wiki0 primitives for local-first Markdown wiki memory.
 - Context snippets with `wiki/...` citations.
 - Backlinks, graph data, lint results, review queues, and structured
   facts.
+- Wiki-building workflow planning for agents that need a deterministic
+  source-to-wiki recipe.
 
 ## Basic usage
 
@@ -21,6 +23,7 @@ import {
 	search_wiki,
 	get_wiki_context,
 	lint_wiki,
+	plan_wiki,
 } from '@wiki0/core';
 
 create_page('projects/wiki0', 'Local-first [[topics/memory]].', {
@@ -30,6 +33,9 @@ index_wiki('.');
 console.log(search_wiki('memory', '.', 10));
 console.log(get_wiki_context('what is wiki0?', '.', 5).markdown);
 console.log(lint_wiki('.'));
+console.log(
+	plan_wiki({ sourceType: 'codebase', scope: 'current repo' }),
+);
 ```
 
 ## Storage model

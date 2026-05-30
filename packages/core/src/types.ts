@@ -136,3 +136,30 @@ export type LintResult = {
 	issueCount: number;
 	issues: LintIssue[];
 };
+
+export type WikiSourceType =
+	| 'general'
+	| 'codebase'
+	| 'docs'
+	| 'research'
+	| 'notes';
+
+export type WikiPlanOptions = {
+	sourceType?: WikiSourceType;
+	scope?: string;
+};
+
+export type WikiPlanPage = {
+	title: string;
+	path: string;
+	purpose: string;
+	tags: string[];
+};
+
+export type WikiPlanResult = {
+	sourceType: WikiSourceType;
+	scope: string;
+	workflow: string;
+	pages: WikiPlanPage[];
+	nextSteps: string[];
+};

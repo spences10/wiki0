@@ -1,4 +1,4 @@
-import type { FactConfidence } from '@wiki0/core';
+import type { FactConfidence, WikiSourceType } from '@wiki0/core';
 import {
 	add_fact,
 	append_page,
@@ -9,6 +9,7 @@ import {
 	index_wiki,
 	lint_wiki,
 	list_facts,
+	plan_wiki,
 	read_page,
 	review_wiki,
 	search_wiki,
@@ -21,6 +22,20 @@ import {
 	print_json,
 	read_markdown_input,
 } from './actions.js';
+
+function parse_wiki_source_type(value: unknown): WikiSourceType {
+	const source_type = typeof value === 'string' ? value : 'general';
+	if (
+		source_type === 'general' ||
+		source_type === 'codebase' ||
+		source_type === 'docs' ||
+		source_type === 'research' ||
+		source_type === 'notes'
+	) {
+		return source_type;
+	}
+	throw new Error(`Invalid wiki source type: ${source_type}`);
+}
 
 function parse_fact_confidence(value: unknown): FactConfidence {
 	const confidence = typeof value === 'string' ? value : 'unknown';
@@ -184,6 +199,31 @@ export const main = defineCommand({
 						print_json(page);
 					},
 				}),
+			},
+		}),
+		plan: defineCommand({
+			meta: {
+				description:
+					'Print a deterministic workflow and starter page plan for building a wiki',
+			},
+			args: {
+				sourceType: {
+					type: 'string',
+					description: 'general, codebase, docs, research, or notes',
+					default: 'general',
+				},
+				scope: {
+					type: 'string',
+					description: 'Source scope description',
+				},
+			},
+			run({ args }) {
+				print_json(
+					plan_wiki({
+						sourceType: parse_wiki_source_type(args.sourceType),
+						scope: args.scope ? String(args.scope) : undefined,
+					}),
+				);
 			},
 		}),
 		facts: defineCommand({

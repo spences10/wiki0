@@ -100,3 +100,14 @@ When a tool failure interrupts a wiki operation, record it here or in
   links to `wiki/packages/core.md`.
 - This closes the gap where page reads were alias-aware but the SQLite
   link index still only understood slugified paths.
+
+## Wiki building workflow gap
+
+- Documented [[product/wiki-building-workflow]] after dogfooding the
+  question "how does an LLM know what to do when a user asks it to
+  make a wiki?"
+- The current package exposes low-level wiki primitives, but not a
+  shipped workflow/prompt/tool that guides agents through consistent
+  wiki creation from arbitrary source material.
+- The workflow should be general wiki building, not just codebase
+  documentation.

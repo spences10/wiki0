@@ -10,6 +10,7 @@ import {
 	list_facts,
 	parse_markdown,
 	parse_wikilinks,
+	plan_wiki,
 	read_page,
 	review_wiki,
 	search_wiki,
@@ -31,6 +32,7 @@ import {
 	ListFactsSchema,
 	ParseMarkdownSchema,
 	ParseWikilinksSchema,
+	PlanWikiSchema,
 	ReadPageSchema,
 	ReviewWikiSchema,
 	SearchWikiSchema,
@@ -58,6 +60,7 @@ type BacklinksForPageInput = InferInput<
 >;
 type ReviewWikiInput = InferInput<typeof ReviewWikiSchema>;
 type AppendPageInput = InferInput<typeof AppendPageSchema>;
+type PlanWikiInput = InferInput<typeof PlanWikiSchema>;
 
 export function register_wiki_tools(server: {
 	tool: (...args: any[]) => void;
@@ -230,5 +233,16 @@ export function register_wiki_tools(server: {
 		},
 		async ({ title, body, root }: AppendPageInput) =>
 			json_response(append_page(title, body, root)),
+	);
+
+	server.tool(
+		{
+			name: 'plan_wiki',
+			description:
+				'Return a deterministic workflow and starter page plan for building a wiki from source material',
+			schema: PlanWikiSchema,
+		},
+		async ({ sourceType, scope }: PlanWikiInput) =>
+			json_response(plan_wiki({ sourceType, scope })),
 	);
 }

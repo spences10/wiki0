@@ -38,3 +38,21 @@ or a product improvement issue.
   tried `wiki/wiki0-package-backlog.md`. This should become an MCP
   dogfood/version check so local changes are validated through the
   actual MCP server under development.
+
+## Review workflow dogfood gap
+
+- A package review initially inspected source and external docs
+  without invoking the published `wiki0` MCP tools, which undermined
+  the goal of dogfooding.
+- Follow-up used published `wiki0` MCP tools (`index_wiki`,
+  `read_page`, `search_wiki`, `get_wiki_context`, `review_wiki`) and
+  confirmed the tools work for basic project-memory retrieval, while
+  broad natural-language queries still return sparse results.
+
+## Wiki building workflow dogfood
+
+- Created [[product/wiki-building-workflow]] using the current `wiki0`
+  MCP tools to capture a general source-to-wiki workflow.
+- This exposed a product gap: agents need a discoverable
+  prompt/resource or high-level planning tool, otherwise "make a wiki"
+  depends too much on the client's ambient instructions.

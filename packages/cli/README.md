@@ -15,6 +15,7 @@ The package exposes the `wiki0` binary.
 ```sh
 wiki0 init ./my-wiki
 wiki0 page create "projects/wiki0" --body "Local-first [[topics/memory]]." --root ./my-wiki
+wiki0 plan --sourceType codebase --scope "current repository"
 wiki0 index --root ./my-wiki
 wiki0 search "memory" --root ./my-wiki
 wiki0 context "what is wiki0?" --root ./my-wiki
