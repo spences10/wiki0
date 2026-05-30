@@ -74,3 +74,18 @@ export type ReviewResult = {
 	tags: string[];
 	reason: string;
 };
+
+export type LintIssue = {
+	code: string;
+	severity: 'error' | 'warning';
+	path: string;
+	message: string;
+	target?: string;
+};
+
+export type LintResult = {
+	root: string;
+	ok: boolean;
+	issueCount: number;
+	issues: LintIssue[];
+};

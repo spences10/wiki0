@@ -47,6 +47,10 @@ export const ContextWikiSchema = v.object({
 	limit: v.optional(v.number(), 5),
 });
 
+export const LintWikiSchema = v.object({
+	root: v.optional(v.string(), '.'),
+});
+
 export const BacklinksForPageSchema = v.object({
 	title: v.string(),
 	root: v.optional(v.string(), '.'),

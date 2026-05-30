@@ -17,14 +17,16 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "24"
-          cache: "pnpm"
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Check packages
-        run: pnpm --filter "./packages/*" run build:self && pnpm --filter "./packages/*" run check:self
+        run:
+          pnpm --filter "./packages/*" run build:self && pnpm --filter
+          "./packages/*" run check:self
 
       - name: Run package tests
         run: pnpm --filter "./packages/*" --if-present run test:self

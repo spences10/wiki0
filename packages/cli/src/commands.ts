@@ -4,6 +4,7 @@ import {
 	create_page,
 	get_wiki_context,
 	index_wiki,
+	lint_wiki,
 	read_page,
 	review_wiki,
 	search_wiki,
@@ -237,6 +238,21 @@ export const main = defineCommand({
 						? JSON.stringify(result, null, 2)
 						: result.markdown,
 				);
+			},
+		}),
+		lint: defineCommand({
+			meta: { description: 'Lint wiki links and duplicate names' },
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+			},
+			run({ args }) {
+				const result = lint_wiki(String(args.root ?? '.'));
+				print_json(result);
+				if (!result.ok) process.exitCode = 1;
 			},
 		}),
 		backlinks: defineCommand({

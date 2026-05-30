@@ -41,3 +41,24 @@ Use this page to capture product gaps discovered while dogfooding
 
 When a tool failure interrupts a wiki operation, record it here or in
 [[dogfooding/tool-improvements]] before moving on.
+
+## Lint command dogfood
+
+- Added `lint_wiki` in core and exposed it as `wiki0 lint` plus an MCP
+  `lint_wiki` tool.
+- Current lint checks unresolved wikilinks and duplicate page
+  titles/aliases.
+- Running `node packages/cli/dist/index.js lint --root .` found
+  unresolved `[[Changesets]]`, unresolved
+  `[[wiki0 package workflow]]`, and duplicate `wiki0` naming between
+  the index and project page.
+- Next product gap: wikilink resolution should probably use the same
+  path/title/alias rules as page reads, not only slugified paths.
+
+## Lint follow-up
+
+- Added `[[Changesets]]` and `[[wiki0 package workflow]]` pages so the
+  new lint command could immediately dogfood unresolved-link fixes.
+- After re-indexing, `wiki0 lint --root .` exits successfully with one
+  warning for duplicate `wiki0` naming between the root index and
+  project page.

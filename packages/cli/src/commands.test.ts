@@ -9,6 +9,7 @@ describe('main command', () => {
 			'index',
 			'search',
 			'context',
+			'lint',
 			'backlinks',
 			'review',
 		]);

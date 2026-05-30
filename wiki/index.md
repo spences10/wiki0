@@ -1,3 +1,12 @@
+---
+title: Wiki home
+aliases:
+  - wiki index
+  - home
+tags:
+  - map
+---
+
 # wiki0
 
 A local-first Markdown wiki for humans and agents.
