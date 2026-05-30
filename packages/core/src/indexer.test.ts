@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { index_wiki } from './indexer.js';
 import { create_page } from './pages.js';
-import { search_wiki } from './search.js';
+import { backlinks_for_page, search_wiki } from './search.js';
 import { make_wiki_root } from './test-utils.js';
 
 describe('index_wiki', () => {
@@ -27,6 +27,41 @@ describe('index_wiki', () => {
 			expect.objectContaining({
 				path: 'topics/memory.md',
 				title: 'memory',
+			}),
+		]);
+	});
+
+	it('resolves wikilinks by page title and alias while indexing', () => {
+		const root = make_wiki_root();
+		create_page(
+			'projects/wiki0',
+			'Links to [[Core package]] and [[wiki0 CLI]].',
+			{ root },
+		);
+		create_page(
+			'packages/core',
+			'---\ntitle: Core package\n---\n# Core\n',
+			{ root },
+		);
+		create_page(
+			'interfaces/cli',
+			'---\ntitle: CLI\naliases: [wiki0 CLI]\n---\n# CLI\n',
+			{ root },
+		);
+
+		const result = index_wiki(root);
+
+		expect(result.linkCount).toBe(2);
+		expect(backlinks_for_page('Core package', root)).toEqual([
+			expect.objectContaining({
+				path: 'projects/wiki0.md',
+				rawText: '[[Core package]]',
+			}),
+		]);
+		expect(backlinks_for_page('wiki0 CLI', root)).toEqual([
+			expect.objectContaining({
+				path: 'projects/wiki0.md',
+				rawText: '[[wiki0 CLI]]',
 			}),
 		]);
 	});

@@ -82,3 +82,21 @@ When a tool failure interrupts a wiki operation, record it here or in
 - Dogfooding
   `wiki0 facts add "wiki0 now exposes a facts API" --category dogfood --confidence high --page "Package gaps" --root .`
   created a linked fact for this page.
+
+## Package README dogfood
+
+- Added package READMEs for `@wiki0/core`, `@wiki0/cli`, and
+  `@wiki0/mcp` because each package includes `README.md` in its
+  published `files` list.
+- Updated the root README command list so the documented CLI surface
+  includes `lint`, `graph`, and `facts`.
+
+## Alias-aware link indexing
+
+- Updated indexing so `[[WikiLinks]]` resolve by direct path first,
+  then by page title or alias.
+- Backlink lookup now uses the same page resolution path as page
+  reads, so queries like `backlinks_for_page("Core package")` can find
+  links to `wiki/packages/core.md`.
+- This closes the gap where page reads were alias-aware but the SQLite
+  link index still only understood slugified paths.
