@@ -12,19 +12,40 @@ export function search_wiki(
 	limit = 10,
 ): SearchResult[] {
 	const db = open_wiki_database(root);
-	const rows = db
-		.prepare(
-			`SELECT path, title,
-				snippet(fts_pages, 2, '[', ']', '…', 12) AS snippet,
-				bm25(fts_pages) AS rank
-			FROM fts_pages
-			WHERE fts_pages MATCH ?
-			ORDER BY rank
-			LIMIT ?`,
-		)
-		.all(query, limit) as SearchResult[];
-	db.close();
-	return rows;
+	const statement = db.prepare(
+		`SELECT path, title,
+			snippet(fts_pages, 2, '[', ']', '…', 12) AS snippet,
+			bm25(fts_pages) AS rank
+		FROM fts_pages
+		WHERE fts_pages MATCH ?
+		ORDER BY rank
+		LIMIT ?`,
+	);
+	const fts_query = plain_text_fts_query(query);
+	if (!fts_query) {
+		db.close();
+		return [];
+	}
+
+	try {
+		const rows = statement.all(fts_query, limit) as SearchResult[];
+		db.close();
+		return rows;
+	} catch (error) {
+		db.close();
+		throw new Error(`Invalid wiki search query: ${query}`, {
+			cause: error,
+		});
+	}
+}
+
+export function plain_text_fts_query(query: string): string {
+	return query
+		.split(/\s+/u)
+		.map((term) => term.replace(/^\W+|\W+$/gu, ''))
+		.filter((term) => term.length > 0)
+		.map((term) => `"${term.replace(/"/gu, '""')}"`)
+		.join(' ');
 }
 
 export function get_wiki_context(
