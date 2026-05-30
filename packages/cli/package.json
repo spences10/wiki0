@@ -1,6 +1,6 @@
 {
 	"name": "@wiki0/cli",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "wiki0 command line interface",
 	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/cli#readme",
 	"license": "MIT",

@@ -1,5 +1,23 @@
 # @wiki0/mcp
 
+## 0.0.3
+
+### Patch Changes
+
+- 127e5db: Add deterministic wiki planning via core workflow, CLI plan command,
+  MCP tool, prompt, and resource.
+- c0e9f98: Add wiki0 info tool, structured MCP JSON responses, and recoverable
+  tool execution error results.
+- 0aa1a23: Add safe wiki bootstrap pages from the planning workflow across core,
+  CLI, and MCP.
+- c5534dc: Harden YAML, add index status and MCP safety, switch SQLite to
+  node:sqlite, improve bootstrap templates.
+- Updated dependencies [127e5db]
+- Updated dependencies [8c0fea3]
+- Updated dependencies [0aa1a23]
+- Updated dependencies [c5534dc]
+  - @wiki0/core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
