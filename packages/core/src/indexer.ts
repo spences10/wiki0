@@ -42,12 +42,27 @@ export function index_wiki(root = '.'): IndexResult {
 	);
 	const page_paths = list_markdown_page_paths(wiki_root);
 	const known_paths = new Set(page_paths);
+	const pages = page_paths.map((page_path) =>
+		read_page_by_path(page_path, wiki_root),
+	);
+	const name_paths = new Map<string, string>();
+	for (const page of pages) {
+		const aliases = page.frontmatter.aliases;
+		const alias_list = Array.isArray(aliases)
+			? aliases
+			: typeof aliases === 'string'
+				? [aliases]
+				: [];
+		for (const name of [page.title, ...alias_list]) {
+			const normalized_name = name.trim().toLowerCase();
+			if (normalized_name) name_paths.set(normalized_name, page.path);
+		}
+	}
 
 	const transaction = db.transaction(() => {
 		clear_fts.run();
-		for (const page_path of page_paths) {
-			const file_path = join(wiki_root, 'wiki', page_path);
-			const page = read_page_by_path(page_path, wiki_root);
+		for (const page of pages) {
+			const file_path = join(wiki_root, 'wiki', page.path);
 			const modified_at = statSync(file_path).mtime.toISOString();
 			const content_hash = createHash('sha256')
 				.update(page.body)
@@ -63,11 +78,16 @@ export function index_wiki(root = '.'): IndexResult {
 			const row = page_id_query.get(page.path) as { id: number };
 			delete_links.run(row.id);
 			for (const link of page.links) {
-				const to_path = wikilink_target_path(link.target);
-				const is_resolved = known_paths.has(to_path);
+				const direct_path = wikilink_target_path(link.target);
+				const target_name =
+					link.target.split('#')[0]?.trim().toLowerCase() ?? '';
+				const resolved_path = known_paths.has(direct_path)
+					? direct_path
+					: name_paths.get(target_name);
+				const is_resolved = Boolean(resolved_path);
 				insert_link.run(
 					row.id,
-					is_resolved ? to_path : null,
+					resolved_path ?? null,
 					link.raw,
 					link.target,
 					link.alias ?? null,

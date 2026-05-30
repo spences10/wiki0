@@ -23,7 +23,7 @@ wiki0/
   wiki/             # canonical Markdown knowledge
   .wiki0/           # local SQLite index/cache
   packages/core/    # schema, indexing, wikilinks, search primitives
-  packages/cli/     # wiki0 init/index/search/context/lint
+  packages/cli/     # wiki0 init/index/search/context/lint/graph/facts
   packages/mcp/     # MCP server wrapping core operations
   apps/web/         # SvelteKit/mdsvex human interface
 ```
@@ -36,6 +36,8 @@ wiki0 index
 wiki0 search "why sqlite"
 wiki0 context "what did we decide about memory?"
 wiki0 lint
+wiki0 graph
+wiki0 facts add "SQLite is a rebuildable index" --category decision
 ```
 
 Agents use the MCP server to create pages, link related knowledge,

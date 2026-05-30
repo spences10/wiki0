@@ -1,5 +1,5 @@
 import { open_wiki_database } from './database.js';
-import { wikilink_target_path } from './paths.js';
+import { resolve_page_path } from './pages.js';
 import type {
 	BacklinkResult,
 	ContextResult,
@@ -90,7 +90,7 @@ export function backlinks_for_page(
 	root = '.',
 ): BacklinkResult[] {
 	const db = open_wiki_database(root);
-	const page_path = wikilink_target_path(title);
+	const page_path = resolve_page_path(title, root);
 	const rows = db
 		.prepare(
 			`SELECT pages.path, pages.title, page_links.raw_text AS rawText,
