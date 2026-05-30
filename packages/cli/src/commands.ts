@@ -7,6 +7,7 @@ import {
 	create_page,
 	get_wiki_context,
 	graph_wiki,
+	index_status,
 	index_wiki,
 	lint_wiki,
 	list_facts,
@@ -339,6 +340,19 @@ export const main = defineCommand({
 			},
 			run({ args }) {
 				print_json(index_wiki(String(args.root ?? '.')));
+			},
+		}),
+		status: defineCommand({
+			meta: { description: 'Show index freshness and schema status' },
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+			},
+			run({ args }) {
+				print_json(index_status(String(args.root ?? '.')));
 			},
 		}),
 		search: defineCommand({

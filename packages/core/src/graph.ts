@@ -21,7 +21,7 @@ export function graph_wiki(root = '.'): GraphResult {
 			JOIN pages ON pages.id = page_links.from_page_id
 			ORDER BY pages.path, page_links.target`,
 		)
-		.all() as GraphEdge[];
+		.all() as unknown as GraphEdge[];
 	db.close();
 
 	return {

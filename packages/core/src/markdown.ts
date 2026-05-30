@@ -1,3 +1,4 @@
+import { isMap, parseDocument, stringify } from 'yaml';
 import type {
 	FrontmatterValue,
 	ParsedMarkdown,
@@ -53,74 +54,54 @@ export function parse_markdown(markdown: string): ParsedMarkdown {
 }
 
 export function parse_frontmatter(source: string): WikiFrontmatter {
-	const frontmatter: WikiFrontmatter = {};
-	let current_key: string | undefined;
-
-	for (const raw_line of source.split(/\r?\n/u)) {
-		const line = raw_line.trimEnd();
-		if (line.trim().length === 0) continue;
-
-		const list_match = line.match(/^\s*-\s+(.+)$/u);
-		if (list_match && current_key) {
-			const value = frontmatter[current_key];
-			const values = Array.isArray(value)
-				? value
-				: value === undefined
-					? []
-					: [String(value)];
-			values.push(
-				String(parse_frontmatter_scalar(list_match[1] ?? '')),
-			);
-			frontmatter[current_key] = values;
-			continue;
-		}
-
-		const pair_match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/u);
-		if (!pair_match) continue;
-
-		const [, key, value] = pair_match;
-		current_key = key;
-		frontmatter[key] =
-			value.length > 0 ? parse_frontmatter_scalar(value) : [];
+	const document = parseDocument(source, { prettyErrors: false });
+	if (document.errors.length > 0) {
+		throw new Error(
+			`Invalid YAML frontmatter: ${document.errors[0]?.message}`,
+		);
 	}
-
-	return frontmatter;
+	if (document.contents === null) return {};
+	if (!isMap(document.contents)) {
+		throw new Error('YAML frontmatter must be a mapping/object');
+	}
+	return normalize_frontmatter_value(
+		document.toJSON(),
+	) as WikiFrontmatter;
 }
 
 export function serialize_frontmatter(
 	frontmatter: WikiFrontmatter,
 ): string {
-	const lines = ['---'];
-
-	for (const [key, value] of Object.entries(frontmatter)) {
-		if (Array.isArray(value)) {
-			lines.push(`${key}:`);
-			for (const item of value) lines.push(`  - ${item}`);
-			continue;
-		}
-		lines.push(`${key}: ${String(value)}`);
-	}
-
-	lines.push('---', '');
-	return `${lines.join('\n')}\n`;
+	const yaml = stringify(frontmatter, {
+		lineWidth: 0,
+	}).trimEnd();
+	return `---\n${yaml}\n---\n\n`;
 }
 
-function parse_frontmatter_scalar(value: string): FrontmatterValue {
-	const trimmed_value = value.trim();
-	const unquoted_value = trimmed_value.replace(/^["']|["']$/gu, '');
-
-	if (trimmed_value === 'true') return true;
-	if (trimmed_value === 'false') return false;
-	if (/^-?\d+(?:\.\d+)?$/u.test(trimmed_value))
-		return Number(trimmed_value);
-	if (trimmed_value.startsWith('[') && trimmed_value.endsWith(']')) {
-		return trimmed_value
-			.slice(1, -1)
-			.split(',')
-			.map((item) => item.trim().replace(/^["']|["']$/gu, ''))
-			.filter((item) => item.length > 0);
+function normalize_frontmatter_value(
+	value: unknown,
+): FrontmatterValue {
+	if (
+		value === null ||
+		typeof value === 'string' ||
+		typeof value === 'number' ||
+		typeof value === 'boolean'
+	) {
+		return value;
 	}
-	return unquoted_value;
+	if (value instanceof Date) return value.toISOString();
+	if (Array.isArray(value)) {
+		return value.map((item) => normalize_frontmatter_value(item));
+	}
+	if (typeof value === 'object') {
+		return Object.fromEntries(
+			Object.entries(value).map(([key, item]) => [
+				key,
+				normalize_frontmatter_value(item),
+			]),
+		);
+	}
+	return JSON.stringify(value) ?? null;
 }
 
 export function page_title_from_markdown(

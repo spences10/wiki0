@@ -14,6 +14,8 @@ tags:
 aliases: [Old Name, Other Name]
 draft: false
 count: 2
+nested:
+  owner: agent
 ---
 # Heading
 `);
@@ -24,8 +26,15 @@ count: 2
 			aliases: ['Old Name', 'Other Name'],
 			draft: false,
 			count: 2,
+			nested: { owner: 'agent' },
 		});
 		expect(parsed.content).toBe('# Heading\n');
+	});
+
+	it('throws for invalid YAML frontmatter', () => {
+		expect(() =>
+			parse_markdown('---\ntitle: [broken\n---\n# Heading\n'),
+		).toThrow('Invalid YAML frontmatter');
 	});
 
 	it('does not parse frontmatter away from byte start', () => {

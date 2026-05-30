@@ -92,7 +92,7 @@ describe('page IO', () => {
 		const root = make_wiki_root();
 		create_page(
 			'packages/core',
-			'---\ntitle: Core package\naliases: [@wiki0/core]\n---\n# Core\n',
+			'---\ntitle: Core package\naliases: ["@wiki0/core"]\n---\n# Core\n',
 			{ root },
 		);
 

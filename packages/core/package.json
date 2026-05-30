@@ -32,10 +32,9 @@
 		"test:self": "vitest run"
 	},
 	"dependencies": {
-		"better-sqlite3": "^12.5.0"
+		"yaml": "^2.9.0"
 	},
 	"devDependencies": {
-		"@types/better-sqlite3": "^7.6.13",
 		"@types/node": "catalog:",
 		"typescript": "catalog:",
 		"vite-plus": "catalog:",

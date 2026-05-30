@@ -1,7 +1,11 @@
 export { open_wiki_database, wiki_db_path } from './database.js';
 export { add_fact, list_facts } from './facts.js';
 export { graph_wiki } from './graph.js';
-export { index_wiki } from './indexer.js';
+export {
+	current_index_schema_version,
+	index_status,
+	index_wiki,
+} from './indexer.js';
 export { lint_wiki } from './lint.js';
 export {
 	page_title_from_markdown,

@@ -10,6 +10,7 @@ describe('main command', () => {
 			'plan',
 			'facts',
 			'index',
+			'status',
 			'search',
 			'context',
 			'graph',

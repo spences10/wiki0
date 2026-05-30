@@ -6,6 +6,7 @@ import {
 	create_page,
 	get_wiki_context,
 	graph_wiki,
+	index_status,
 	index_wiki,
 	lint_wiki,
 	list_facts,
@@ -26,6 +27,7 @@ import {
 	text_response,
 	with_tool_errors,
 } from './responses.js';
+import { assert_mcp_writable, mcp_root } from './safety.js';
 import {
 	AddFactSchema,
 	AppendPageSchema,
@@ -34,6 +36,7 @@ import {
 	ContextWikiSchema,
 	CreatePageSchema,
 	GraphWikiSchema,
+	IndexStatusSchema,
 	IndexWikiSchema,
 	LintWikiSchema,
 	ListFactsSchema,
@@ -58,6 +61,7 @@ type SetPageFrontmatterInput = InferInput<
 	typeof SetPageFrontmatterSchema
 >;
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
+type IndexStatusInput = InferInput<typeof IndexStatusSchema>;
 type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type ListFactsInput = InferInput<typeof ListFactsSchema>;
@@ -127,8 +131,12 @@ export function register_wiki_tools(server: {
 			description: 'Create a Markdown page in a wiki0 wiki',
 			schema: CreatePageSchema,
 		},
-		async ({ title, body, root, overwrite }: CreatePageInput) =>
-			json_response(create_page(title, body, { root, overwrite })),
+		async ({ title, body, root, overwrite }: CreatePageInput) => {
+			assert_mcp_writable('create_page');
+			return json_response(
+				create_page(title, body, { root: mcp_root(root), overwrite }),
+			);
+		},
 	);
 
 	tool(
@@ -138,7 +146,7 @@ export function register_wiki_tools(server: {
 			schema: ReadPageSchema,
 		},
 		async ({ title, root }: ReadPageInput) =>
-			json_response(read_page(title, root)),
+			json_response(read_page(title, mcp_root(root))),
 	);
 
 	tool(
@@ -152,13 +160,15 @@ export function register_wiki_tools(server: {
 			frontmatter,
 			root,
 			merge,
-		}: SetPageFrontmatterInput) =>
-			json_response(
+		}: SetPageFrontmatterInput) => {
+			assert_mcp_writable('set_page_frontmatter');
+			return json_response(
 				set_page_frontmatter(title, frontmatter as WikiFrontmatter, {
-					root,
+					root: mcp_root(root),
 					merge,
 				}),
-			),
+			);
+		},
 	);
 
 	tool(
@@ -167,7 +177,12 @@ export function register_wiki_tools(server: {
 			description: 'Add a structured fact to the wiki0 fact index',
 			schema: AddFactSchema,
 		},
-		async (input: AddFactInput) => json_response(add_fact(input)),
+		async (input: AddFactInput) => {
+			assert_mcp_writable('add_fact');
+			return json_response(
+				add_fact({ ...input, root: mcp_root(input.root) }),
+			);
+		},
 	);
 
 	tool(
@@ -177,7 +192,7 @@ export function register_wiki_tools(server: {
 			schema: ListFactsSchema,
 		},
 		async ({ root, category }: ListFactsInput) =>
-			json_response(list_facts(root, category)),
+			json_response(list_facts(mcp_root(root), category)),
 	);
 
 	tool(
@@ -186,8 +201,20 @@ export function register_wiki_tools(server: {
 			description: 'Rebuild the SQLite index for a wiki0 wiki',
 			schema: IndexWikiSchema,
 		},
-		async ({ root }: IndexWikiInput) =>
-			json_response(index_wiki(root)),
+		async ({ root }: IndexWikiInput) => {
+			assert_mcp_writable('index_wiki');
+			return json_response(index_wiki(mcp_root(root)));
+		},
+	);
+
+	tool(
+		{
+			name: 'index_status',
+			description: 'Show index freshness and schema status',
+			schema: IndexStatusSchema,
+		},
+		async ({ root }: IndexStatusInput) =>
+			json_response(index_status(mcp_root(root))),
 	);
 
 	tool(
@@ -197,7 +224,7 @@ export function register_wiki_tools(server: {
 			schema: GraphWikiSchema,
 		},
 		async ({ root }: GraphWikiInput) =>
-			json_response(graph_wiki(root)),
+			json_response(graph_wiki(mcp_root(root))),
 	);
 
 	tool(
@@ -206,7 +233,8 @@ export function register_wiki_tools(server: {
 			description: 'Lint wiki links and duplicate names',
 			schema: LintWikiSchema,
 		},
-		async ({ root }: LintWikiInput) => json_response(lint_wiki(root)),
+		async ({ root }: LintWikiInput) =>
+			json_response(lint_wiki(mcp_root(root))),
 	);
 
 	tool(
@@ -216,7 +244,7 @@ export function register_wiki_tools(server: {
 			schema: SearchWikiSchema,
 		},
 		async ({ query, root, limit }: SearchWikiInput) =>
-			json_response(search_wiki(query, root, limit)),
+			json_response(search_wiki(query, mcp_root(root), limit)),
 	);
 
 	tool(
@@ -226,7 +254,7 @@ export function register_wiki_tools(server: {
 			schema: ContextWikiSchema,
 		},
 		async ({ query, root, limit }: ContextWikiInput) =>
-			json_response(get_wiki_context(query, root, limit)),
+			json_response(get_wiki_context(query, mcp_root(root), limit)),
 	);
 
 	tool(
@@ -236,7 +264,7 @@ export function register_wiki_tools(server: {
 			schema: BacklinksForPageSchema,
 		},
 		async ({ title, root }: BacklinksForPageInput) =>
-			json_response(backlinks_for_page(title, root)),
+			json_response(backlinks_for_page(title, mcp_root(root))),
 	);
 
 	tool(
@@ -246,7 +274,7 @@ export function register_wiki_tools(server: {
 			schema: ReviewWikiSchema,
 		},
 		async ({ root }: ReviewWikiInput) =>
-			json_response(review_wiki(root)),
+			json_response(review_wiki(mcp_root(root))),
 	);
 
 	tool(
@@ -255,8 +283,10 @@ export function register_wiki_tools(server: {
 			description: 'Append Markdown to a page in a wiki0 wiki',
 			schema: AppendPageSchema,
 		},
-		async ({ title, body, root }: AppendPageInput) =>
-			json_response(append_page(title, body, root)),
+		async ({ title, body, root }: AppendPageInput) => {
+			assert_mcp_writable('append_page');
+			return json_response(append_page(title, body, mcp_root(root)));
+		},
 	);
 
 	tool(
@@ -282,9 +312,16 @@ export function register_wiki_tools(server: {
 			sourceType,
 			scope,
 			overwrite,
-		}: BootstrapWikiInput) =>
-			json_response(
-				bootstrap_wiki({ root, sourceType, scope, overwrite }),
-			),
+		}: BootstrapWikiInput) => {
+			assert_mcp_writable('bootstrap_wiki');
+			return json_response(
+				bootstrap_wiki({
+					root: mcp_root(root),
+					sourceType,
+					scope,
+					overwrite,
+				}),
+			);
+		},
 	);
 }

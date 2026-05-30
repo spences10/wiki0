@@ -54,6 +54,10 @@ export const IndexWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
 });
 
+export const IndexStatusSchema = v.object({
+	root: v.optional(v.string(), '.'),
+});
+
 export const SearchWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),

@@ -152,7 +152,7 @@ export function backlinks_for_page(
 			WHERE page_links.to_path = ?
 			ORDER BY pages.path`,
 		)
-		.all(page_path) as BacklinkResult[];
+		.all(page_path) as unknown as BacklinkResult[];
 	db.close();
 	return rows.map((row) => ({ ...row, embed: Boolean(row.embed) }));
 }

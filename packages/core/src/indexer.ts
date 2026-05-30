@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { open_wiki_database, wiki_db_path } from './database.js';
 import {
@@ -7,7 +7,9 @@ import {
 	read_page_by_path,
 } from './pages.js';
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
-import type { IndexResult } from './types.js';
+import type { IndexResult, IndexStatus } from './types.js';
+
+export const current_index_schema_version = 1;
 
 export function index_wiki(root = '.'): IndexResult {
 	const wiki_root = resolve_wiki_root(root);
@@ -40,6 +42,13 @@ export function index_wiki(root = '.'): IndexResult {
 	const insert_fts = db.prepare(
 		'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
 	);
+	const set_meta = db.prepare(`
+		INSERT INTO wiki_meta (key, value, updated_at)
+		VALUES (?, ?, datetime('now'))
+		ON CONFLICT(key) DO UPDATE SET
+			value = excluded.value,
+			updated_at = datetime('now')
+	`);
 	const page_paths = list_markdown_page_paths(wiki_root);
 	const known_paths = new Set(page_paths);
 	const pages = page_paths.map((page_path) =>
@@ -49,7 +58,7 @@ export function index_wiki(root = '.'): IndexResult {
 	for (const page of pages) {
 		const aliases = page.frontmatter.aliases;
 		const alias_list = Array.isArray(aliases)
-			? aliases
+			? aliases.filter((alias) => typeof alias === 'string')
 			: typeof aliases === 'string'
 				? [aliases]
 				: [];
@@ -59,7 +68,10 @@ export function index_wiki(root = '.'): IndexResult {
 		}
 	}
 
-	const transaction = db.transaction(() => {
+	let indexed_at = new Date().toISOString();
+	db.exec('BEGIN');
+	try {
+		indexed_at = new Date().toISOString();
 		clear_fts.run();
 		for (const page of pages) {
 			const file_path = join(wiki_root, 'wiki', page.path);
@@ -108,14 +120,102 @@ export function index_wiki(root = '.'): IndexResult {
 		} else {
 			db.prepare('DELETE FROM pages').run();
 		}
-	});
-
-	transaction();
+		set_meta.run('indexed_at', indexed_at);
+		set_meta.run(
+			'schema_version',
+			String(current_index_schema_version),
+		);
+		db.exec('COMMIT');
+	} catch (error) {
+		db.exec('ROLLBACK');
+		throw error;
+	}
 	db.close();
 	return {
 		root: wiki_root,
 		dbPath: db_path,
 		pageCount: page_count,
 		linkCount: link_count,
+		indexedAt: indexed_at,
+		schemaVersion: current_index_schema_version,
+	};
+}
+
+export function index_status(root = '.'): IndexStatus {
+	const wiki_root = resolve_wiki_root(root);
+	const db_path = wiki_db_path(wiki_root);
+	const page_paths = list_markdown_page_paths(wiki_root);
+	const reasons: string[] = [];
+	if (!existsSync(db_path)) {
+		return {
+			root: wiki_root,
+			dbPath: db_path,
+			exists: false,
+			indexedAt: null,
+			schemaVersion: null,
+			currentSchemaVersion: current_index_schema_version,
+			pageCount: page_paths.length,
+			indexedPageCount: 0,
+			stale: true,
+			reasons: ['missing-index'],
+		};
+	}
+
+	const db = open_wiki_database(wiki_root);
+	const meta_rows = db
+		.prepare('SELECT key, value FROM wiki_meta')
+		.all() as { key: string; value: string }[];
+	const meta = new Map(meta_rows.map((row) => [row.key, row.value]));
+	const indexed_at = meta.get('indexed_at') ?? null;
+	const schema_version = Number(meta.get('schema_version') ?? NaN);
+	const indexed_page_count = (
+		db.prepare('SELECT COUNT(*) AS count FROM pages').get() as {
+			count: number;
+		}
+	).count;
+	const indexed_pages = db
+		.prepare('SELECT path, content_hash AS contentHash FROM pages')
+		.all() as { path: string; contentHash: string }[];
+	db.close();
+
+	if (!indexed_at) reasons.push('never-indexed');
+	if (schema_version !== current_index_schema_version) {
+		reasons.push('schema-version-mismatch');
+	}
+	if (indexed_page_count !== page_paths.length) {
+		reasons.push('page-count-changed');
+	}
+
+	const current_paths = new Set(page_paths);
+	const indexed_hashes = new Map(
+		indexed_pages.map((page) => [page.path, page.contentHash]),
+	);
+	for (const page of indexed_pages) {
+		if (!current_paths.has(page.path)) reasons.push('deleted-pages');
+	}
+	for (const page_path of page_paths) {
+		const page = read_page_by_path(page_path, wiki_root);
+		const current_hash = createHash('sha256')
+			.update(page.body)
+			.digest('hex');
+		const indexed_hash = indexed_hashes.get(page_path);
+		if (!indexed_hash) reasons.push('new-pages');
+		else if (indexed_hash !== current_hash)
+			reasons.push('modified-pages');
+	}
+
+	return {
+		root: wiki_root,
+		dbPath: db_path,
+		exists: true,
+		indexedAt: indexed_at,
+		schemaVersion: Number.isNaN(schema_version)
+			? null
+			: schema_version,
+		currentSchemaVersion: current_index_schema_version,
+		pageCount: page_paths.length,
+		indexedPageCount: indexed_page_count,
+		stale: reasons.length > 0,
+		reasons: [...new Set(reasons)],
 	};
 }

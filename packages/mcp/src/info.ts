@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { mcp_safety_config } from './safety.js';
 
 type PackageJson = {
 	name?: string;
@@ -15,10 +16,15 @@ export type Wiki0Info = {
 		resources: boolean;
 	};
 	features: string[];
+	safety: {
+		readOnly: boolean;
+		allowedRoots: string[];
+	};
 };
 
 export function wiki0_info(): Wiki0Info {
 	const package_json = read_package_json();
+	const safety = mcp_safety_config();
 	return {
 		name: package_json.name ?? '@wiki0/mcp',
 		version: package_json.version ?? '0.0.0',
@@ -28,9 +34,11 @@ export function wiki0_info(): Wiki0Info {
 			prompts: true,
 			resources: true,
 		},
+		safety,
 		features: [
 			'wiki-page-io',
 			'wiki-indexing',
+			'wiki-index-status',
 			'wiki-search',
 			'wiki-context',
 			'wiki-graph',
@@ -42,6 +50,8 @@ export function wiki0_info(): Wiki0Info {
 			'wiki-bootstrap',
 			'structured-json-responses',
 			'tool-execution-errors',
+			'mcp-root-allowlist',
+			'mcp-read-only-mode',
 		],
 	};
 }

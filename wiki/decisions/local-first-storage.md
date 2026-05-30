@@ -1,6 +1,6 @@
 ---
 title: Local-first storage
-status: proposed
+status: accepted
 tags:
   - decision
   - storage
@@ -9,7 +9,7 @@ tags:
 
 # Local-first storage
 
-Status: proposed
+Status: accepted
 
 wiki0 should treat Markdown as the source of truth and SQLite as a
 rebuildable local index/cache.

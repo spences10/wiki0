@@ -1,7 +1,7 @@
 ---
 title: Core package
 aliases:
-  - @wiki0/core
+  - '@wiki0/core'
   - packages/core
 tags:
   - package

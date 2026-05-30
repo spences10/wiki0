@@ -25,7 +25,9 @@ export function review_wiki(root = '.'): ReviewResult[] {
 		const status = page.frontmatter.status;
 		const tags = page.frontmatter.tags;
 		const status_text = typeof status === 'string' ? status : null;
-		const tag_list = Array.isArray(tags) ? tags : [];
+		const tag_list = Array.isArray(tags)
+			? tags.filter((tag) => typeof tag === 'string')
+			: [];
 		const matching_tag = tag_list.find((tag) => review_tags.has(tag));
 
 		if (status_text && review_statuses.has(status_text)) {

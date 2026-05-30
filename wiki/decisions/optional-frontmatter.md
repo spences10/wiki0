@@ -1,6 +1,6 @@
 ---
 title: Optional frontmatter
-status: proposed
+status: accepted
 tags:
   - decision
   - metadata
@@ -9,7 +9,7 @@ tags:
 
 # Optional frontmatter
 
-Status: proposed
+Status: accepted
 
 wiki0 should support YAML frontmatter as optional page metadata, but
 plain Markdown pages and `[[WikiLinks]]` must continue to work without

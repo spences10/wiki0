@@ -18,6 +18,7 @@ wiki0 page create "projects/wiki0" --body "Local-first [[topics/memory]]." --roo
 wiki0 plan --sourceType codebase --scope "current repository"
 wiki0 bootstrap --sourceType docs --scope "docs folder" --root ./my-wiki
 wiki0 index --root ./my-wiki
+wiki0 status --root ./my-wiki
 wiki0 search "memory" --root ./my-wiki
 wiki0 context "what is wiki0?" --root ./my-wiki
 wiki0 lint --root ./my-wiki

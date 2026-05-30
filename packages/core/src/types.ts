@@ -11,7 +11,13 @@ export type WikiLink = {
 	embed: boolean;
 };
 
-export type FrontmatterValue = string | number | boolean | string[];
+export type FrontmatterValue =
+	| string
+	| number
+	| boolean
+	| null
+	| FrontmatterValue[]
+	| { [key: string]: FrontmatterValue };
 
 export type WikiFrontmatter = Record<string, FrontmatterValue>;
 
@@ -44,6 +50,21 @@ export type IndexResult = {
 	dbPath: string;
 	pageCount: number;
 	linkCount: number;
+	indexedAt: string;
+	schemaVersion: number;
+};
+
+export type IndexStatus = {
+	root: string;
+	dbPath: string;
+	exists: boolean;
+	indexedAt: string | null;
+	schemaVersion: number | null;
+	currentSchemaVersion: number;
+	pageCount: number;
+	indexedPageCount: number;
+	stale: boolean;
+	reasons: string[];
 };
 
 export type SearchResult = {

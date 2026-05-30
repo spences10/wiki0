@@ -105,7 +105,7 @@ export function resolve_page_path(title: string, root = '.'): string {
 		const page = read_page_by_path(page_path, wiki_root);
 		const aliases = page.frontmatter.aliases;
 		const alias_list = Array.isArray(aliases)
-			? aliases
+			? aliases.filter((alias) => typeof alias === 'string')
 			: typeof aliases === 'string'
 				? [aliases]
 				: [];

@@ -34,4 +34,10 @@ CREATE TABLE IF NOT EXISTS facts (
 	created_at TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS wiki_meta (
+	key TEXT PRIMARY KEY,
+	value TEXT NOT NULL,
+	updated_at TEXT DEFAULT (datetime('now'))
+);
+
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_pages USING fts5(path, title, body);

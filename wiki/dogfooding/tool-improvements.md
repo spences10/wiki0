@@ -6,7 +6,6 @@ aliases:
 tags:
   - dogfooding
   - tooling
-  - needs-review
 ---
 
 # Tool improvements
@@ -97,3 +96,28 @@ or a product improvement issue.
   as opaque protocol failures.
 - Updated the MCP server metadata version to come from package
   metadata instead of a hard-coded `0.0.0`.
+
+## Remaining backlog after wiki workflow dogfood
+
+Prioritized follow-up items:
+
+1. Frontmatter/YAML hardening: replace the limited YAML-like
+   parser/serializer with a real YAML implementation or clearly
+   document the supported subset.
+2. MCP root safety: add allowed-root and read-only modes so
+   write-capable tools cannot mutate arbitrary paths by accident.
+3. Index freshness/status: track indexed-at time, schema version,
+   package version, and stale state; expose through CLI/MCP.
+4. Review queue cleanup: decide or update proposed decision pages and
+   remove `needs-review` from dogfood/product pages once accepted.
+5. Bootstrap depth: improve starter templates and eventually support
+   source ingestion/open-question/fact extraction from detected
+   material.
+
+Completed in this dogfood run:
+
+- `plan_wiki` workflow across core, CLI, MCP, prompt, and resource.
+- Broad search fallback with stopword filtering and relaxed OR query.
+- `wiki0_info`, structured MCP JSON responses, and `isError` tool
+  errors.
+- `bootstrap_wiki` starter page creation across core, CLI, and MCP.

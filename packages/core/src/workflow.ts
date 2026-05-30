@@ -1,4 +1,5 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { index_wiki } from './indexer.js';
 import { serialize_frontmatter } from './markdown.js';
 import { create_page } from './pages.js';
@@ -151,6 +152,11 @@ export function bootstrap_wiki(
 	const created: string[] = [];
 	const skipped: string[] = [];
 
+	const detected_sources = detect_source_inventory(
+		root,
+		plan.sourceType,
+	);
+
 	for (const page of plan.pages) {
 		if (
 			!options.overwrite &&
@@ -159,10 +165,14 @@ export function bootstrap_wiki(
 			skipped.push(page.path);
 			continue;
 		}
-		create_page(page.path, page_template(page, plan), {
-			root,
-			overwrite: options.overwrite,
-		});
+		create_page(
+			page.path,
+			page_template(page, plan, detected_sources),
+			{
+				root,
+				overwrite: options.overwrite,
+			},
+		);
 		created.push(page.path);
 	}
 
@@ -178,13 +188,20 @@ export function bootstrap_wiki(
 function page_template(
 	page: WikiPlanPage,
 	plan: WikiPlanResult,
+	detected_sources: string[],
 ): string {
 	if (page.path === 'index') return index_template(page, plan);
 	const frontmatter = serialize_frontmatter({
 		title: page.title,
 		tags: page.tags,
 	});
-	return `${frontmatter}# ${page.title}\n\n${page.purpose}\n\n## Source scope\n\n${plan.scope}\n\n## Notes\n\n- Add source-backed details here.\n`;
+	if (page.path === 'sources/index') {
+		return `${frontmatter}# ${page.title}\n\n${page.purpose}\n\n## Source scope\n\n${plan.scope}\n\n## Detected sources\n\n${format_source_inventory(detected_sources)}\n\n## Ingestion notes\n\n- Record source paths, URLs, owners, and freshness before extracting durable facts.\n`;
+	}
+	if (page.path === 'questions/open-questions') {
+		return `${frontmatter}# ${page.title}\n\n${page.purpose}\n\n## Source scope\n\n${plan.scope}\n\n## Questions\n\n- What source material has not been inspected yet?\n- Which claims need citations or owner confirmation?\n- Which pages should move from needs-review to verified?\n`;
+	}
+	return `${frontmatter}# ${page.title}\n\n${page.purpose}\n\n## Source scope\n\n${plan.scope}\n\n## Evidence\n\n- Add source-backed details here with citations or file paths.\n\n## Candidate facts\n\n- Add durable claims here before promoting them with add_fact.\n`;
 }
 
 function index_template(
@@ -202,5 +219,37 @@ function index_template(
 				`- [[${planned_page.path}|${planned_page.title}]] — ${planned_page.purpose}`,
 		)
 		.join('\n');
-	return `${frontmatter}# ${page.title}\n\nWiki for ${plan.scope}.\n\n## Start here\n\n${links}\n\n## Workflow\n\nUse [[workflows/index|Workflows]] to capture repeatable processes and [[questions/open-questions|Open questions]] for uncertain claims.\n`;
+	return `${frontmatter}# ${page.title}\n\nWiki for ${plan.scope}.\n\n## Start here\n\n${links}\n\n## Workflow\n\nUse [[workflows/index|Workflows]] to capture repeatable processes, [[sources/index|Sources]] to track inspected material, and [[questions/open-questions|Open questions]] for uncertain claims.\n`;
+}
+
+function detect_source_inventory(
+	root: string,
+	source_type: WikiSourceType,
+): string[] {
+	const candidates = ['README.md', 'package.json', 'docs'];
+	if (source_type === 'codebase') candidates.push('packages');
+	const sources: string[] = [];
+	for (const candidate of candidates) {
+		const candidate_path = join(root, candidate);
+		if (!existsSync(candidate_path)) continue;
+		if (candidate === 'packages') {
+			for (const entry of readdirSync(candidate_path, {
+				withFileTypes: true,
+			})) {
+				if (entry.isDirectory()) {
+					sources.push(`packages/${entry.name}/package.json`);
+				}
+			}
+			continue;
+		}
+		sources.push(candidate);
+	}
+	return sources;
+}
+
+function format_source_inventory(sources: string[]): string {
+	if (sources.length === 0) {
+		return '- No local sources detected automatically; add source paths or URLs here.';
+	}
+	return sources.map((source) => `- \`${source}\``).join('\n');
 }

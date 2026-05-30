@@ -18,7 +18,7 @@ export function lint_wiki(root = '.'): LintResult {
 	for (const page of pages) {
 		const aliases = page.frontmatter.aliases;
 		const alias_list = Array.isArray(aliases)
-			? aliases
+			? aliases.filter((alias) => typeof alias === 'string')
 			: typeof aliases === 'string'
 				? [aliases]
 				: [];

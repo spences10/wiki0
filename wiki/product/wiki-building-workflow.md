@@ -6,7 +6,6 @@ aliases:
 tags:
   - product
   - workflow
-  - needs-review
 ---
 
 # Wiki building workflow

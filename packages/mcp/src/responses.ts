@@ -25,8 +25,7 @@ export function json_response(value: unknown): ToolResponse {
 }
 
 export function error_response(error: unknown): ToolResponse {
-	const message =
-		error instanceof Error ? error.message : String(error);
+	const message = error_message(error);
 	return {
 		content: [{ type: 'text', text: message }],
 		structuredContent: { error: message },
@@ -44,6 +43,12 @@ export function with_tool_errors<TInput>(
 			return error_response(error);
 		}
 	};
+}
+
+function error_message(error: unknown): string {
+	if (error instanceof Error) return error.message;
+	if (typeof error === 'string') return error;
+	return JSON.stringify(error) ?? 'Unknown error';
 }
 
 function structured_content(value: unknown): StructuredContent {
