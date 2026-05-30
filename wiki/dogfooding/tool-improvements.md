@@ -56,3 +56,21 @@ or a product improvement issue.
 - This exposed a product gap: agents need a discoverable
   prompt/resource or high-level planning tool, otherwise "make a wiki"
   depends too much on the client's ambient instructions.
+
+## Search dogfood after workflow implementation
+
+- Searching for
+  `wiki building workflow gap plan_wiki build_wiki version capability structuredContent search`
+  returned no results even though [[product/wiki-building-workflow]]
+  and this page contain several of those terms.
+- This reinforces that `search_wiki` needs better broad-query
+  behavior, likely stopword/noise handling, OR fallback, and
+  phrase/term relaxation.
+
+## Search relaxation implementation
+
+- Added an OR fallback for broad plain-text searches when the strict
+  FTS query returns no rows.
+- Added stopword filtering for the relaxed query path.
+- Dogfooding through the local CLI after rebuilding core returned a
+  result for the previously failing broad workflow search.

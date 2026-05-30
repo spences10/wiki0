@@ -29,23 +29,75 @@ export function search_wiki(
 
 	try {
 		const rows = statement.all(fts_query, limit) as SearchResult[];
-		db.close();
-		return rows;
+		if (rows.length > 0) return rows;
+
+		const relaxed_query = relaxed_plain_text_fts_query(query);
+		if (!relaxed_query || relaxed_query === fts_query) return rows;
+		return statement.all(relaxed_query, limit) as SearchResult[];
 	} catch (error) {
-		db.close();
 		throw new Error(`Invalid wiki search query: ${query}`, {
 			cause: error,
 		});
+	} finally {
+		db.close();
 	}
 }
 
+const stop_words = new Set([
+	'a',
+	'an',
+	'and',
+	'are',
+	'as',
+	'at',
+	'be',
+	'by',
+	'did',
+	'do',
+	'does',
+	'for',
+	'from',
+	'how',
+	'in',
+	'is',
+	'it',
+	'of',
+	'on',
+	'or',
+	'that',
+	'the',
+	'this',
+	'to',
+	'was',
+	'we',
+	'what',
+	'when',
+	'where',
+	'who',
+	'why',
+	'with',
+]);
+
 export function plain_text_fts_query(query: string): string {
+	return plain_text_terms(query).map(quote_fts_term).join(' ');
+}
+
+export function relaxed_plain_text_fts_query(query: string): string {
+	return plain_text_terms(query)
+		.filter((term) => !stop_words.has(term.toLowerCase()))
+		.map(quote_fts_term)
+		.join(' OR ');
+}
+
+function plain_text_terms(query: string): string[] {
 	return query
 		.split(/\s+/u)
 		.map((term) => term.replace(/^\W+|\W+$/gu, ''))
-		.filter((term) => term.length > 0)
-		.map((term) => `"${term.replace(/"/gu, '""')}"`)
-		.join(' ');
+		.filter((term) => term.length > 0);
+}
+
+function quote_fts_term(term: string): string {
+	return `"${term.replace(/"/gu, '""')}"`;
 }
 
 export function get_wiki_context(

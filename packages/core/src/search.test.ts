@@ -5,6 +5,7 @@ import {
 	backlinks_for_page,
 	get_wiki_context,
 	plain_text_fts_query,
+	relaxed_plain_text_fts_query,
 	search_wiki,
 } from './search.js';
 import { make_wiki_root } from './test-utils.js';
@@ -53,6 +54,33 @@ describe('context and backlinks', () => {
 		expect(plain_text_fts_query('@wiki0/core')).toBe('"wiki0/core"');
 		expect(search_wiki('@wiki0/core', root, 1)).toEqual([
 			expect.objectContaining({ path: 'packages/core.md' }),
+		]);
+	});
+
+	it('relaxes broad natural-language searches when exact term matching fails', () => {
+		const root = make_wiki_root();
+		create_page(
+			'product/wiki-building-workflow',
+			'The build_wiki prompt and plan_wiki tool describe a wiki building workflow.',
+			{ root },
+		);
+		index_wiki(root);
+
+		expect(
+			relaxed_plain_text_fts_query(
+				'wiki building workflow gap plan_wiki build_wiki version capability structuredContent search',
+			),
+		).toContain(' OR ');
+		expect(
+			search_wiki(
+				'wiki building workflow gap plan_wiki build_wiki version capability structuredContent search',
+				root,
+				1,
+			),
+		).toEqual([
+			expect.objectContaining({
+				path: 'product/wiki-building-workflow.md',
+			}),
 		]);
 	});
 });
