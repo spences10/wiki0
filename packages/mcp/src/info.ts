@@ -39,6 +39,7 @@ export function wiki0_info(): Wiki0Info {
 			'wiki-facts',
 			'wiki-planning',
 			'wiki-building-prompt',
+			'wiki-bootstrap',
 			'structured-json-responses',
 			'tool-execution-errors',
 		],

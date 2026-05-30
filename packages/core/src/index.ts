@@ -38,6 +38,7 @@ export {
 } from './search.js';
 export type * from './types.js';
 export {
+	bootstrap_wiki,
 	plan_wiki,
 	wiki_building_workflow_markdown,
 } from './workflow.js';

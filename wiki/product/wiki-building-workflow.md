@@ -75,3 +75,15 @@ produce consistent wikis.
   the blueprint directly.
 - Added tests, README notes, and a changeset for the new package
   surface.
+
+## Bootstrap implementation
+
+- Added `bootstrap_wiki` in core to create starter pages from
+  `plan_wiki`, skip existing pages unless `overwrite` is enabled, and
+  re-index after writing.
+- Added `wiki0 bootstrap` for CLI users.
+- Added MCP `bootstrap_wiki` so agents can move from planning to a
+  safe starter wiki without inventing page templates.
+- Dogfooding against a temporary initialized wiki created source,
+  concept, workflow, question, and docs map pages while skipping the
+  existing index page, then linted cleanly.

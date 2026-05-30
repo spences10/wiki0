@@ -96,3 +96,13 @@ export const PlanWikiSchema = v.object({
 	),
 	scope: v.optional(v.string()),
 });
+
+export const BootstrapWikiSchema = v.object({
+	root: v.optional(v.string(), '.'),
+	sourceType: v.optional(
+		v.picklist(['general', 'codebase', 'docs', 'research', 'notes']),
+		'general',
+	),
+	scope: v.optional(v.string()),
+	overwrite: v.optional(v.boolean(), false),
+});

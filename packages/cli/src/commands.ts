@@ -3,6 +3,7 @@ import {
 	add_fact,
 	append_page,
 	backlinks_for_page,
+	bootstrap_wiki,
 	create_page,
 	get_wiki_context,
 	graph_wiki,
@@ -199,6 +200,42 @@ export const main = defineCommand({
 						print_json(page);
 					},
 				}),
+			},
+		}),
+		bootstrap: defineCommand({
+			meta: {
+				description:
+					'Create starter wiki pages from a deterministic wiki-building plan',
+			},
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				sourceType: {
+					type: 'string',
+					description: 'general, codebase, docs, research, or notes',
+					default: 'general',
+				},
+				scope: {
+					type: 'string',
+					description: 'Source scope description',
+				},
+				overwrite: {
+					type: 'boolean',
+					description: 'Overwrite existing starter pages',
+				},
+			},
+			run({ args }) {
+				print_json(
+					bootstrap_wiki({
+						root: String(args.root ?? '.'),
+						sourceType: parse_wiki_source_type(args.sourceType),
+						scope: args.scope ? String(args.scope) : undefined,
+						overwrite: Boolean(args.overwrite),
+					}),
+				);
 			},
 		}),
 		plan: defineCommand({

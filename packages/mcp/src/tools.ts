@@ -2,6 +2,7 @@ import {
 	add_fact,
 	append_page,
 	backlinks_for_page,
+	bootstrap_wiki,
 	create_page,
 	get_wiki_context,
 	graph_wiki,
@@ -29,6 +30,7 @@ import {
 	AddFactSchema,
 	AppendPageSchema,
 	BacklinksForPageSchema,
+	BootstrapWikiSchema,
 	ContextWikiSchema,
 	CreatePageSchema,
 	GraphWikiSchema,
@@ -67,6 +69,7 @@ type BacklinksForPageInput = InferInput<
 type ReviewWikiInput = InferInput<typeof ReviewWikiSchema>;
 type AppendPageInput = InferInput<typeof AppendPageSchema>;
 type PlanWikiInput = InferInput<typeof PlanWikiSchema>;
+type BootstrapWikiInput = InferInput<typeof BootstrapWikiSchema>;
 
 export function register_wiki_tools(server: {
 	tool: (...args: any[]) => void;
@@ -265,5 +268,23 @@ export function register_wiki_tools(server: {
 		},
 		async ({ sourceType, scope }: PlanWikiInput) =>
 			json_response(plan_wiki({ sourceType, scope })),
+	);
+
+	tool(
+		{
+			name: 'bootstrap_wiki',
+			description:
+				'Create starter wiki pages from the deterministic wiki-building plan, then index the wiki',
+			schema: BootstrapWikiSchema,
+		},
+		async ({
+			root,
+			sourceType,
+			scope,
+			overwrite,
+		}: BootstrapWikiInput) =>
+			json_response(
+				bootstrap_wiki({ root, sourceType, scope, overwrite }),
+			),
 	);
 }

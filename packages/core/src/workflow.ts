@@ -1,4 +1,11 @@
+import { existsSync } from 'node:fs';
+import { index_wiki } from './indexer.js';
+import { serialize_frontmatter } from './markdown.js';
+import { create_page } from './pages.js';
+import { page_file_path, resolve_wiki_root } from './paths.js';
 import type {
+	WikiBootstrapOptions,
+	WikiBootstrapResult,
 	WikiPlanOptions,
 	WikiPlanPage,
 	WikiPlanResult,
@@ -134,4 +141,66 @@ export function plan_wiki(
 			'Run index_wiki, lint_wiki, and review_wiki before handing off.',
 		],
 	};
+}
+
+export function bootstrap_wiki(
+	options: WikiBootstrapOptions = {},
+): WikiBootstrapResult {
+	const root = resolve_wiki_root(options.root);
+	const plan = plan_wiki(options);
+	const created: string[] = [];
+	const skipped: string[] = [];
+
+	for (const page of plan.pages) {
+		if (
+			!options.overwrite &&
+			existsSync(page_file_path(page.path, root))
+		) {
+			skipped.push(page.path);
+			continue;
+		}
+		create_page(page.path, page_template(page, plan), {
+			root,
+			overwrite: options.overwrite,
+		});
+		created.push(page.path);
+	}
+
+	return {
+		root,
+		plan,
+		created,
+		skipped,
+		indexed: index_wiki(root),
+	};
+}
+
+function page_template(
+	page: WikiPlanPage,
+	plan: WikiPlanResult,
+): string {
+	if (page.path === 'index') return index_template(page, plan);
+	const frontmatter = serialize_frontmatter({
+		title: page.title,
+		tags: page.tags,
+	});
+	return `${frontmatter}# ${page.title}\n\n${page.purpose}\n\n## Source scope\n\n${plan.scope}\n\n## Notes\n\n- Add source-backed details here.\n`;
+}
+
+function index_template(
+	page: WikiPlanPage,
+	plan: WikiPlanResult,
+): string {
+	const frontmatter = serialize_frontmatter({
+		title: page.title,
+		tags: page.tags,
+	});
+	const links = plan.pages
+		.filter((planned_page) => planned_page.path !== page.path)
+		.map(
+			(planned_page) =>
+				`- [[${planned_page.path}|${planned_page.title}]] — ${planned_page.purpose}`,
+		)
+		.join('\n');
+	return `${frontmatter}# ${page.title}\n\nWiki for ${plan.scope}.\n\n## Start here\n\n${links}\n\n## Workflow\n\nUse [[workflows/index|Workflows]] to capture repeatable processes and [[questions/open-questions|Open questions]] for uncertain claims.\n`;
 }

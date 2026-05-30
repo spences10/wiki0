@@ -16,6 +16,8 @@ The package exposes the `wiki0-mcp` binary.
 - `parse_wikilinks`, `parse_markdown`, `slugify_title`
 - `plan_wiki` for a deterministic source-to-wiki workflow and starter
   page plan
+- `bootstrap_wiki` to create starter pages from that plan and index
+  the wiki
 - `create_page`, `read_page`, `append_page`, `set_page_frontmatter`
 - `index_wiki`, `search_wiki`, `get_wiki_context`
 - `backlinks_for_page`, `graph_wiki`, `lint_wiki`, `review_wiki`

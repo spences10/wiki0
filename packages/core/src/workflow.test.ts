@@ -1,5 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { lint_wiki } from './lint.js';
+import { make_wiki_root } from './test-utils.js';
 import {
+	bootstrap_wiki,
 	plan_wiki,
 	wiki_building_workflow_markdown,
 } from './workflow.js';
@@ -33,5 +38,31 @@ describe('wiki building workflow', () => {
 		expect(plan.pages.map((page) => page.path)).toContain(
 			'packages/index',
 		);
+	});
+
+	it('bootstraps starter pages and indexes them', () => {
+		const root = make_wiki_root();
+		const result = bootstrap_wiki({
+			root,
+			sourceType: 'docs',
+			scope: 'docs folder',
+		});
+
+		expect(result.created).toContain('index');
+		expect(result.created).toContain('docs/documentation-map');
+		expect(result.indexed.pageCount).toBe(result.created.length);
+		expect(
+			readFileSync(join(root, 'wiki/index.md'), 'utf-8'),
+		).toContain('[[sources/index|Sources]]');
+		expect(lint_wiki(root).ok).toBe(true);
+	});
+
+	it('skips existing pages unless overwrite is enabled', () => {
+		const root = make_wiki_root();
+		bootstrap_wiki({ root, sourceType: 'general' });
+		const second = bootstrap_wiki({ root, sourceType: 'general' });
+
+		expect(second.created).toEqual([]);
+		expect(second.skipped).toContain('index');
 	});
 });

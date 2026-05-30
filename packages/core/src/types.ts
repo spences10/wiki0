@@ -149,6 +149,11 @@ export type WikiPlanOptions = {
 	scope?: string;
 };
 
+export type WikiBootstrapOptions = WikiPlanOptions & {
+	root?: string;
+	overwrite?: boolean;
+};
+
 export type WikiPlanPage = {
 	title: string;
 	path: string;
@@ -162,4 +167,12 @@ export type WikiPlanResult = {
 	workflow: string;
 	pages: WikiPlanPage[];
 	nextSteps: string[];
+};
+
+export type WikiBootstrapResult = {
+	root: string;
+	plan: WikiPlanResult;
+	created: string[];
+	skipped: string[];
+	indexed: IndexResult;
 };

@@ -33,6 +33,7 @@ wiki0/
 ```sh
 wiki0 init ~/my-wiki
 wiki0 plan --sourceType codebase --scope "current repository"
+wiki0 bootstrap --sourceType docs --scope "docs folder"
 wiki0 index
 wiki0 search "why sqlite"
 wiki0 context "what did we decide about memory?"
