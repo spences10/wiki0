@@ -1,5 +1,6 @@
 export { open_wiki_database, wiki_db_path } from './database.js';
 export { index_wiki } from './indexer.js';
+export { lint_wiki } from './lint.js';
 export {
 	page_title_from_markdown,
 	parse_frontmatter,

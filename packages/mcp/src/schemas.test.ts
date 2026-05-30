@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	CreatePageSchema,
 	IndexWikiSchema,
+	LintWikiSchema,
 	SearchWikiSchema,
 } from './schemas.js';
 
@@ -20,6 +21,7 @@ describe('MCP schemas', () => {
 
 	it('applies defaults for indexing and search', () => {
 		expect(parse(IndexWikiSchema, {})).toEqual({ root: '.' });
+		expect(parse(LintWikiSchema, {})).toEqual({ root: '.' });
 		expect(parse(SearchWikiSchema, { query: 'agent' })).toEqual({
 			query: 'agent',
 			root: '.',

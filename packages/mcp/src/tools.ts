@@ -4,6 +4,7 @@ import {
 	create_page,
 	get_wiki_context,
 	index_wiki,
+	lint_wiki,
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
@@ -21,6 +22,7 @@ import {
 	ContextWikiSchema,
 	CreatePageSchema,
 	IndexWikiSchema,
+	LintWikiSchema,
 	ParseMarkdownSchema,
 	ParseWikilinksSchema,
 	ReadPageSchema,
@@ -39,6 +41,7 @@ type SetPageFrontmatterInput = InferInput<
 	typeof SetPageFrontmatterSchema
 >;
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
+type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type SearchWikiInput = InferInput<typeof SearchWikiSchema>;
 type ContextWikiInput = InferInput<typeof ContextWikiSchema>;
 type BacklinksForPageInput = InferInput<
@@ -130,6 +133,15 @@ export function register_wiki_tools(server: {
 		},
 		async ({ root }: IndexWikiInput) =>
 			json_response(index_wiki(root)),
+	);
+
+	server.tool(
+		{
+			name: 'lint_wiki',
+			description: 'Lint wiki links and duplicate names',
+			schema: LintWikiSchema,
+		},
+		async ({ root }: LintWikiInput) => json_response(lint_wiki(root)),
 	);
 
 	server.tool(
