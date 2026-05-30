@@ -72,3 +72,13 @@ When a tool failure interrupts a wiki operation, record it here or in
   API later.
 - Dogfooding `node packages/cli/dist/index.js graph --root .` showed
   the project wiki currently has 15 nodes and 24 edges after indexing.
+
+## Facts command dogfood
+
+- Added `add_fact` and `list_facts` in core, exposed as
+  `wiki0 facts add/list` and MCP `add_fact`/`list_facts` tools.
+- Facts can optionally link to an indexed page, carry a category,
+  body, and confidence.
+- Dogfooding
+  `wiki0 facts add "wiki0 now exposes a facts API" --category dogfood --confidence high --page "Package gaps" --root .`
+  created a linked fact for this page.

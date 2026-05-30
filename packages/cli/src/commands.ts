@@ -1,4 +1,6 @@
+import type { FactConfidence } from '@wiki0/core';
 import {
+	add_fact,
 	append_page,
 	backlinks_for_page,
 	create_page,
@@ -6,6 +8,7 @@ import {
 	graph_wiki,
 	index_wiki,
 	lint_wiki,
+	list_facts,
 	read_page,
 	review_wiki,
 	search_wiki,
@@ -18,6 +21,20 @@ import {
 	print_json,
 	read_markdown_input,
 } from './actions.js';
+
+function parse_fact_confidence(value: unknown): FactConfidence {
+	const confidence = typeof value === 'string' ? value : 'unknown';
+	if (
+		confidence === 'unknown' ||
+		confidence === 'low' ||
+		confidence === 'medium' ||
+		confidence === 'high' ||
+		confidence === 'verified'
+	) {
+		return confidence;
+	}
+	throw new Error(`Invalid fact confidence: ${confidence}`);
+}
 
 export const main = defineCommand({
 	meta: {
@@ -165,6 +182,71 @@ export const main = defineCommand({
 							String(args.root ?? '.'),
 						);
 						print_json(page);
+					},
+				}),
+			},
+		}),
+		facts: defineCommand({
+			meta: { description: 'Add and list structured wiki facts' },
+			subCommands: {
+				add: defineCommand({
+					meta: { description: 'Add a structured wiki fact' },
+					args: {
+						summary: { type: 'positional', required: true },
+						category: {
+							type: 'string',
+							description: 'Fact category',
+							default: 'note',
+						},
+						body: { type: 'string', description: 'Fact details' },
+						confidence: {
+							type: 'string',
+							description: 'unknown, low, medium, high, or verified',
+							default: 'unknown',
+						},
+						page: {
+							type: 'string',
+							description: 'Related page title or path',
+						},
+						root: {
+							type: 'string',
+							description: 'Wiki root path',
+							default: '.',
+						},
+					},
+					run({ args }) {
+						print_json(
+							add_fact({
+								root: String(args.root ?? '.'),
+								page: args.page ? String(args.page) : undefined,
+								category: String(args.category ?? 'note'),
+								summary: String(args.summary),
+								body: args.body ? String(args.body) : undefined,
+								confidence: parse_fact_confidence(args.confidence),
+							}),
+						);
+					},
+				}),
+				list: defineCommand({
+					meta: { description: 'List structured wiki facts' },
+					args: {
+						category: {
+							type: 'string',
+							description: 'Filter by category',
+						},
+						root: {
+							type: 'string',
+							description: 'Wiki root path',
+							default: '.',
+						},
+					},
+					run({ args }) {
+						print_json(
+							list_facts(
+								String(args.root ?? '.'),
+								args.category ? String(args.category) : undefined,
+							),
+						);
 					},
 				}),
 			},

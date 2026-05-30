@@ -1,4 +1,5 @@
 import {
+	add_fact,
 	append_page,
 	backlinks_for_page,
 	create_page,
@@ -6,6 +7,7 @@ import {
 	graph_wiki,
 	index_wiki,
 	lint_wiki,
+	list_facts,
 	parse_markdown,
 	parse_wikilinks,
 	read_page,
@@ -18,6 +20,7 @@ import {
 import type { InferInput } from 'valibot';
 import { json_response, text_response } from './responses.js';
 import {
+	AddFactSchema,
 	AppendPageSchema,
 	BacklinksForPageSchema,
 	ContextWikiSchema,
@@ -25,6 +28,7 @@ import {
 	GraphWikiSchema,
 	IndexWikiSchema,
 	LintWikiSchema,
+	ListFactsSchema,
 	ParseMarkdownSchema,
 	ParseWikilinksSchema,
 	ReadPageSchema,
@@ -37,6 +41,7 @@ import {
 type ParseWikilinksInput = InferInput<typeof ParseWikilinksSchema>;
 type ParseMarkdownInput = InferInput<typeof ParseMarkdownSchema>;
 type SlugifyTitleInput = InferInput<typeof SlugifyTitleSchema>;
+type AddFactInput = InferInput<typeof AddFactSchema>;
 type CreatePageInput = InferInput<typeof CreatePageSchema>;
 type ReadPageInput = InferInput<typeof ReadPageSchema>;
 type SetPageFrontmatterInput = InferInput<
@@ -45,6 +50,7 @@ type SetPageFrontmatterInput = InferInput<
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
 type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
+type ListFactsInput = InferInput<typeof ListFactsSchema>;
 type SearchWikiInput = InferInput<typeof SearchWikiSchema>;
 type ContextWikiInput = InferInput<typeof ContextWikiSchema>;
 type BacklinksForPageInput = InferInput<
@@ -126,6 +132,25 @@ export function register_wiki_tools(server: {
 					merge,
 				}),
 			),
+	);
+
+	server.tool(
+		{
+			name: 'add_fact',
+			description: 'Add a structured fact to the wiki0 fact index',
+			schema: AddFactSchema,
+		},
+		async (input: AddFactInput) => json_response(add_fact(input)),
+	);
+
+	server.tool(
+		{
+			name: 'list_facts',
+			description: 'List structured facts from the wiki0 fact index',
+			schema: ListFactsSchema,
+		},
+		async ({ root, category }: ListFactsInput) =>
+			json_response(list_facts(root, category)),
 	);
 
 	server.tool(
