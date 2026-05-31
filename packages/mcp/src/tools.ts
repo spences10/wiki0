@@ -2,13 +2,11 @@ import {
 	add_fact,
 	append_page,
 	backlinks_for_page,
-	bootstrap_wiki,
 	create_page,
 	get_wiki_context,
 	graph_wiki,
 	index_status,
 	index_wiki,
-	ingest_documents,
 	lint_wiki,
 	list_facts,
 	list_topic_threads,
@@ -23,6 +21,7 @@ import {
 	set_page_frontmatter,
 	show_wiki_chunk,
 	slugify_title,
+	sync_documents,
 	type WikiFrontmatter,
 } from '@wiki0/core';
 import { isAbsolute, resolve } from 'node:path';
@@ -38,13 +37,11 @@ import {
 	AddFactSchema,
 	AppendPageSchema,
 	BacklinksForPageSchema,
-	BootstrapWikiSchema,
 	ContextWikiSchema,
 	CreatePageSchema,
 	GraphWikiSchema,
 	IndexStatusSchema,
 	IndexWikiSchema,
-	IngestDocumentsSchema,
 	LintWikiSchema,
 	ListFactsSchema,
 	ListTopicThreadsSchema,
@@ -59,6 +56,7 @@ import {
 	SetPageFrontmatterSchema,
 	ShowWikiChunkSchema,
 	SlugifyTitleSchema,
+	SyncDocumentsSchema,
 	Wiki0InfoSchema,
 } from './schemas.js';
 
@@ -74,7 +72,7 @@ type SetPageFrontmatterInput = InferInput<
 >;
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
 type IndexStatusInput = InferInput<typeof IndexStatusSchema>;
-type IngestDocumentsInput = InferInput<typeof IngestDocumentsSchema>;
+type SyncDocumentsInput = InferInput<typeof SyncDocumentsSchema>;
 type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type ListFactsInput = InferInput<typeof ListFactsSchema>;
@@ -91,7 +89,6 @@ type BacklinksForPageInput = InferInput<
 type ReviewWikiInput = InferInput<typeof ReviewWikiSchema>;
 type AppendPageInput = InferInput<typeof AppendPageSchema>;
 type PlanWikiInput = InferInput<typeof PlanWikiSchema>;
-type BootstrapWikiInput = InferInput<typeof BootstrapWikiSchema>;
 
 export function register_wiki_tools(server: {
 	tool: (...args: any[]) => void;
@@ -360,20 +357,20 @@ export function register_wiki_tools(server: {
 
 	tool(
 		{
-			name: 'ingest_documents',
+			name: 'sync_documents',
 			description:
-				'Ingest source documents into wiki source pages, then index the wiki',
-			schema: IngestDocumentsSchema,
+				'Sync source documents into wiki source pages, then index the wiki',
+			schema: SyncDocumentsSchema,
 		},
 		async ({
 			root,
 			sources,
 			overwrite,
 			index,
-		}: IngestDocumentsInput) => {
-			assert_mcp_writable('ingest_documents');
+		}: SyncDocumentsInput) => {
+			assert_mcp_writable('sync_documents');
 			return json_response(
-				await ingest_documents({
+				await sync_documents({
 					root: mcp_root(root),
 					sources,
 					overwrite,
@@ -392,34 +389,5 @@ export function register_wiki_tools(server: {
 		},
 		async ({ source_type, scope, sources }: PlanWikiInput) =>
 			json_response(plan_wiki({ source_type, scope, sources })),
-	);
-
-	tool(
-		{
-			name: 'bootstrap_wiki',
-			description:
-				'Create starter wiki pages from the deterministic wiki-building plan, then index the wiki',
-			schema: BootstrapWikiSchema,
-		},
-		async ({
-			root,
-			source_type,
-			scope,
-			sources,
-			overwrite,
-			ingest_sources,
-		}: BootstrapWikiInput) => {
-			assert_mcp_writable('bootstrap_wiki');
-			return json_response(
-				bootstrap_wiki({
-					root: mcp_root(root),
-					source_type,
-					scope,
-					sources,
-					overwrite,
-					ingest_sources,
-				}),
-			);
-		},
 	);
 }

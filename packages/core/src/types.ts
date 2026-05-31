@@ -195,12 +195,6 @@ export type WikiPlanOptions = {
 	sources?: string[];
 };
 
-export type WikiBootstrapOptions = WikiPlanOptions & {
-	root?: string;
-	overwrite?: boolean;
-	ingest_sources?: boolean;
-};
-
 export type WikiPlanPage = {
 	title: string;
 	path: string;
@@ -216,20 +210,14 @@ export type WikiPlanResult = {
 	next_steps: string[];
 };
 
-export type WikiSourceIngestion = {
-	source: string;
-	page: string;
-	kind: 'file' | 'url' | 'missing';
-};
-
-export type WikiDocumentIngestOptions = {
+export type WikiDocumentSyncOptions = {
 	root?: string;
 	sources: string[];
 	overwrite?: boolean;
 	index?: boolean;
 };
 
-export type WikiDocumentIngestion = {
+export type WikiDocumentSync = {
 	source: string;
 	page: string;
 	kind: 'markdown' | 'text' | 'pdf' | 'docx' | 'unsupported';
@@ -237,22 +225,13 @@ export type WikiDocumentIngestion = {
 	warnings: string[];
 };
 
-export type WikiDocumentIngestResult = {
+export type WikiDocumentSyncResult = {
 	root: string;
 	sources: string[];
 	created: string[];
 	skipped: string[];
-	ingested_sources: WikiDocumentIngestion[];
+	synced_sources: WikiDocumentSync[];
 	indexed: IndexResult | null;
-};
-
-export type WikiBootstrapResult = {
-	root: string;
-	plan: WikiPlanResult;
-	created: string[];
-	skipped: string[];
-	ingested_sources: WikiSourceIngestion[];
-	indexed: IndexResult;
 };
 
 export type WikiEvent = {

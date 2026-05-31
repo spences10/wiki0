@@ -5,13 +5,13 @@ import {
 	CreatePageSchema,
 	GraphWikiSchema,
 	IndexWikiSchema,
-	IngestDocumentsSchema,
 	LintWikiSchema,
 	ListFactsSchema,
 	ListTopicThreadsSchema,
 	ListWikiEventsSchema,
 	ParseDocumentSchema,
 	SearchWikiSchema,
+	SyncDocumentsSchema,
 } from './schemas.js';
 
 describe('MCP schemas', () => {
@@ -59,14 +59,14 @@ describe('MCP schemas', () => {
 	});
 
 	it('applies defaults for indexing and search', () => {
-		expect(
-			parse(IngestDocumentsSchema, { sources: ['docs'] }),
-		).toEqual({
-			root: '.',
-			sources: ['docs'],
-			overwrite: false,
-			index: true,
-		});
+		expect(parse(SyncDocumentsSchema, { sources: ['docs'] })).toEqual(
+			{
+				root: '.',
+				sources: ['docs'],
+				overwrite: false,
+				index: true,
+			},
+		);
 		expect(parse(IndexWikiSchema, {})).toEqual({ root: '.' });
 		expect(parse(GraphWikiSchema, {})).toEqual({ root: '.' });
 		expect(parse(LintWikiSchema, {})).toEqual({ root: '.' });

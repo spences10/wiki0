@@ -124,21 +124,9 @@ export const PlanWikiSchema = v.object({
 	sources: v.optional(v.array(v.string())),
 });
 
-export const IngestDocumentsSchema = v.object({
+export const SyncDocumentsSchema = v.object({
 	root: v.optional(v.string(), '.'),
 	sources: v.array(v.string()),
 	overwrite: v.optional(v.boolean(), false),
 	index: v.optional(v.boolean(), true),
-});
-
-export const BootstrapWikiSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	source_type: v.optional(
-		v.picklist(['general', 'codebase', 'docs', 'research', 'notes']),
-		'general',
-	),
-	scope: v.optional(v.string()),
-	sources: v.optional(v.array(v.string())),
-	overwrite: v.optional(v.boolean(), false),
-	ingest_sources: v.optional(v.boolean(), false),
 });

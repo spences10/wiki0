@@ -26,8 +26,8 @@ Use this page to capture product gaps discovered while dogfooding
 - Graph/backlink data is partly present through `page_links`, but
   there is no graph API or command.
 - Package READMEs are listed for publishing but are missing.
-- Skills describe source ingestion and review workflows that are ahead
-  of available product commands.
+- Skills describe source sync and review workflows that are ahead of
+  available product commands.
 
 ## Started fixes
 

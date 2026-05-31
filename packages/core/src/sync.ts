@@ -17,9 +17,9 @@ import {
 	slugify_title,
 } from './paths.js';
 import type {
-	WikiDocumentIngestOptions,
-	WikiDocumentIngestResult,
-	WikiDocumentIngestion,
+	WikiDocumentSync,
+	WikiDocumentSyncOptions,
+	WikiDocumentSyncResult,
 } from './types.js';
 
 const supported_extensions = new Set([
@@ -30,9 +30,9 @@ const supported_extensions = new Set([
 	'.docx',
 ]);
 
-export async function ingest_documents(
-	options: WikiDocumentIngestOptions,
-): Promise<WikiDocumentIngestResult> {
+export async function sync_documents(
+	options: WikiDocumentSyncOptions,
+): Promise<WikiDocumentSyncResult> {
 	const root = resolve_wiki_root(options.root);
 	const sources = discover_sources(root, options.sources);
 	const display_sources = sources.map((source) =>
@@ -40,7 +40,7 @@ export async function ingest_documents(
 	);
 	const created: string[] = [];
 	const skipped: string[] = [];
-	const ingested_sources: WikiDocumentIngestion[] = [];
+	const synced_sources: WikiDocumentSync[] = [];
 
 	for (const source of sources) {
 		const display_source = source_display_path(root, source);
@@ -60,7 +60,7 @@ export async function ingest_documents(
 			existing_fingerprint === fingerprint
 		) {
 			skipped.push(page);
-			ingested_sources.push({
+			synced_sources.push({
 				source: display_source,
 				page: `${page}.md`,
 				kind: existing_kind,
@@ -71,7 +71,7 @@ export async function ingest_documents(
 		}
 		if (page_exists && !options.overwrite) {
 			skipped.push(page);
-			ingested_sources.push({
+			synced_sources.push({
 				source: display_source,
 				page: `${page}.md`,
 				kind: existing_kind,
@@ -93,7 +93,7 @@ export async function ingest_documents(
 			},
 		);
 		created.push(page);
-		ingested_sources.push({
+		synced_sources.push({
 			source: display_source,
 			page: `${page}.md`,
 			kind: parsed.kind,
@@ -110,14 +110,14 @@ export async function ingest_documents(
 	const indexed = options.index === false ? null : index_wiki(root);
 	log_wiki_event({
 		root,
-		operation: 'ingest_documents',
-		summary: `Ingested ${created.length} document sources`,
+		operation: 'sync_documents',
+		summary: `Synced ${created.length} document sources`,
 		target: root,
 		details: {
 			sources: display_sources,
 			created,
 			skipped,
-			ingested_sources,
+			synced_sources,
 		},
 	});
 
@@ -126,7 +126,7 @@ export async function ingest_documents(
 		sources: display_sources,
 		created,
 		skipped,
-		ingested_sources,
+		synced_sources,
 		indexed,
 	};
 }
@@ -168,7 +168,7 @@ function discover_directory(directory: string): string[] {
 }
 
 function source_page_path(source: string): string {
-	return `sources/ingested/${slugify_title(source)}`;
+	return `sources/synced/${slugify_title(source)}`;
 }
 
 function source_page_template(
@@ -300,7 +300,7 @@ function existing_source_fingerprint(
 
 function existing_source_kind(
 	file_path: string,
-): WikiDocumentIngestion['kind'] {
+): WikiDocumentSync['kind'] {
 	const kind = parse_markdown(readFileSync(file_path, 'utf-8'))
 		.frontmatter.source_kind;
 	return kind === 'markdown' ||

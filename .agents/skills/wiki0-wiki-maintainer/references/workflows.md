@@ -17,7 +17,7 @@ When a human says they want to build a wiki about a subject:
 5. Add `status: seed` or `status: draft` until the human validates the
    structure.
 
-## Source ingestion pattern
+## Source sync pattern
 
 For each source:
 

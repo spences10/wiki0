@@ -2,7 +2,7 @@
 title: Wiki building workflow
 aliases:
   - build a wiki workflow
-  - wiki bootstrap workflow
+  - wiki sync workflow
 tags:
   - product
   - workflow
@@ -49,9 +49,10 @@ Using the tools available today, an agent should:
 
 - A shipped MCP prompt/resource for this workflow so LLM clients can
   discover the recipe.
-- A high-level `bootstrap_wiki` or `plan_wiki` tool that returns a
-  proposed structure before writing.
-- A CLI command such as `wiki0 bootstrap` for non-MCP users.
+- A high-level `plan_wiki` tool that returns a proposed structure
+  before writing.
+- A CLI command such as `wiki0 sync` for non-MCP users to sync source
+  material.
 - Page templates for index, sources, concepts, workflows, decisions,
   package/module notes, and open questions.
 - A version/capability tool so agents can tell which wiki0 workflow
@@ -75,14 +76,10 @@ produce consistent wikis.
 - Added tests, README notes, and a changeset for the new package
   surface.
 
-## Bootstrap implementation
+## Sync implementation
 
-- Added `bootstrap_wiki` in core to create starter pages from
-  `plan_wiki`, skip existing pages unless `overwrite` is enabled, and
-  re-index after writing.
-- Added `wiki0 bootstrap` for CLI users.
-- Added MCP `bootstrap_wiki` so agents can move from planning to a
-  safe starter wiki without inventing page templates.
-- Dogfooding against a temporary initialized wiki created source,
-  concept, workflow, question, and docs map pages while skipping the
-  existing index page, then linted cleanly.
+- `plan_wiki` remains a read-only planning primitive.
+- `wiki0 sync` and MCP `sync_documents` sync source documents into
+  durable Markdown source pages and rebuild the index.
+- Bootstrap-specific page creation has been removed in favor of
+  explicit sync plus normal page creation tools.

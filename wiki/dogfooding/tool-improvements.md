@@ -112,9 +112,9 @@ Completed follow-up items:
 
 Remaining future enhancement:
 
-- Bootstrap ingestion now creates source notes with excerpts,
-  candidate facts, and open questions. A later pass can add richer
-  semantic extraction and automated fact promotion.
+- Bootstrap sync now creates source notes with excerpts, candidate
+  facts, and open questions. A later pass can add richer semantic
+  extraction and automated fact promotion.
 
 Completed in this dogfood run:
 
@@ -124,12 +124,12 @@ Completed in this dogfood run:
   errors.
 - `bootstrap_wiki` starter page creation across core, CLI, and MCP.
 
-## Bootstrap source ingestion follow-up
+## Bootstrap source sync follow-up
 
-- Added optional bootstrap source ingestion through `sources` and
-  `ingest_sources` options.
-- Ingestion creates source note pages for explicit paths, detected
-  URLs in scope text, and auto-detected local sources.
+- Added optional bootstrap source sync through `sources` and
+  `sync_sources` options.
+- Syncion creates source note pages for explicit paths, detected URLs
+  in scope text, and auto-detected local sources.
 - Source notes include file excerpts when local, URL extraction
   prompts when remote, candidate facts, and open questions.
 - Replaced remaining `node:sqlite` `as unknown as` row casts with
@@ -142,11 +142,11 @@ Completed in this dogfood run:
 - Added direct indexed chunk lookup for page or `page:line` targets
   through CLI `wiki0 show` and core `show_wiki_chunk`.
 - Dogfooding
-  `wiki0 context "chunk context path line citations source ingestion" --root . --json`
+  `wiki0 context "chunk context path line citations source sync" --root . --json`
   returned section-level results with headings and full chunk bodies.
 - Dogfooding
   `wiki0 show dogfooding/tool-improvements.md:127 --root . --json`
-  returned the expected source-ingestion section chunk.
+  returned the expected source-sync section chunk.
 - MCP exposure is implemented as `show_wiki_chunk`; restart the dev
   MCP process before validating that new tool path.
 
@@ -198,8 +198,8 @@ Completed in this dogfood run:
 
 ## Document parsing core dogfood
 
-- Added [[product/document-ingestion]] to capture the
-  rebuildable-index ingestion plan.
+- Added [[product/document-sync]] to capture the rebuildable-index
+  sync plan.
 - Added core `parse_document` / `document_kind` primitives for `.md`,
   `.txt`, `.pdf`, `.docx`, and unsupported files.
 - Added parser dependencies in `@wiki0/core`: `pdf-parse` and
@@ -209,35 +209,34 @@ Completed in this dogfood run:
   `pnpm --filter @wiki0/core run check:self`, and
   `pnpm --filter @wiki0/core run build:self` passed.
 
-## Recurring document ingest dogfood
+## Recurring document sync dogfood
 
-- Added core `ingest_documents` to recursively ingest supported source
-  files into Markdown source pages under `sources/ingested` and
-  rebuild the index by default.
-- Added CLI `wiki0 ingest <sources>` and MCP `ingest_documents` for
-  recurring ingestion after bootstrap.
-- Ingested source pages preserve extracted text, parser metadata,
-  parser warnings, candidate facts, and open questions in Markdown so
-  the SQLite database remains rebuildable.
+- Added core `sync_documents` to recursively sync supported source
+  files into Markdown source pages under `sources/synced` and rebuild
+  the index by default.
+- Added CLI `wiki0 sync <sources>` and MCP `sync_documents` for
+  recurring sync after bootstrap.
+- Synced source pages preserve extracted text, parser metadata, parser
+  warnings, candidate facts, and open questions in Markdown so the
+  SQLite database remains rebuildable.
 - Dogfooded the built CLI against a temporary wiki with
-  `node packages/cli/dist/index.js ingest docs --root <tmp> --json`;
-  it created `sources/ingested/docs-runtime-md.md` and indexed one
-  page.
+  `node packages/cli/dist/index.js sync docs --root <tmp> --json`; it
+  created `sources/synced/docs-runtime-md.md` and indexed one page.
 
-## Document ingest fingerprint dogfood
+## Document sync fingerprint dogfood
 
 - Added SHA-256 `source_fingerprint` frontmatter to generated source
   pages.
-- Recurring ingest now reports unchanged pages without rewriting them,
+- Recurring sync now reports unchanged pages without rewriting them,
   changed pages without overwriting user-visible Markdown by default,
   and updated pages when `overwrite` is supplied.
-- Dogfooded the built CLI against a temporary wiki: second ingest
+- Dogfooded the built CLI against a temporary wiki: second sync
   returned `unchanged`, modified source returned `changed`, and
   `--overwrite` returned `updated`.
 
-## Full text ingest dogfood
+## Full text sync dogfood
 
-- Removed the 10k-character truncation from ingested source pages so
+- Removed the 10k-character truncation from synced source pages so
   parsed PDF/DOCX/text content remains fully inspectable in Markdown.
 - Added adaptive Markdown code fences for extracted text containing
   backticks.
@@ -261,6 +260,27 @@ Completed in this dogfood run:
 - This keeps indexed source text focused on visible documentation
   while preserving useful metadata such as title and status.
 - Dogfooded
-  `wiki0 extract wiki/product/document-ingestion.md --root . --json`;
-  output text starts at `# Document ingestion` and metadata includes
+  `wiki0 extract wiki/product/document-sync.md --root . --json`;
+  output text starts at `# Document sync` and metadata includes
   frontmatter title/status.
+
+## Bootstrap removal dogfood
+
+- Removed the bootstrap CLI command, MCP tool, core export, and
+  bootstrap result/types from the active API.
+- Kept `plan_wiki` as the read-only planning primitive and
+  `sync_documents` / `wiki0 sync` as the source sync workflow.
+- Updated current README and wiki guidance away from bootstrap toward
+  extract/sync/index.
+
+## Sync rename dogfood
+
+- Replaced the active ingest naming with sync across core, CLI, and
+  MCP: `sync_documents`, `wiki0 sync`, and MCP `sync_documents`.
+- Generated source pages now live under `sources/synced` and results
+  return `synced_sources`.
+- Removed `wiki0 ingest` from CLI help and updated current docs to
+  describe extract/sync/index.
+- Dogfooded the built CLI against a temporary wiki;
+  `wiki0 sync docs --root <tmp> --json` created
+  `sources/synced/docs-sync-md.md` and indexed one page.

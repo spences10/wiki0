@@ -3,13 +3,11 @@ import {
 	add_fact,
 	append_page,
 	backlinks_for_page,
-	bootstrap_wiki,
 	create_page,
 	get_wiki_context,
 	graph_wiki,
 	index_status,
 	index_wiki,
-	ingest_documents,
 	lint_wiki,
 	list_facts,
 	list_topic_threads,
@@ -21,6 +19,7 @@ import {
 	search_wiki,
 	set_page_frontmatter,
 	show_wiki_chunk,
+	sync_documents,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
 import { isAbsolute, resolve } from 'node:path';
@@ -251,57 +250,10 @@ export const main = defineCommand({
 				);
 			},
 		}),
-		bootstrap: defineCommand({
+		sync: defineCommand({
 			meta: {
 				description:
-					'Create starter wiki pages from a deterministic wiki-building plan',
-			},
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				source_type: {
-					type: 'string',
-					description: 'general, codebase, docs, research, or notes',
-					default: 'general',
-				},
-				scope: {
-					type: 'string',
-					description: 'Source scope description',
-				},
-				overwrite: {
-					type: 'boolean',
-					description: 'Overwrite existing starter pages',
-				},
-				ingest_sources: {
-					type: 'boolean',
-					description:
-						'Create source note pages for detected sources',
-				},
-				sources: {
-					type: 'string',
-					description: 'Comma-separated source paths or URLs',
-				},
-			},
-			run({ args }) {
-				print_json(
-					bootstrap_wiki({
-						root: String(args.root ?? '.'),
-						source_type: parse_wiki_source_type(args.source_type),
-						scope: args.scope ? String(args.scope) : undefined,
-						overwrite: Boolean(args.overwrite),
-						ingest_sources: Boolean(args.ingest_sources),
-						sources: parse_sources(args.sources),
-					}),
-				);
-			},
-		}),
-		ingest: defineCommand({
-			meta: {
-				description:
-					'Ingest source documents into wiki source pages, then index the wiki',
+					'Sync source documents into wiki source pages, then index the wiki',
 			},
 			args: {
 				sources: {
@@ -316,17 +268,16 @@ export const main = defineCommand({
 				},
 				overwrite: {
 					type: 'boolean',
-					description: 'Overwrite existing ingested source pages',
+					description: 'Overwrite existing synced source pages',
 				},
 				noIndex: {
 					type: 'boolean',
-					description:
-						'Skip rebuilding the SQLite index after ingest',
+					description: 'Skip rebuilding the SQLite index after sync',
 				},
 			},
 			async run({ args }) {
 				print_json(
-					await ingest_documents({
+					await sync_documents({
 						root: String(args.root ?? '.'),
 						sources: parse_sources(args.sources) ?? [],
 						overwrite: Boolean(args.overwrite),

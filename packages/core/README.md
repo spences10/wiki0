@@ -23,13 +23,14 @@ Core wiki0 primitives for local-first Markdown wiki memory.
 
 ```ts
 import {
-	bootstrap_wiki,
 	create_page,
 	index_status,
 	index_wiki,
 	search_wiki,
 	get_wiki_context,
+	sync_documents,
 	lint_wiki,
+	parse_document,
 	plan_wiki,
 } from '@wiki0/core';
 
@@ -44,12 +45,11 @@ console.log(lint_wiki('.'));
 console.log(
 	plan_wiki({ source_type: 'codebase', scope: 'current repo' }),
 );
+console.log(await parse_document('docs/guide.md'));
 console.log(
-	bootstrap_wiki({
+	await sync_documents({
 		root: '.',
-		source_type: 'docs',
-		sources: ['docs/guide.md'],
-		ingest_sources: true,
+		sources: ['docs'],
 	}),
 );
 ```

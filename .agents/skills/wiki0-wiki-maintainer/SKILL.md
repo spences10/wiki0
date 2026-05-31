@@ -1,7 +1,7 @@
 ---
 # prettier-ignore
 name: wiki0-wiki-maintainer
-description: Maintain a wiki0 LLM wiki. Use when creating a new wiki, ingesting sources, updating linked Markdown pages, answering from wiki context, or reviewing wiki health.
+description: Maintain a wiki0 LLM wiki. Use when creating a new wiki, syncing sources, updating linked Markdown pages, answering from wiki context, or reviewing wiki health.
 ---
 
 # wiki0 Wiki Maintainer
@@ -30,10 +30,10 @@ links, synthesis, review markers, and indexing.
    `projects/`.
 3. Add frontmatter with `title`, `status`, `tags`, and useful aliases.
 4. Seed `wiki/index.md` as the map of maps: topic hubs, current
-   questions, and next ingestion targets.
+   questions, and next sync targets.
 5. Run or recommend `wiki0 index` after page creation.
 
-## Ingesting sources
+## Syncing sources
 
 1. Identify source type, author/date if available, and reliability.
 2. Search/context first to find related existing pages.

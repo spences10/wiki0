@@ -13,11 +13,12 @@ The package exposes the `wiki0-mcp` binary.
 ## Tool surface
 
 - `wiki0_info` for server version, capabilities, and feature flags
-- `parse_wikilinks`, `parse_markdown`, `slugify_title`
+- `parse_wikilinks`, `parse_markdown`, `parse_document`,
+  `slugify_title`
 - `plan_wiki` for a deterministic source-to-wiki workflow and starter
   page plan
-- `bootstrap_wiki` to create starter pages from that plan, optionally
-  ingest detected source notes, and index the wiki
+- `sync_documents` to sync source documents into Markdown source pages
+  and index the wiki
 - `create_page`, `read_page`, `append_page`, `set_page_frontmatter`
 - `index_wiki`, `index_status`, `search_wiki`, `get_wiki_context`
 - `show_wiki_chunk` for known page or `page:line` retrieval
@@ -44,4 +45,4 @@ By default the MCP server only allows roots under its current working
 directory. Set `WIKI0_ALLOWED_ROOTS` to a comma-separated list of
 allowed root directories. Set `WIKI0_READ_ONLY=true` to block write
 operations such as page creation, frontmatter updates, fact writes,
-index rebuilds, and bootstrap.
+index rebuilds, and document sync.
