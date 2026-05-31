@@ -22,9 +22,7 @@ import {
 	sync_documents,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
-import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { isAbsolute, resolve } from 'node:path';
 import {
 	init_workspace,
 	parse_frontmatter_json,
@@ -64,18 +62,6 @@ function parse_optional_sources(
 
 function resolve_cli_source(root: string, source: string): string {
 	return isAbsolute(source) ? source : resolve(root, source);
-}
-
-function find_workspace_root(start = process.cwd()): string {
-	let current = start;
-	while (true) {
-		if (existsSync(join(current, 'apps/wiki0-web/package.json'))) {
-			return current;
-		}
-		const parent = dirname(current);
-		if (parent === current) return start;
-		current = parent;
-	}
 }
 
 function parse_fact_confidence(value: unknown): FactConfidence {
@@ -599,64 +585,6 @@ export const main = defineCommand({
 						? JSON.stringify(result, null, 2)
 						: result.markdown,
 				);
-			},
-		}),
-		serve: defineCommand({
-			meta: {
-				description: 'Serve the local wiki0 web UI',
-			},
-			args: {
-				root: {
-					type: 'positional',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				port: {
-					type: 'string',
-					description: 'Local web server port',
-					default: '5173',
-				},
-				host: {
-					type: 'string',
-					description: 'Local web server host',
-					default: '127.0.0.1',
-				},
-				open: {
-					type: 'boolean',
-					description: 'Open the browser automatically',
-					default: true,
-				},
-			},
-			run({ args }) {
-				const root = resolve(String(args.root ?? '.'));
-				const status = index_status(root);
-				if (status.stale) index_wiki(root);
-
-				const workspace_root = find_workspace_root();
-				const child = spawn(
-					'pnpm',
-					[
-						'--filter',
-						'wiki0-web',
-						'run',
-						'dev',
-						'--',
-						'--host',
-						String(args.host ?? '127.0.0.1'),
-						'--port',
-						String(args.port ?? '5173'),
-						...(args.open ? ['--open'] : []),
-					],
-					{
-						cwd: workspace_root,
-						env: { ...process.env, WIKI0_ROOT: root },
-						stdio: 'inherit',
-					},
-				);
-
-				child.on('exit', (code) => {
-					process.exitCode = code ?? 0;
-				});
 			},
 		}),
 		graph: defineCommand({
