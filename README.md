@@ -16,6 +16,11 @@ it can read and write, backed by a disposable SQLite index for fast
 search, backlinks, facts, and graph views. No opaque vendor memory;
 the knowledge stays local, diffable, and portable.
 
+It is meant to be memory/context infrastructure rather than another
+opaque chat history: agents can preserve decisions, retrieve cited
+project context, inspect sources, and update the underlying Markdown so
+future sessions start from durable knowledge instead of vibes.
+
 ## Shape
 
 ```txt
