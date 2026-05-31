@@ -54,6 +54,12 @@ function parse_sources(value: unknown): string[] | undefined {
 		.filter(Boolean);
 }
 
+function parse_optional_sources(
+	value: unknown,
+): string[] | undefined {
+	return parse_sources(value);
+}
+
 function resolve_cli_source(root: string, source: string): string {
 	return isAbsolute(source) ? source : resolve(root, source);
 }
@@ -270,6 +276,25 @@ export const main = defineCommand({
 					type: 'boolean',
 					description: 'Overwrite existing synced source pages',
 				},
+				include: {
+					type: 'string',
+					description:
+						'Comma-separated glob patterns to include during recursive sync',
+				},
+				ignore: {
+					type: 'string',
+					description:
+						'Comma-separated glob patterns to ignore during recursive sync',
+				},
+				noFacts: {
+					type: 'boolean',
+					description: 'Skip deriving SQLite facts from source text',
+				},
+				proposePages: {
+					type: 'boolean',
+					description:
+						'Generate proposed concept/workflow pages from source text',
+				},
 				noIndex: {
 					type: 'boolean',
 					description: 'Skip rebuilding the SQLite index after sync',
@@ -282,6 +307,10 @@ export const main = defineCommand({
 						sources: parse_sources(args.sources) ?? [],
 						overwrite: Boolean(args.overwrite),
 						index: !args.noIndex,
+						include: parse_optional_sources(args.include),
+						ignore: parse_optional_sources(args.ignore),
+						derive_facts: !args.noFacts,
+						propose_pages: Boolean(args.proposePages),
 					}),
 				);
 			},

@@ -129,4 +129,8 @@ export const SyncDocumentsSchema = v.object({
 	sources: v.array(v.string()),
 	overwrite: v.optional(v.boolean(), false),
 	index: v.optional(v.boolean(), true),
+	include: v.optional(v.array(v.string())),
+	ignore: v.optional(v.array(v.string())),
+	derive_facts: v.optional(v.boolean(), true),
+	propose_pages: v.optional(v.boolean(), false),
 });

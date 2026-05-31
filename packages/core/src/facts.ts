@@ -10,6 +10,13 @@ import type {
 	ShowChunkResult,
 } from './types.js';
 
+export type DerivedFactCandidate = Omit<
+	FactWriteOptions,
+	'root' | 'page' | 'source'
+> & {
+	line: number;
+};
+
 export function add_fact(fact: FactWriteOptions): Fact {
 	const wiki_root = resolve_wiki_root(fact.root);
 	const db = open_wiki_database(wiki_root);
@@ -75,6 +82,43 @@ export function list_facts(root = '.', category?: string): Fact[] {
 		: db.prepare(sql).all();
 	db.close();
 	return rows.map(fact_from_row);
+}
+
+export function derive_facts_from_markdown(
+	markdown: string,
+): DerivedFactCandidate[] {
+	return markdown
+		.split(/\n/u)
+		.map((line, index) => ({
+			line: line.trim(),
+			line_number: index + 1,
+		}))
+		.filter(({ line }) =>
+			/\b(should|must|required|requirement|decision|constraint|risk|assumption|fact)\b/iu.test(
+				line,
+			),
+		)
+		.slice(0, 20)
+		.map(({ line, line_number }) => ({
+			category: fact_category(line),
+			summary: line.replace(/^[-*]\s*/u, '').slice(0, 240),
+			body: `Derived from extracted source text line ${line_number}.`,
+			confidence: 'low',
+			source_quote: line,
+			line: line_number,
+		}));
+}
+
+function fact_category(line: string): string {
+	if (/\b(decision)\b/iu.test(line)) return 'decision';
+	if (/\b(risk)\b/iu.test(line)) return 'risk';
+	if (/\b(assumption)\b/iu.test(line)) return 'assumption';
+	if (
+		/\b(constraint|must|required|requirement|should)\b/iu.test(line)
+	) {
+		return 'constraint';
+	}
+	return 'note';
 }
 
 const fact_select_sql = `SELECT facts.id, pages.path AS page_path, facts.category,

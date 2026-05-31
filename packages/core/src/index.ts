@@ -7,7 +7,12 @@ export {
 	type ParsedDocumentMetadata,
 } from './documents.js';
 export { list_wiki_events, log_wiki_event } from './events.js';
-export { add_fact, list_facts } from './facts.js';
+export {
+	add_fact,
+	derive_facts_from_markdown,
+	list_facts,
+	type DerivedFactCandidate,
+} from './facts.js';
 export { graph_wiki } from './graph.js';
 export {
 	current_index_package_version,

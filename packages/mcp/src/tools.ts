@@ -367,6 +367,10 @@ export function register_wiki_tools(server: {
 			sources,
 			overwrite,
 			index,
+			include,
+			ignore,
+			derive_facts,
+			propose_pages,
 		}: SyncDocumentsInput) => {
 			assert_mcp_writable('sync_documents');
 			return json_response(
@@ -375,6 +379,10 @@ export function register_wiki_tools(server: {
 					sources,
 					overwrite,
 					index,
+					include,
+					ignore,
+					derive_facts,
+					propose_pages,
 				}),
 			);
 		},

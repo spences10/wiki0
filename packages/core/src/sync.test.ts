@@ -26,6 +26,8 @@ describe('sync_documents', () => {
 		expect(
 			result.synced_sources.map((source) => source.kind),
 		).toEqual(['markdown', 'text']);
+		expect(result.derived_facts).toHaveLength(1);
+		expect(result.derived_facts[0]?.category).toBe('decision');
 		const guide = read_page(result.created[0] ?? '', root);
 		expect(guide.content).toContain('A decision must be recorded.');
 		expect(guide.content).toContain(
@@ -90,6 +92,51 @@ describe('sync_documents', () => {
 		const page = read_page(result.created[0] ?? '', root);
 		expect(page.content).toContain('Tail marker');
 		expect(page.content).toContain('````\n');
+	});
+
+	it('filters recursive sync with include and ignore globs', async () => {
+		const root = make_wiki_root();
+		mkdirSync(join(root, 'docs/nested'), { recursive: true });
+		writeFileSync(join(root, 'docs/keep.md'), '# Keep');
+		writeFileSync(join(root, 'docs/drop.md'), '# Drop');
+		writeFileSync(join(root, 'docs/nested/keep.txt'), 'Nested');
+
+		const result = await sync_documents({
+			root,
+			sources: ['docs'],
+			include: ['docs/**/*.txt', 'docs/*.md'],
+			ignore: ['docs/drop.md'],
+		});
+
+		expect(result.sources).toEqual([
+			'docs/keep.md',
+			'docs/nested/keep.txt',
+		]);
+	});
+
+	it('generates proposed concept and workflow pages when requested', async () => {
+		const root = make_wiki_root();
+		writeFileSync(
+			join(root, 'playbook.md'),
+			'# Release Playbook\n\nThe workflow has one step: ship safely.',
+		);
+
+		const result = await sync_documents({
+			root,
+			sources: ['playbook.md'],
+			propose_pages: true,
+		});
+
+		expect(result.proposed_pages).toContain(
+			'concepts/proposed/release-playbook',
+		);
+		expect(result.proposed_pages).toContain(
+			'workflows/proposed/the-workflow-has-one-step-ship-safely',
+		);
+		expect(
+			read_page('concepts/proposed/release-playbook', root)
+				.frontmatter.status,
+		).toBe('review');
 	});
 
 	it('records missing sources as warning pages', async () => {

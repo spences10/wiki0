@@ -215,6 +215,10 @@ export type WikiDocumentSyncOptions = {
 	sources: string[];
 	overwrite?: boolean;
 	index?: boolean;
+	include?: string[];
+	ignore?: string[];
+	derive_facts?: boolean;
+	propose_pages?: boolean;
 };
 
 export type WikiDocumentSync = {
@@ -230,6 +234,8 @@ export type WikiDocumentSyncResult = {
 	sources: string[];
 	created: string[];
 	skipped: string[];
+	proposed_pages: string[];
+	derived_facts: Fact[];
 	synced_sources: WikiDocumentSync[];
 	indexed: IndexResult | null;
 };
