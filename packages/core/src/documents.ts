@@ -2,7 +2,10 @@ import mammoth from 'mammoth';
 import { readFile, stat } from 'node:fs/promises';
 import { basename, extname, resolve } from 'node:path';
 import { PDFParse } from 'pdf-parse';
-import { page_title_from_markdown } from './markdown.js';
+import {
+	page_title_from_markdown,
+	parse_markdown,
+} from './markdown.js';
 
 export type ParsedDocumentKind =
 	| 'markdown'
@@ -83,12 +86,16 @@ async function parse_markdown_document(
 	source_path: string,
 ): Promise<ParsedDocument> {
 	const text = await readFile(source_path, 'utf-8');
+	const parsed = parse_markdown(text);
 	return {
 		source_path,
 		kind: 'markdown',
 		title: page_title_from_markdown(text, basename(source_path)),
-		text: normalize_text(text),
-		metadata: { bytes: Buffer.byteLength(text) },
+		text: normalize_text(parsed.content),
+		metadata: {
+			bytes: Buffer.byteLength(text),
+			...flatten_frontmatter_metadata(parsed.frontmatter),
+		},
 		warnings: [],
 	};
 }
@@ -155,6 +162,22 @@ async function parse_docx_document(
 
 function normalize_text(text: string): string {
 	return text.replace(/\r\n?/gu, '\n').trim();
+}
+
+function flatten_frontmatter_metadata(
+	frontmatter: Record<string, unknown>,
+): ParsedDocumentMetadata {
+	return Object.fromEntries(
+		Object.entries(frontmatter)
+			.filter(
+				(
+					entry,
+				): entry is [string, string | number | boolean | null] =>
+					entry[1] === null ||
+					['string', 'number', 'boolean'].includes(typeof entry[1]),
+			)
+			.map(([key, value]) => [`frontmatter_${key}`, value]),
+	);
 }
 
 function compact_metadata(

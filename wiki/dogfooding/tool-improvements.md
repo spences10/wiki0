@@ -223,3 +223,44 @@ Completed in this dogfood run:
   `node packages/cli/dist/index.js ingest docs --root <tmp> --json`;
   it created `sources/ingested/docs-runtime-md.md` and indexed one
   page.
+
+## Document ingest fingerprint dogfood
+
+- Added SHA-256 `source_fingerprint` frontmatter to generated source
+  pages.
+- Recurring ingest now reports unchanged pages without rewriting them,
+  changed pages without overwriting user-visible Markdown by default,
+  and updated pages when `overwrite` is supplied.
+- Dogfooded the built CLI against a temporary wiki: second ingest
+  returned `unchanged`, modified source returned `changed`, and
+  `--overwrite` returned `updated`.
+
+## Full text ingest dogfood
+
+- Removed the 10k-character truncation from ingested source pages so
+  parsed PDF/DOCX/text content remains fully inspectable in Markdown.
+- Added adaptive Markdown code fences for extracted text containing
+  backticks.
+- Added a long text fixture to verify source pages preserve content
+  beyond 10k characters and keep fence structure valid.
+
+## Document extract interface dogfood
+
+- Added CLI `wiki0 extract <source>` for read-only document parsing
+  without writing wiki pages.
+- Added MCP `parse_document` schema/tool and `wiki-document-parsing`
+  feature flag for the dev server after reload.
+- Dogfooded the built CLI against a temporary Markdown source; it
+  returned normalized text, title, kind, and warnings as JSON.
+
+## Markdown extraction frontmatter dogfood
+
+- Markdown document parsing now strips YAML frontmatter from
+  normalized text and exposes primitive frontmatter values as parser
+  metadata.
+- This keeps indexed source text focused on visible documentation
+  while preserving useful metadata such as title and status.
+- Dogfooded
+  `wiki0 extract wiki/product/document-ingestion.md --root . --json`;
+  output text starts at `# Document ingestion` and metadata includes
+  frontmatter title/status.

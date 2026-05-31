@@ -10,6 +10,7 @@ import {
 	ListFactsSchema,
 	ListTopicThreadsSchema,
 	ListWikiEventsSchema,
+	ParseDocumentSchema,
 	SearchWikiSchema,
 } from './schemas.js';
 
@@ -45,6 +46,15 @@ describe('MCP schemas', () => {
 		expect(parse(ListTopicThreadsSchema, {})).toEqual({
 			root: '.',
 			limit: 50,
+		});
+	});
+
+	it('applies defaults for document parsing', () => {
+		expect(
+			parse(ParseDocumentSchema, { source_path: 'docs/a.pdf' }),
+		).toEqual({
+			source_path: 'docs/a.pdf',
+			root: '.',
 		});
 	});
 

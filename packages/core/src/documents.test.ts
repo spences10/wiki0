@@ -75,6 +75,27 @@ describe('parse_document', () => {
 		});
 	});
 
+	it('strips markdown frontmatter into metadata', async () => {
+		const root = temp_root();
+		const path = join(root, 'frontmatter.md');
+		writeFileSync(
+			path,
+			'---\ntitle: Frontmatter title\nstatus: draft\npriority: 2\n---\n\n# Visible\n\nBody',
+		);
+
+		await expect(parse_document(path)).resolves.toMatchObject({
+			kind: 'markdown',
+			title: 'Frontmatter title',
+			text: '# Visible\n\nBody',
+			metadata: {
+				frontmatter_title: 'Frontmatter title',
+				frontmatter_status: 'draft',
+				frontmatter_priority: 2,
+			},
+			warnings: [],
+		});
+	});
+
 	it('parses plain text', async () => {
 		const root = temp_root();
 		const path = join(root, 'notes.txt');

@@ -10,6 +10,11 @@ export const ParseMarkdownSchema = v.object({
 	markdown: v.string(),
 });
 
+export const ParseDocumentSchema = v.object({
+	source_path: v.string(),
+	root: v.optional(v.string(), '.'),
+});
+
 export const SlugifyTitleSchema = v.object({
 	title: v.string(),
 });

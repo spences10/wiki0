@@ -13,6 +13,7 @@ import {
 	list_facts,
 	list_topic_threads,
 	list_wiki_events,
+	parse_document,
 	parse_markdown,
 	parse_wikilinks,
 	plan_wiki,
@@ -24,6 +25,7 @@ import {
 	slugify_title,
 	type WikiFrontmatter,
 } from '@wiki0/core';
+import { isAbsolute, resolve } from 'node:path';
 import type { InferInput } from 'valibot';
 import { wiki0_info } from './info.js';
 import {
@@ -47,6 +49,7 @@ import {
 	ListFactsSchema,
 	ListTopicThreadsSchema,
 	ListWikiEventsSchema,
+	ParseDocumentSchema,
 	ParseMarkdownSchema,
 	ParseWikilinksSchema,
 	PlanWikiSchema,
@@ -61,6 +64,7 @@ import {
 
 type ParseWikilinksInput = InferInput<typeof ParseWikilinksSchema>;
 type ParseMarkdownInput = InferInput<typeof ParseMarkdownSchema>;
+type ParseDocumentInput = InferInput<typeof ParseDocumentSchema>;
 type SlugifyTitleInput = InferInput<typeof SlugifyTitleSchema>;
 type AddFactInput = InferInput<typeof AddFactSchema>;
 type CreatePageInput = InferInput<typeof CreatePageSchema>;
@@ -127,6 +131,25 @@ export function register_wiki_tools(server: {
 		},
 		async ({ markdown }: ParseMarkdownInput) =>
 			json_response(parse_markdown(markdown)),
+	);
+
+	tool(
+		{
+			name: 'parse_document',
+			description:
+				'Extract normalized text and metadata from a source document',
+			schema: ParseDocumentSchema,
+		},
+		async ({ source_path, root }: ParseDocumentInput) => {
+			const safe_root = mcp_root(root);
+			return json_response(
+				await parse_document(
+					isAbsolute(source_path)
+						? source_path
+						: resolve(safe_root, source_path),
+				),
+			);
+		},
 	);
 
 	tool(

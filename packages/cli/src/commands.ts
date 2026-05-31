@@ -14,6 +14,7 @@ import {
 	list_facts,
 	list_topic_threads,
 	list_wiki_events,
+	parse_document,
 	plan_wiki,
 	read_page,
 	review_wiki,
@@ -22,6 +23,7 @@ import {
 	show_wiki_chunk,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
+import { isAbsolute, resolve } from 'node:path';
 import {
 	init_workspace,
 	parse_frontmatter_json,
@@ -51,6 +53,10 @@ function parse_sources(value: unknown): string[] | undefined {
 		.split(',')
 		.map((source) => source.trim())
 		.filter(Boolean);
+}
+
+function resolve_cli_source(root: string, source: string): string {
+	return isAbsolute(source) ? source : resolve(root, source);
 }
 
 function parse_fact_confidence(value: unknown): FactConfidence {
@@ -215,6 +221,34 @@ export const main = defineCommand({
 						print_json(page);
 					},
 				}),
+			},
+		}),
+		extract: defineCommand({
+			meta: {
+				description:
+					'Extract normalized text and metadata from a source document',
+			},
+			args: {
+				source: {
+					type: 'positional',
+					required: true,
+					description: 'Source document path',
+				},
+				root: {
+					type: 'string',
+					description: 'Wiki root path for relative sources',
+					default: '.',
+				},
+			},
+			async run({ args }) {
+				print_json(
+					await parse_document(
+						resolve_cli_source(
+							String(args.root ?? '.'),
+							String(args.source),
+						),
+					),
+				);
 			},
 		}),
 		bootstrap: defineCommand({

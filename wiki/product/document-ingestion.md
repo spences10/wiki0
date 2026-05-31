@@ -86,3 +86,31 @@ interface ParsedDocument {
 - [[decisions/local-first-storage]]
 - [[product/wiki-building-workflow]]
 - [[dogfooding/tool-improvements]]
+
+## Sync fingerprint behavior
+
+Recurring ingestion tracks a SHA-256 `source_fingerprint` in each
+generated source page's frontmatter.
+
+- If the source page does not exist, ingestion creates it.
+- If the source page exists and the fingerprint is unchanged,
+  ingestion reports `unchanged` and leaves the page alone.
+- If the source page exists and the fingerprint changed, ingestion
+  reports `changed` and asks for `overwrite` before replacing
+  generated Markdown.
+- With `overwrite`, changed generated source pages are refreshed and
+  reported as `updated`.
+
+This keeps the wiki Markdown as durable state while still making
+source drift visible to CLI and MCP users.
+
+## Full extracted text
+
+Generated source pages should preserve the full extracted text rather
+than only an excerpt. The SQLite index can chunk and search this
+Markdown, while the original extracted text remains inspectable and
+rebuildable from the wiki page.
+
+If a source contains Markdown code fences, ingestion should choose a
+longer fence so extracted content does not break the generated page
+structure.

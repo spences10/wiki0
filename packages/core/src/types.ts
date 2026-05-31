@@ -233,7 +233,7 @@ export type WikiDocumentIngestion = {
 	source: string;
 	page: string;
 	kind: 'markdown' | 'text' | 'pdf' | 'docx' | 'unsupported';
-	status: 'created' | 'skipped' | 'warning';
+	status: 'created' | 'updated' | 'unchanged' | 'changed' | 'warning';
 	warnings: string[];
 };
 

@@ -33,7 +33,7 @@ describe('ingest_documents', () => {
 		);
 	});
 
-	it('skips existing source pages unless overwrite is enabled', async () => {
+	it('uses source fingerprints to report unchanged and changed pages', async () => {
 		const root = make_wiki_root();
 		writeFileSync(join(root, 'notes.txt'), 'First version');
 
@@ -41,18 +41,55 @@ describe('ingest_documents', () => {
 			root,
 			sources: ['notes.txt'],
 		});
-		writeFileSync(join(root, 'notes.txt'), 'Second version');
-		const second = await ingest_documents({
+		const unchanged = await ingest_documents({
 			root,
 			sources: ['notes.txt'],
 		});
+		writeFileSync(join(root, 'notes.txt'), 'Second version');
+		const changed = await ingest_documents({
+			root,
+			sources: ['notes.txt'],
+		});
+		const updated = await ingest_documents({
+			root,
+			sources: ['notes.txt'],
+			overwrite: true,
+		});
 
 		expect(first.created).toHaveLength(1);
-		expect(second.created).toHaveLength(0);
-		expect(second.skipped).toEqual(first.created);
-		expect(second.ingested_sources[0]).toMatchObject({
-			status: 'skipped',
+		expect(unchanged.ingested_sources[0]).toMatchObject({
+			kind: 'text',
+			status: 'unchanged',
 		});
+		expect(changed.created).toHaveLength(0);
+		expect(changed.skipped).toEqual(first.created);
+		expect(changed.ingested_sources[0]).toMatchObject({
+			kind: 'text',
+			status: 'changed',
+		});
+		expect(updated.created).toEqual(first.created);
+		expect(updated.ingested_sources[0]).toMatchObject({
+			kind: 'text',
+			status: 'updated',
+		});
+		expect(read_page(first.created[0] ?? '', root).content).toContain(
+			'Second version',
+		);
+	});
+
+	it('preserves full extracted text in generated Markdown', async () => {
+		const root = make_wiki_root();
+		const long_text = `${'A'.repeat(12_000)}\n${'`'.repeat(3)}\nTail marker`;
+		writeFileSync(join(root, 'long.txt'), long_text);
+
+		const result = await ingest_documents({
+			root,
+			sources: ['long.txt'],
+		});
+
+		const page = read_page(result.created[0] ?? '', root);
+		expect(page.content).toContain('Tail marker');
+		expect(page.content).toContain('````\n');
 	});
 
 	it('records missing sources as warning pages', async () => {

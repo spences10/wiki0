@@ -1,9 +1,15 @@
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+	existsSync,
+	readFileSync,
+	readdirSync,
+	statSync,
+} from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { parse_document, type ParsedDocument } from './documents.js';
 import { log_wiki_event } from './events.js';
 import { index_wiki } from './indexer.js';
-import { serialize_frontmatter } from './markdown.js';
+import { parse_markdown, serialize_frontmatter } from './markdown.js';
 import { create_page } from './pages.js';
 import {
 	page_file_path,
@@ -39,30 +45,64 @@ export async function ingest_documents(
 	for (const source of sources) {
 		const display_source = source_display_path(root, source);
 		const page = source_page_path(display_source);
-		const page_exists = existsSync(page_file_path(page, root));
+		const file_path = page_file_path(page, root);
+		const page_exists = existsSync(file_path);
+		const fingerprint = source_fingerprint(source);
+		const existing_fingerprint = page_exists
+			? existing_source_fingerprint(file_path)
+			: null;
+		const existing_kind = page_exists
+			? existing_source_kind(file_path)
+			: 'unsupported';
+		if (
+			page_exists &&
+			fingerprint !== null &&
+			existing_fingerprint === fingerprint
+		) {
+			skipped.push(page);
+			ingested_sources.push({
+				source: display_source,
+				page: `${page}.md`,
+				kind: existing_kind,
+				status: 'unchanged',
+				warnings: [],
+			});
+			continue;
+		}
 		if (page_exists && !options.overwrite) {
 			skipped.push(page);
 			ingested_sources.push({
 				source: display_source,
 				page: `${page}.md`,
-				kind: 'unsupported',
-				status: 'skipped',
-				warnings: ['Source page already exists.'],
+				kind: existing_kind,
+				status: 'changed',
+				warnings: [
+					'Source page exists and source fingerprint changed; rerun with overwrite to refresh generated content.',
+				],
 			});
 			continue;
 		}
 
 		const parsed = await parse_document(source);
-		create_page(page, source_page_template(parsed, display_source), {
-			root,
-			overwrite: options.overwrite,
-		});
+		create_page(
+			page,
+			source_page_template(parsed, display_source, fingerprint),
+			{
+				root,
+				overwrite: options.overwrite,
+			},
+		);
 		created.push(page);
 		ingested_sources.push({
 			source: display_source,
 			page: `${page}.md`,
 			kind: parsed.kind,
-			status: parsed.kind === 'unsupported' ? 'warning' : 'created',
+			status:
+				parsed.kind === 'unsupported'
+					? 'warning'
+					: page_exists
+						? 'updated'
+						: 'created',
 			warnings: parsed.warnings,
 		});
 	}
@@ -134,6 +174,7 @@ function source_page_path(source: string): string {
 function source_page_template(
 	parsed: ParsedDocument,
 	display_source: string,
+	fingerprint: string | null,
 ): string {
 	const frontmatter = serialize_frontmatter({
 		title: `Source: ${parsed.title ?? display_source}`,
@@ -141,10 +182,11 @@ function source_page_template(
 		status: parsed.kind === 'unsupported' ? 'review' : 'draft',
 		source_path: display_source,
 		source_kind: parsed.kind,
+		source_fingerprint: fingerprint,
 	});
 	return `${frontmatter}# Source: ${parsed.title ?? display_source}
 
-Source path: \`${display_source}\`  
+Source path: \`${display_source}\`
 Source kind: \`${parsed.kind}\`
 
 ## Extracted text
@@ -172,7 +214,19 @@ ${format_candidate_facts(parsed.text)}
 
 function format_extracted_text(parsed: ParsedDocument): string {
 	if (parsed.text.length === 0) return '- No text extracted.';
-	return `\`\`\`\n${parsed.text.slice(0, 10_000)}\n\`\`\``;
+	const fence = markdown_code_fence(parsed.text);
+	return `${fence}\n${parsed.text}\n${fence}`;
+}
+
+function markdown_code_fence(text: string): string {
+	const longest_backtick_run = Math.max(
+		0,
+		...Array.from(
+			text.matchAll(/`+/gu),
+			(match) => match[0]?.length ?? 0,
+		),
+	);
+	return '`'.repeat(Math.max(3, longest_backtick_run + 1));
 }
 
 function format_metadata(parsed: ParsedDocument): string {
@@ -220,4 +274,40 @@ function source_display_path(root: string, source: string): string {
 	return relative_source.startsWith('..') || relative_source === ''
 		? source
 		: relative_source;
+}
+
+function source_fingerprint(source: string): string | null {
+	try {
+		const stats = statSync(source);
+		if (!stats.isFile()) return null;
+		return createHash('sha256')
+			.update(readFileSync(source))
+			.digest('hex');
+	} catch {
+		return null;
+	}
+}
+
+function existing_source_fingerprint(
+	file_path: string,
+): string | null {
+	const fingerprint = parse_markdown(readFileSync(file_path, 'utf-8'))
+		.frontmatter.source_fingerprint;
+	return typeof fingerprint === 'string' && fingerprint.length > 0
+		? fingerprint
+		: null;
+}
+
+function existing_source_kind(
+	file_path: string,
+): WikiDocumentIngestion['kind'] {
+	const kind = parse_markdown(readFileSync(file_path, 'utf-8'))
+		.frontmatter.source_kind;
+	return kind === 'markdown' ||
+		kind === 'text' ||
+		kind === 'pdf' ||
+		kind === 'docx' ||
+		kind === 'unsupported'
+		? kind
+		: 'unsupported';
 }

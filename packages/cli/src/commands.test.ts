@@ -6,6 +6,7 @@ describe('main command', () => {
 		expect(Object.keys(main.subCommands ?? {})).toEqual([
 			'init',
 			'page',
+			'extract',
 			'bootstrap',
 			'ingest',
 			'plan',

@@ -53,6 +53,7 @@ export function wiki0_info(): Wiki0Info {
 			'wiki-building-prompt',
 			'wiki-bootstrap',
 			'wiki-bootstrap-source-ingestion',
+			'wiki-document-parsing',
 			'wiki-document-ingestion',
 			'structured-json-responses',
 			'tool-execution-errors',
