@@ -171,11 +171,13 @@ export type WikiSourceType =
 export type WikiPlanOptions = {
 	sourceType?: WikiSourceType;
 	scope?: string;
+	sources?: string[];
 };
 
 export type WikiBootstrapOptions = WikiPlanOptions & {
 	root?: string;
 	overwrite?: boolean;
+	ingestSources?: boolean;
 };
 
 export type WikiPlanPage = {
@@ -193,10 +195,17 @@ export type WikiPlanResult = {
 	nextSteps: string[];
 };
 
+export type WikiSourceIngestion = {
+	source: string;
+	page: string;
+	kind: 'file' | 'url' | 'missing';
+};
+
 export type WikiBootstrapResult = {
 	root: string;
 	plan: WikiPlanResult;
 	created: string[];
 	skipped: string[];
+	ingestedSources: WikiSourceIngestion[];
 	indexed: IndexResult;
 };

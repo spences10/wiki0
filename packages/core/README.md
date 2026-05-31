@@ -39,7 +39,14 @@ console.log(lint_wiki('.'));
 console.log(
 	plan_wiki({ sourceType: 'codebase', scope: 'current repo' }),
 );
-console.log(bootstrap_wiki({ root: '.', sourceType: 'docs' }));
+console.log(
+	bootstrap_wiki({
+		root: '.',
+		sourceType: 'docs',
+		sources: ['docs/guide.md'],
+		ingestSources: true,
+	}),
+);
 ```
 
 ## Storage model

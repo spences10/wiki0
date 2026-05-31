@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lint_wiki } from './lint.js';
@@ -50,10 +50,47 @@ describe('wiki building workflow', () => {
 
 		expect(result.created).toContain('index');
 		expect(result.created).toContain('docs/documentation-map');
+		expect(result.ingestedSources).toEqual([]);
 		expect(result.indexed.pageCount).toBe(result.created.length);
 		expect(
 			readFileSync(join(root, 'wiki/index.md'), 'utf-8'),
 		).toContain('[[sources/index|Sources]]');
+		expect(lint_wiki(root).ok).toBe(true);
+	});
+
+	it('can ingest detected sources into source note pages', () => {
+		const root = make_wiki_root();
+		mkdirSync(join(root, 'docs'));
+		writeFileSync(
+			join(root, 'docs/guide.md'),
+			'# Guide\n\nFact candidate.\n',
+		);
+		const result = bootstrap_wiki({
+			root,
+			sourceType: 'docs',
+			scope: 'docs plus https://example.com/research',
+			sources: ['docs/guide.md'],
+			ingestSources: true,
+		});
+
+		expect(result.ingestedSources).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					source: 'docs/guide.md',
+					kind: 'file',
+				}),
+				expect.objectContaining({
+					source: 'https://example.com/research',
+					kind: 'url',
+				}),
+			]),
+		);
+		expect(
+			readFileSync(
+				join(root, 'wiki/sources/detected/docs-guide-md.md'),
+				'utf-8',
+			),
+		).toContain('Fact candidate.');
 		expect(lint_wiki(root).ok).toBe(true);
 	});
 

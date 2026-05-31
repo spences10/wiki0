@@ -296,8 +296,8 @@ export function register_wiki_tools(server: {
 				'Return a deterministic workflow and starter page plan for building a wiki from source material',
 			schema: PlanWikiSchema,
 		},
-		async ({ sourceType, scope }: PlanWikiInput) =>
-			json_response(plan_wiki({ sourceType, scope })),
+		async ({ sourceType, scope, sources }: PlanWikiInput) =>
+			json_response(plan_wiki({ sourceType, scope, sources })),
 	);
 
 	tool(
@@ -311,7 +311,9 @@ export function register_wiki_tools(server: {
 			root,
 			sourceType,
 			scope,
+			sources,
 			overwrite,
+			ingestSources,
 		}: BootstrapWikiInput) => {
 			assert_mcp_writable('bootstrap_wiki');
 			return json_response(
@@ -319,7 +321,9 @@ export function register_wiki_tools(server: {
 					root: mcp_root(root),
 					sourceType,
 					scope,
+					sources,
 					overwrite,
+					ingestSources,
 				}),
 			);
 		},

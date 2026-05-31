@@ -1,3 +1,4 @@
+import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database } from './database.js';
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { GraphEdge, GraphNode, GraphResult } from './types.js';
@@ -8,7 +9,7 @@ export function graph_wiki(root = '.'): GraphResult {
 	const nodes = db
 		.prepare('SELECT path, title FROM pages ORDER BY path')
 		.all() as GraphNode[];
-	const edges = db
+	const edge_rows = db
 		.prepare(
 			`SELECT pages.path AS "from",
 				COALESCE(page_links.to_path, page_links.target) AS "to",
@@ -21,9 +22,10 @@ export function graph_wiki(root = '.'): GraphResult {
 			JOIN pages ON pages.id = page_links.from_page_id
 			ORDER BY pages.path, page_links.target`,
 		)
-		.all() as unknown as GraphEdge[];
+		.all() as Record<string, SQLOutputValue>[];
 	db.close();
 
+	const edges = edge_rows.map(graph_edge_from_row);
 	return {
 		root: wiki_root,
 		nodes,
@@ -35,5 +37,19 @@ export function graph_wiki(root = '.'): GraphResult {
 					: wikilink_target_path(edge.target),
 			embed: Boolean(edge.embed),
 		})),
+	};
+}
+
+function graph_edge_from_row(
+	row: Record<string, SQLOutputValue>,
+): GraphEdge {
+	return {
+		from: String(row.from),
+		to: String(row.to),
+		target: String(row.target),
+		rawText: String(row.rawText),
+		alias: row.alias === null ? null : String(row.alias),
+		embed: Boolean(row.embed),
+		status: row.status === 'resolved' ? 'resolved' : 'unresolved',
 	};
 }

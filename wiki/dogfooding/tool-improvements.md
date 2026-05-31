@@ -110,10 +110,11 @@ Completed follow-up items:
 - Core SQLite access now uses Node's built-in `node:sqlite` instead of
   `better-sqlite3`.
 
-Remaining follow-up item:
+Remaining future enhancement:
 
-- Bootstrap depth: eventually support source ingestion, open-question
-  extraction, and fact extraction from detected material.
+- Bootstrap ingestion now creates source notes with excerpts,
+  candidate facts, and open questions. A later pass can add richer
+  semantic extraction and automated fact promotion.
 
 Completed in this dogfood run:
 
@@ -122,3 +123,14 @@ Completed in this dogfood run:
 - `wiki0_info`, structured MCP JSON responses, and `isError` tool
   errors.
 - `bootstrap_wiki` starter page creation across core, CLI, and MCP.
+
+## Bootstrap source ingestion follow-up
+
+- Added optional bootstrap source ingestion through `sources` and
+  `ingestSources` options.
+- Ingestion creates source note pages for explicit paths, detected
+  URLs in scope text, and auto-detected local sources.
+- Source notes include file excerpts when local, URL extraction
+  prompts when remote, candidate facts, and open questions.
+- Replaced remaining `node:sqlite` `as unknown as` row casts with
+  explicit row-normalization helpers for graph edges and backlinks.

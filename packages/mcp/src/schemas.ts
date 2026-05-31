@@ -99,6 +99,7 @@ export const PlanWikiSchema = v.object({
 		'general',
 	),
 	scope: v.optional(v.string()),
+	sources: v.optional(v.array(v.string())),
 });
 
 export const BootstrapWikiSchema = v.object({
@@ -108,5 +109,7 @@ export const BootstrapWikiSchema = v.object({
 		'general',
 	),
 	scope: v.optional(v.string()),
+	sources: v.optional(v.array(v.string())),
 	overwrite: v.optional(v.boolean(), false),
+	ingestSources: v.optional(v.boolean(), false),
 });

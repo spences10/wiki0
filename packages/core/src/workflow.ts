@@ -1,4 +1,9 @@
-import { existsSync, readdirSync } from 'node:fs';
+import {
+	existsSync,
+	readFileSync,
+	readdirSync,
+	statSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { index_wiki } from './indexer.js';
 import { serialize_frontmatter } from './markdown.js';
@@ -10,6 +15,7 @@ import type {
 	WikiPlanOptions,
 	WikiPlanPage,
 	WikiPlanResult,
+	WikiSourceIngestion,
 	WikiSourceType,
 } from './types.js';
 
@@ -155,6 +161,8 @@ export function bootstrap_wiki(
 	const detected_sources = detect_source_inventory(
 		root,
 		plan.sourceType,
+		options.sources,
+		plan.scope,
 	);
 
 	for (const page of plan.pages) {
@@ -176,11 +184,22 @@ export function bootstrap_wiki(
 		created.push(page.path);
 	}
 
+	const ingested_sources = options.ingestSources
+		? ingest_sources(
+				root,
+				detected_sources,
+				options.overwrite,
+				created,
+				skipped,
+			)
+		: [];
+
 	return {
 		root,
 		plan,
 		created,
 		skipped,
+		ingestedSources: ingested_sources,
 		indexed: index_wiki(root),
 	};
 }
@@ -225,10 +244,15 @@ function index_template(
 function detect_source_inventory(
 	root: string,
 	source_type: WikiSourceType,
+	explicit_sources: string[] = [],
+	scope = '',
 ): string[] {
 	const candidates = ['README.md', 'package.json', 'docs'];
 	if (source_type === 'codebase') candidates.push('packages');
-	const sources: string[] = [];
+	const sources: string[] = [
+		...explicit_sources,
+		...extract_urls(scope),
+	];
 	for (const candidate of candidates) {
 		const candidate_path = join(root, candidate);
 		if (!existsSync(candidate_path)) continue;
@@ -244,7 +268,91 @@ function detect_source_inventory(
 		}
 		sources.push(candidate);
 	}
-	return sources;
+	return [...new Set(sources)];
+}
+
+function ingest_sources(
+	root: string,
+	sources: string[],
+	overwrite: boolean | undefined,
+	created: string[],
+	skipped: string[],
+): WikiSourceIngestion[] {
+	const ingested: WikiSourceIngestion[] = [];
+	for (const source of sources) {
+		const source_page = `sources/detected/${source_slug(source)}`;
+		if (!overwrite && existsSync(page_file_path(source_page, root))) {
+			skipped.push(source_page);
+			continue;
+		}
+		const source_kind = source.startsWith('http')
+			? 'url'
+			: existsSync(join(root, source))
+				? 'file'
+				: 'missing';
+		create_page(
+			source_page,
+			source_template(root, source, source_kind),
+			{
+				root,
+				overwrite,
+			},
+		);
+		created.push(source_page);
+		ingested.push({
+			source,
+			page: `${source_page}.md`,
+			kind: source_kind,
+		});
+	}
+	return ingested;
+}
+
+function source_template(
+	root: string,
+	source: string,
+	kind: WikiSourceIngestion['kind'],
+): string {
+	const frontmatter = serialize_frontmatter({
+		title: `Source: ${source}`,
+		tags: ['source', kind],
+		status: kind === 'missing' ? 'review' : 'draft',
+	});
+	const excerpt =
+		kind === 'file' ? source_excerpt(join(root, source)) : '';
+	const evidence =
+		kind === 'file'
+			? `## Extracted excerpt\n\n${excerpt}\n\n`
+			: kind === 'url'
+				? '## Extraction\n\n- URL ingestion is registered; fetch and summarize this source before promoting facts.\n\n'
+				: '## Extraction\n\n- Source was listed but not found locally; confirm the path or URL.\n\n';
+	return `${frontmatter}# Source: ${source}\n\nSource kind: ${kind}\n\n${evidence}## Candidate facts\n\n- Review this source and promote durable claims with add_fact.\n\n## Open questions\n\n- What claims from this source should become stable wiki pages?\n- What needs citation, owner confirmation, or freshness review?\n`;
+}
+
+function source_excerpt(file_path: string): string {
+	const stats = statSync(file_path);
+	if (stats.isDirectory())
+		return '- Directory source; inspect child files before extracting facts.';
+	const content = readFileSync(file_path, 'utf-8')
+		.slice(0, 2000)
+		.trim();
+	return content.length > 0
+		? `\`\`\`\n${content}\n\`\`\``
+		: '- Source file is empty.';
+}
+
+function source_slug(source: string): string {
+	return (
+		source
+			.replace(/^https?:\/\//u, '')
+			.replace(/[^A-Za-z0-9]+/gu, '-')
+			.replace(/^-+|-+$/gu, '')
+			.toLowerCase() || 'source'
+	);
+}
+
+function extract_urls(scope: string): string[] {
+	return scope.match(/https?:\/\/[^\s)]+/gu) ?? [];
 }
 
 function format_source_inventory(sources: string[]): string {

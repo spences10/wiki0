@@ -39,6 +39,16 @@ function parse_wiki_source_type(value: unknown): WikiSourceType {
 	throw new Error(`Invalid wiki source type: ${source_type}`);
 }
 
+function parse_sources(value: unknown): string[] | undefined {
+	if (typeof value !== 'string' || value.trim().length === 0) {
+		return undefined;
+	}
+	return value
+		.split(',')
+		.map((source) => source.trim())
+		.filter(Boolean);
+}
+
 function parse_fact_confidence(value: unknown): FactConfidence {
 	const confidence = typeof value === 'string' ? value : 'unknown';
 	if (
@@ -227,6 +237,15 @@ export const main = defineCommand({
 					type: 'boolean',
 					description: 'Overwrite existing starter pages',
 				},
+				ingestSources: {
+					type: 'boolean',
+					description:
+						'Create source note pages for detected sources',
+				},
+				sources: {
+					type: 'string',
+					description: 'Comma-separated source paths or URLs',
+				},
 			},
 			run({ args }) {
 				print_json(
@@ -235,6 +254,8 @@ export const main = defineCommand({
 						sourceType: parse_wiki_source_type(args.sourceType),
 						scope: args.scope ? String(args.scope) : undefined,
 						overwrite: Boolean(args.overwrite),
+						ingestSources: Boolean(args.ingestSources),
+						sources: parse_sources(args.sources),
 					}),
 				);
 			},
@@ -254,12 +275,17 @@ export const main = defineCommand({
 					type: 'string',
 					description: 'Source scope description',
 				},
+				sources: {
+					type: 'string',
+					description: 'Comma-separated source paths or URLs',
+				},
 			},
 			run({ args }) {
 				print_json(
 					plan_wiki({
 						sourceType: parse_wiki_source_type(args.sourceType),
 						scope: args.scope ? String(args.scope) : undefined,
+						sources: parse_sources(args.sources),
 					}),
 				);
 			},

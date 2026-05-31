@@ -1,3 +1,4 @@
+import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database } from './database.js';
 import { resolve_page_path } from './pages.js';
 import type {
@@ -152,7 +153,19 @@ export function backlinks_for_page(
 			WHERE page_links.to_path = ?
 			ORDER BY pages.path`,
 		)
-		.all(page_path) as unknown as BacklinkResult[];
+		.all(page_path) as Record<string, SQLOutputValue>[];
 	db.close();
-	return rows.map((row) => ({ ...row, embed: Boolean(row.embed) }));
+	return rows.map(backlink_from_row);
+}
+
+function backlink_from_row(
+	row: Record<string, SQLOutputValue>,
+): BacklinkResult {
+	return {
+		path: String(row.path),
+		title: String(row.title),
+		rawText: String(row.rawText),
+		alias: row.alias === null ? null : String(row.alias),
+		embed: Boolean(row.embed),
+	};
 }
