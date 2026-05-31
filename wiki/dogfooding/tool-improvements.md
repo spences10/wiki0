@@ -178,3 +178,12 @@ Completed in this dogfood run:
   index operations.
 - Dogfooding bootstrap against a temporary source produced a
   `Candidate facts` chunk with extracted source lines.
+
+## Schema migration follow-up
+
+- The current runtime `ALTER TABLE` guards were added to keep the active dogfood SQLite index usable while iterating quickly across schema versions.
+- Because `.wiki0/wiki0.sqlite` is a rebuildable cache and wiki0 is not yet used outside this repo, this does not need to become a full migration framework immediately.
+- Next iteration should decide between two explicit paths:
+  - keep the index disposable and rebuild automatically when `schema_version` changes, or
+  - add a small migration module if durable user data moves into SQLite.
+- Important distinction: facts and operation logs are currently stored in SQLite, so either they need export/rebuild semantics or they should be treated as durable enough to justify migrations.
