@@ -29,8 +29,8 @@ export function add_fact(fact: FactWriteOptions): Fact {
 		);
 	const inserted = db
 		.prepare(
-			`SELECT facts.id, pages.path AS pagePath, facts.category,
-				facts.summary, facts.body, facts.confidence, facts.created_at AS createdAt
+			`SELECT facts.id, pages.path AS page_path, facts.category,
+				facts.summary, facts.body, facts.confidence, facts.created_at AS created_at
 			FROM facts
 			LEFT JOIN pages ON pages.id = facts.page_id
 			WHERE facts.id = ?`,
@@ -42,8 +42,8 @@ export function add_fact(fact: FactWriteOptions): Fact {
 
 export function list_facts(root = '.', category?: string): Fact[] {
 	const db = open_wiki_database(root);
-	const sql = `SELECT facts.id, pages.path AS pagePath, facts.category,
-		facts.summary, facts.body, facts.confidence, facts.created_at AS createdAt
+	const sql = `SELECT facts.id, pages.path AS page_path, facts.category,
+		facts.summary, facts.body, facts.confidence, facts.created_at AS created_at
 		FROM facts
 		LEFT JOIN pages ON pages.id = facts.page_id
 		${category ? 'WHERE facts.category = ?' : ''}

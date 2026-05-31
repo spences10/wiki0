@@ -36,8 +36,8 @@ export function register_wiki_workflow(server: {
 				'Guide an agent to build a wiki0 wiki from code, docs, notes, research, or mixed source material',
 			schema: PlanWikiSchema,
 		},
-		({ sourceType, scope }: PlanWikiInput) => {
-			const plan = plan_wiki({ sourceType, scope });
+		({ source_type, scope }: PlanWikiInput) => {
+			const plan = plan_wiki({ source_type, scope });
 			return {
 				messages: [
 					{
@@ -47,7 +47,7 @@ export function register_wiki_workflow(server: {
 							text: [
 								'Build a wiki0 wiki from the requested source material.',
 								'',
-								`Source type: ${plan.sourceType}`,
+								`Source type: ${plan.source_type}`,
 								`Scope: ${plan.scope}`,
 								'',
 								plan.workflow,

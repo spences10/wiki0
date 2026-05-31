@@ -39,14 +39,14 @@ console.log(search_wiki('memory', '.', 10));
 console.log(get_wiki_context('what is wiki0?', '.', 5).markdown);
 console.log(lint_wiki('.'));
 console.log(
-	plan_wiki({ sourceType: 'codebase', scope: 'current repo' }),
+	plan_wiki({ source_type: 'codebase', scope: 'current repo' }),
 );
 console.log(
 	bootstrap_wiki({
 		root: '.',
-		sourceType: 'docs',
+		source_type: 'docs',
 		sources: ['docs/guide.md'],
-		ingestSources: true,
+		ingest_sources: true,
 	}),
 );
 ```

@@ -128,8 +128,8 @@ export function index_wiki(root = '.'): IndexResult {
 					page.title,
 					chunk.heading,
 					chunk.body,
-					chunk.startLine,
-					chunk.endLine,
+					chunk.start_line,
+					chunk.end_line,
 					chunk.sequence,
 				);
 				insert_chunk_fts.run(
@@ -165,20 +165,20 @@ export function index_wiki(root = '.'): IndexResult {
 	db.close();
 	return {
 		root: wiki_root,
-		dbPath: db_path,
-		pageCount: page_count,
-		linkCount: link_count,
-		indexedAt: indexed_at,
-		schemaVersion: current_index_schema_version,
-		packageVersion: current_index_package_version,
+		db_path: db_path,
+		page_count: page_count,
+		link_count: link_count,
+		indexed_at: indexed_at,
+		schema_version: current_index_schema_version,
+		package_version: current_index_package_version,
 	};
 }
 
 type PageChunk = {
 	heading: string | null;
 	body: string;
-	startLine: number;
-	endLine: number;
+	start_line: number;
+	end_line: number;
 	sequence: number;
 };
 
@@ -193,8 +193,8 @@ export function chunk_page_body(body: string): PageChunk[] {
 			{
 				heading: null,
 				body: body.trim(),
-				startLine: 1,
-				endLine: Math.max(lines.length, 1),
+				start_line: 1,
+				end_line: Math.max(lines.length, 1),
 				sequence: 0,
 			},
 		];
@@ -211,8 +211,8 @@ export function chunk_page_body(body: string): PageChunk[] {
 				.slice(heading.index, end_index + 1)
 				.join('\n')
 				.trim(),
-			startLine: heading.index + 1,
-			endLine: end_index + 1,
+			start_line: heading.index + 1,
+			end_line: end_index + 1,
 			sequence,
 		};
 	});
@@ -226,15 +226,15 @@ export function index_status(root = '.'): IndexStatus {
 	if (!existsSync(db_path)) {
 		return {
 			root: wiki_root,
-			dbPath: db_path,
+			db_path: db_path,
 			exists: false,
-			indexedAt: null,
-			schemaVersion: null,
-			currentSchemaVersion: current_index_schema_version,
-			packageVersion: null,
-			currentPackageVersion: current_index_package_version,
-			pageCount: page_paths.length,
-			indexedPageCount: 0,
+			indexed_at: null,
+			schema_version: null,
+			current_schema_version: current_index_schema_version,
+			package_version: null,
+			current_package_version: current_index_package_version,
+			page_count: page_paths.length,
+			indexed_page_count: 0,
 			stale: true,
 			reasons: ['missing-index'],
 		};
@@ -254,8 +254,8 @@ export function index_status(root = '.'): IndexStatus {
 		}
 	).count;
 	const indexed_pages = db
-		.prepare('SELECT path, content_hash AS contentHash FROM pages')
-		.all() as { path: string; contentHash: string }[];
+		.prepare('SELECT path, content_hash AS content_hash FROM pages')
+		.all() as { path: string; content_hash: string }[];
 	db.close();
 
 	if (!indexed_at) reasons.push('never-indexed');
@@ -271,7 +271,7 @@ export function index_status(root = '.'): IndexStatus {
 
 	const current_paths = new Set(page_paths);
 	const indexed_hashes = new Map(
-		indexed_pages.map((page) => [page.path, page.contentHash]),
+		indexed_pages.map((page) => [page.path, page.content_hash]),
 	);
 	for (const page of indexed_pages) {
 		if (!current_paths.has(page.path)) reasons.push('deleted-pages');
@@ -289,17 +289,17 @@ export function index_status(root = '.'): IndexStatus {
 
 	return {
 		root: wiki_root,
-		dbPath: db_path,
+		db_path: db_path,
 		exists: true,
-		indexedAt: indexed_at,
-		schemaVersion: Number.isNaN(schema_version)
+		indexed_at: indexed_at,
+		schema_version: Number.isNaN(schema_version)
 			? null
 			: schema_version,
-		currentSchemaVersion: current_index_schema_version,
-		packageVersion: package_version,
-		currentPackageVersion: current_index_package_version,
-		pageCount: page_paths.length,
-		indexedPageCount: indexed_page_count,
+		current_schema_version: current_index_schema_version,
+		package_version: package_version,
+		current_package_version: current_index_package_version,
+		page_count: page_paths.length,
+		indexed_page_count: indexed_page_count,
 		stale: reasons.length > 0,
 		reasons: [...new Set(reasons)],
 	};

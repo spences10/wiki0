@@ -32,7 +32,7 @@ describe('context and backlinks', () => {
 			results: [
 				expect.objectContaining({
 					path: 'topics/memory.md',
-					startLine: 1,
+					start_line: 1,
 				}),
 			],
 			markdown: expect.stringContaining(
@@ -42,7 +42,7 @@ describe('context and backlinks', () => {
 		expect(backlinks_for_page('topics/memory', root)).toEqual([
 			expect.objectContaining({
 				path: 'projects/wiki0.md',
-				rawText: '[[topics/memory|memory]]',
+				raw_text: '[[topics/memory|memory]]',
 				alias: 'memory',
 				embed: false,
 			}),
@@ -63,7 +63,7 @@ describe('context and backlinks', () => {
 				expect.objectContaining({
 					path: 'projects/wiki0.md',
 					heading: 'Retrieval',
-					startLine: 5,
+					start_line: 5,
 				}),
 			],
 		);

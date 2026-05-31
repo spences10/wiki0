@@ -21,7 +21,7 @@ describe('facts', () => {
 
 		expect(fact).toEqual(
 			expect.objectContaining({
-				pagePath: 'projects/wiki0.md',
+				page_path: 'projects/wiki0.md',
 				category: 'decision',
 				summary: 'wiki0 stores canonical knowledge in Markdown.',
 				body: 'SQLite is a rebuildable index.',

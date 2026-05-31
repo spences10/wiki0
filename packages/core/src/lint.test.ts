@@ -25,7 +25,7 @@ describe('lint_wiki', () => {
 		expect(lint_wiki(root)).toEqual({
 			root,
 			ok: false,
-			issueCount: 2,
+			issue_count: 2,
 			issues: [
 				expect.objectContaining({
 					code: 'unresolved-wikilink',

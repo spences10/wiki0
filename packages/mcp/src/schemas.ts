@@ -99,7 +99,7 @@ export const AppendPageSchema = v.object({
 });
 
 export const PlanWikiSchema = v.object({
-	sourceType: v.optional(
+	source_type: v.optional(
 		v.picklist(['general', 'codebase', 'docs', 'research', 'notes']),
 		'general',
 	),
@@ -109,12 +109,12 @@ export const PlanWikiSchema = v.object({
 
 export const BootstrapWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
-	sourceType: v.optional(
+	source_type: v.optional(
 		v.picklist(['general', 'codebase', 'docs', 'research', 'notes']),
 		'general',
 	),
 	scope: v.optional(v.string()),
 	sources: v.optional(v.array(v.string())),
 	overwrite: v.optional(v.boolean(), false),
-	ingestSources: v.optional(v.boolean(), false),
+	ingest_sources: v.optional(v.boolean(), false),
 });

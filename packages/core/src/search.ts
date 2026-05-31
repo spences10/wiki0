@@ -113,13 +113,13 @@ export function search_wiki_chunks(
 ): ChunkSearchResult[] {
 	const db = open_wiki_database(root);
 	const statement = db.prepare(
-		`SELECT fts_page_chunks.chunk_id AS chunkId,
+		`SELECT fts_page_chunks.chunk_id AS chunk_id,
 			fts_page_chunks.path,
 			fts_page_chunks.title,
 			page_chunks.heading,
 			page_chunks.body,
-			page_chunks.start_line AS startLine,
-			page_chunks.end_line AS endLine,
+			page_chunks.start_line AS start_line,
+			page_chunks.end_line AS end_line,
 			snippet(fts_page_chunks, 4, '[', ']', '…', 12) AS snippet,
 			bm25(fts_page_chunks) AS rank
 		FROM fts_page_chunks
@@ -161,8 +161,8 @@ export function show_wiki_chunk(
 	const db = open_wiki_database(root);
 	const row = db
 		.prepare(
-			`SELECT id AS chunkId, path, title, heading, body,
-				start_line AS startLine, end_line AS endLine,
+			`SELECT id AS chunk_id, path, title, heading, body,
+				start_line AS start_line, end_line AS end_line,
 				body AS snippet, 0 AS rank
 			FROM page_chunks
 			WHERE path = ? AND (? IS NULL OR (start_line <= ? AND end_line >= ?))
@@ -214,7 +214,7 @@ export function format_context_markdown(
 	}
 
 	for (const [index, result] of results.entries()) {
-		const line_range = `${result.startLine}-${result.endLine}`;
+		const line_range = `${result.start_line}-${result.end_line}`;
 		lines.push(
 			`## ${index + 1}. ${result.title}`,
 			`Source: \`wiki/${result.path}:${line_range}\``,
@@ -236,7 +236,7 @@ export function backlinks_for_page(
 	const page_path = resolve_page_path(title, root);
 	const rows = db
 		.prepare(
-			`SELECT pages.path, pages.title, page_links.raw_text AS rawText,
+			`SELECT pages.path, pages.title, page_links.raw_text AS raw_text,
 				page_links.alias, page_links.embed
 			FROM page_links
 			JOIN pages ON pages.id = page_links.from_page_id
@@ -254,7 +254,7 @@ function backlink_from_row(
 	return {
 		path: String(row.path),
 		title: String(row.title),
-		rawText: String(row.rawText),
+		raw_text: String(row.raw_text),
 		alias: row.alias === null ? null : String(row.alias),
 		embed: Boolean(row.embed),
 	};

@@ -2,14 +2,14 @@ import { resolve_wiki_root } from '@wiki0/core';
 import { resolve } from 'node:path';
 
 export type McpSafetyConfig = {
-	allowedRoots: string[];
-	readOnly: boolean;
+	allowed_roots: string[];
+	read_only: boolean;
 };
 
 export function mcp_safety_config(): McpSafetyConfig {
 	return {
-		allowedRoots: parse_allowed_roots(),
-		readOnly: parse_boolean(process.env.WIKI0_READ_ONLY),
+		allowed_roots: parse_allowed_roots(),
+		read_only: parse_boolean(process.env.WIKI0_READ_ONLY),
 	};
 }
 

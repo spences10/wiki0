@@ -62,7 +62,7 @@ export function lint_wiki(root = '.'): LintResult {
 	return {
 		root: wiki_root,
 		ok: issues.every((issue) => issue.severity !== 'error'),
-		issueCount: issues.length,
+		issue_count: issues.length,
 		issues: issues.sort((left, right) =>
 			`${left.path}:${left.code}:${left.target ?? ''}`.localeCompare(
 				`${right.path}:${right.code}:${right.target ?? ''}`,

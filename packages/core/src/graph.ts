@@ -14,7 +14,7 @@ export function graph_wiki(root = '.'): GraphResult {
 			`SELECT pages.path AS "from",
 				COALESCE(page_links.to_path, page_links.target) AS "to",
 				page_links.target,
-				page_links.raw_text AS rawText,
+				page_links.raw_text AS raw_text,
 				page_links.alias,
 				page_links.embed,
 				page_links.status
@@ -47,7 +47,7 @@ function graph_edge_from_row(
 		from: String(row.from),
 		to: String(row.to),
 		target: String(row.target),
-		rawText: String(row.rawText),
+		raw_text: String(row.raw_text),
 		alias: row.alias === null ? null : String(row.alias),
 		embed: Boolean(row.embed),
 		status: row.status === 'resolved' ? 'resolved' : 'unresolved',

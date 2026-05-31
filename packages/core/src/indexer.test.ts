@@ -23,11 +23,13 @@ describe('index_wiki', () => {
 		);
 
 		const result = index_wiki(root);
-		expect(result.pageCount).toBe(2);
-		expect(result.linkCount).toBe(1);
-		expect(result.indexedAt).toEqual(expect.any(String));
-		expect(result.schemaVersion).toBe(2);
-		expect(result.packageVersion).toBe(current_index_package_version);
+		expect(result.page_count).toBe(2);
+		expect(result.link_count).toBe(1);
+		expect(result.indexed_at).toEqual(expect.any(String));
+		expect(result.schema_version).toBe(2);
+		expect(result.package_version).toBe(
+			current_index_package_version,
+		);
 
 		const results = search_wiki('inspectable', root);
 		expect(results).toEqual([
@@ -56,10 +58,10 @@ describe('index_wiki', () => {
 				exists: true,
 				stale: false,
 				reasons: [],
-				packageVersion: current_index_package_version,
-				currentPackageVersion: current_index_package_version,
-				pageCount: 1,
-				indexedPageCount: 1,
+				package_version: current_index_package_version,
+				current_package_version: current_index_package_version,
+				page_count: 1,
+				indexed_page_count: 1,
 			}),
 		);
 
@@ -95,17 +97,17 @@ describe('index_wiki', () => {
 
 		const result = index_wiki(root);
 
-		expect(result.linkCount).toBe(2);
+		expect(result.link_count).toBe(2);
 		expect(backlinks_for_page('Core package', root)).toEqual([
 			expect.objectContaining({
 				path: 'projects/wiki0.md',
-				rawText: '[[Core package]]',
+				raw_text: '[[Core package]]',
 			}),
 		]);
 		expect(backlinks_for_page('wiki0 CLI', root)).toEqual([
 			expect.objectContaining({
 				path: 'projects/wiki0.md',
-				rawText: '[[wiki0 CLI]]',
+				raw_text: '[[wiki0 CLI]]',
 			}),
 		]);
 	});

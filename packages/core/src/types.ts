@@ -1,7 +1,7 @@
 export type WikiConfig = {
 	root: string;
-	wikiDir?: string;
-	dbPath?: string;
+	wiki_dir?: string;
+	db_path?: string;
 };
 
 export type WikiLink = {
@@ -47,25 +47,25 @@ export type PageFrontmatterOptions = {
 
 export type IndexResult = {
 	root: string;
-	dbPath: string;
-	pageCount: number;
-	linkCount: number;
-	indexedAt: string;
-	schemaVersion: number;
-	packageVersion: string;
+	db_path: string;
+	page_count: number;
+	link_count: number;
+	indexed_at: string;
+	schema_version: number;
+	package_version: string;
 };
 
 export type IndexStatus = {
 	root: string;
-	dbPath: string;
+	db_path: string;
 	exists: boolean;
-	indexedAt: string | null;
-	schemaVersion: number | null;
-	currentSchemaVersion: number;
-	packageVersion: string | null;
-	currentPackageVersion: string;
-	pageCount: number;
-	indexedPageCount: number;
+	indexed_at: string | null;
+	schema_version: number | null;
+	current_schema_version: number;
+	package_version: string | null;
+	current_package_version: string;
+	page_count: number;
+	indexed_page_count: number;
 	stale: boolean;
 	reasons: string[];
 };
@@ -78,11 +78,11 @@ export type SearchResult = {
 };
 
 export type ChunkSearchResult = SearchResult & {
-	chunkId: number;
+	chunk_id: number;
 	heading: string | null;
 	body: string;
-	startLine: number;
-	endLine: number;
+	start_line: number;
+	end_line: number;
 };
 
 export type ShowChunkResult = ChunkSearchResult;
@@ -96,7 +96,7 @@ export type ContextResult = {
 export type BacklinkResult = {
 	path: string;
 	title: string;
-	rawText: string;
+	raw_text: string;
 	alias: string | null;
 	embed: boolean;
 };
@@ -110,7 +110,7 @@ export type GraphEdge = {
 	from: string;
 	to: string;
 	target: string;
-	rawText: string;
+	raw_text: string;
 	alias: string | null;
 	embed: boolean;
 	status: 'resolved' | 'unresolved';
@@ -131,12 +131,12 @@ export type FactConfidence =
 
 export type Fact = {
 	id: number;
-	pagePath: string | null;
+	page_path: string | null;
 	category: string;
 	summary: string;
 	body: string | null;
 	confidence: FactConfidence;
-	createdAt: string;
+	created_at: string;
 };
 
 export type FactWriteOptions = {
@@ -167,7 +167,7 @@ export type LintIssue = {
 export type LintResult = {
 	root: string;
 	ok: boolean;
-	issueCount: number;
+	issue_count: number;
 	issues: LintIssue[];
 };
 
@@ -179,7 +179,7 @@ export type WikiSourceType =
 	| 'notes';
 
 export type WikiPlanOptions = {
-	sourceType?: WikiSourceType;
+	source_type?: WikiSourceType;
 	scope?: string;
 	sources?: string[];
 };
@@ -187,7 +187,7 @@ export type WikiPlanOptions = {
 export type WikiBootstrapOptions = WikiPlanOptions & {
 	root?: string;
 	overwrite?: boolean;
-	ingestSources?: boolean;
+	ingest_sources?: boolean;
 };
 
 export type WikiPlanPage = {
@@ -198,11 +198,11 @@ export type WikiPlanPage = {
 };
 
 export type WikiPlanResult = {
-	sourceType: WikiSourceType;
+	source_type: WikiSourceType;
 	scope: string;
 	workflow: string;
 	pages: WikiPlanPage[];
-	nextSteps: string[];
+	next_steps: string[];
 };
 
 export type WikiSourceIngestion = {
@@ -216,6 +216,6 @@ export type WikiBootstrapResult = {
 	plan: WikiPlanResult;
 	created: string[];
 	skipped: string[];
-	ingestedSources: WikiSourceIngestion[];
+	ingested_sources: WikiSourceIngestion[];
 	indexed: IndexResult;
 };

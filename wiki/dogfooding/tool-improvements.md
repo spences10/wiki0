@@ -127,7 +127,7 @@ Completed in this dogfood run:
 ## Bootstrap source ingestion follow-up
 
 - Added optional bootstrap source ingestion through `sources` and
-  `ingestSources` options.
+  `ingest_sources` options.
 - Ingestion creates source note pages for explicit paths, detected
   URLs in scope text, and auto-detected local sources.
 - Source notes include file excerpts when local, URL extraction

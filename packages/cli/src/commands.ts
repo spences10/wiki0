@@ -225,7 +225,7 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
-				sourceType: {
+				source_type: {
 					type: 'string',
 					description: 'general, codebase, docs, research, or notes',
 					default: 'general',
@@ -238,7 +238,7 @@ export const main = defineCommand({
 					type: 'boolean',
 					description: 'Overwrite existing starter pages',
 				},
-				ingestSources: {
+				ingest_sources: {
 					type: 'boolean',
 					description:
 						'Create source note pages for detected sources',
@@ -252,10 +252,10 @@ export const main = defineCommand({
 				print_json(
 					bootstrap_wiki({
 						root: String(args.root ?? '.'),
-						sourceType: parse_wiki_source_type(args.sourceType),
+						source_type: parse_wiki_source_type(args.source_type),
 						scope: args.scope ? String(args.scope) : undefined,
 						overwrite: Boolean(args.overwrite),
-						ingestSources: Boolean(args.ingestSources),
+						ingest_sources: Boolean(args.ingest_sources),
 						sources: parse_sources(args.sources),
 					}),
 				);
@@ -267,7 +267,7 @@ export const main = defineCommand({
 					'Print a deterministic workflow and starter page plan for building a wiki',
 			},
 			args: {
-				sourceType: {
+				source_type: {
 					type: 'string',
 					description: 'general, codebase, docs, research, or notes',
 					default: 'general',
@@ -284,7 +284,7 @@ export const main = defineCommand({
 			run({ args }) {
 				print_json(
 					plan_wiki({
-						sourceType: parse_wiki_source_type(args.sourceType),
+						source_type: parse_wiki_source_type(args.source_type),
 						scope: args.scope ? String(args.scope) : undefined,
 						sources: parse_sources(args.sources),
 					}),

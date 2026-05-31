@@ -21,7 +21,7 @@ describe('wiki building workflow', () => {
 	it('plans common wiki pages for arbitrary source material', () => {
 		const plan = plan_wiki({ scope: 'meeting notes' });
 
-		expect(plan.sourceType).toBe('general');
+		expect(plan.source_type).toBe('general');
 		expect(plan.scope).toBe('meeting notes');
 		expect(plan.pages.map((page) => page.path)).toContain('index');
 		expect(plan.pages.map((page) => page.path)).toContain(
@@ -30,7 +30,10 @@ describe('wiki building workflow', () => {
 	});
 
 	it('adds source-specific pages for codebases', () => {
-		const plan = plan_wiki({ sourceType: 'codebase', scope: 'repo' });
+		const plan = plan_wiki({
+			source_type: 'codebase',
+			scope: 'repo',
+		});
 
 		expect(plan.pages.map((page) => page.path)).toContain(
 			'architecture/overview',
@@ -44,14 +47,14 @@ describe('wiki building workflow', () => {
 		const root = make_wiki_root();
 		const result = bootstrap_wiki({
 			root,
-			sourceType: 'docs',
+			source_type: 'docs',
 			scope: 'docs folder',
 		});
 
 		expect(result.created).toContain('index');
 		expect(result.created).toContain('docs/documentation-map');
-		expect(result.ingestedSources).toEqual([]);
-		expect(result.indexed.pageCount).toBe(result.created.length);
+		expect(result.ingested_sources).toEqual([]);
+		expect(result.indexed.page_count).toBe(result.created.length);
 		expect(
 			readFileSync(join(root, 'wiki/index.md'), 'utf-8'),
 		).toContain('[[sources/index|Sources]]');
@@ -67,13 +70,13 @@ describe('wiki building workflow', () => {
 		);
 		const result = bootstrap_wiki({
 			root,
-			sourceType: 'docs',
+			source_type: 'docs',
 			scope: 'docs plus https://example.com/research',
 			sources: ['docs/guide.md'],
-			ingestSources: true,
+			ingest_sources: true,
 		});
 
-		expect(result.ingestedSources).toEqual(
+		expect(result.ingested_sources).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					source: 'docs/guide.md',
@@ -96,8 +99,8 @@ describe('wiki building workflow', () => {
 
 	it('skips existing pages unless overwrite is enabled', () => {
 		const root = make_wiki_root();
-		bootstrap_wiki({ root, sourceType: 'general' });
-		const second = bootstrap_wiki({ root, sourceType: 'general' });
+		bootstrap_wiki({ root, source_type: 'general' });
+		const second = bootstrap_wiki({ root, source_type: 'general' });
 
 		expect(second.created).toEqual([]);
 		expect(second.skipped).toContain('index');

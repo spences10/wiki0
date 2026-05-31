@@ -15,8 +15,8 @@ The package exposes the `wiki0` binary.
 ```sh
 wiki0 init ./my-wiki
 wiki0 page create "projects/wiki0" --body "Local-first [[topics/memory]]." --root ./my-wiki
-wiki0 plan --sourceType codebase --scope "current repository" --sources README.md,package.json
-wiki0 bootstrap --sourceType docs --scope "docs folder" --sources docs/guide.md --ingestSources --root ./my-wiki
+wiki0 plan --source_type codebase --scope "current repository" --sources README.md,package.json
+wiki0 bootstrap --source_type docs --scope "docs folder" --sources docs/guide.md --ingest_sources --root ./my-wiki
 wiki0 index --root ./my-wiki
 wiki0 status --root ./my-wiki
 wiki0 search "memory" --root ./my-wiki

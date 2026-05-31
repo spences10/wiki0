@@ -28,8 +28,8 @@ describe('MCP safety', () => {
 		process.env.WIKI0_READ_ONLY = 'true';
 
 		expect(mcp_safety_config()).toEqual({
-			allowedRoots: [root],
-			readOnly: true,
+			allowed_roots: [root],
+			read_only: true,
 		});
 	});
 

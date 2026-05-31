@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { mcp_safety_config } from './safety.js';
+import { mcp_safety_config, type McpSafetyConfig } from './safety.js';
 
 type PackageJson = {
 	name?: string;
@@ -9,17 +9,14 @@ type PackageJson = {
 export type Wiki0Info = {
 	name: string;
 	version: string;
-	serverType: string;
+	server_type: string;
 	capabilities: {
 		tools: boolean;
 		prompts: boolean;
 		resources: boolean;
 	};
 	features: string[];
-	safety: {
-		readOnly: boolean;
-		allowedRoots: string[];
-	};
+	safety: McpSafetyConfig;
 };
 
 export function wiki0_info(): Wiki0Info {
@@ -28,7 +25,7 @@ export function wiki0_info(): Wiki0Info {
 	return {
 		name: package_json.name ?? '@wiki0/mcp',
 		version: package_json.version ?? '0.0.0',
-		serverType: process.env.WIKI0_SERVER_TYPE ?? 'unknown',
+		server_type: process.env.WIKI0_SERVER_TYPE ?? 'unknown',
 		capabilities: {
 			tools: true,
 			prompts: true,

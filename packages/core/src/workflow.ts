@@ -132,16 +132,16 @@ const source_pages: Record<WikiSourceType, WikiPlanPage[]> = {
 export function plan_wiki(
 	options: WikiPlanOptions = {},
 ): WikiPlanResult {
-	const source_type = options.sourceType ?? 'general';
+	const source_type = options.source_type ?? 'general';
 	const scope = options.scope ?? 'user-provided source material';
 	const pages = [...common_pages, ...source_pages[source_type]];
 
 	return {
-		sourceType: source_type,
+		source_type: source_type,
 		scope,
 		workflow: wiki_building_workflow_markdown,
 		pages,
-		nextSteps: [
+		next_steps: [
 			'Inspect the source material and adjust this plan before writing pages.',
 			'Create or update the index page first so later pages have a navigation target.',
 			'Create focused pages with frontmatter and wikilinks.',
@@ -160,7 +160,7 @@ export function bootstrap_wiki(
 
 	const detected_sources = detect_source_inventory(
 		root,
-		plan.sourceType,
+		plan.source_type,
 		options.sources,
 		plan.scope,
 	);
@@ -184,7 +184,7 @@ export function bootstrap_wiki(
 		created.push(page.path);
 	}
 
-	const ingested_sources = options.ingestSources
+	const ingested_sources = options.ingest_sources
 		? ingest_sources(
 				root,
 				detected_sources,
@@ -199,7 +199,7 @@ export function bootstrap_wiki(
 		plan,
 		created,
 		skipped,
-		ingestedSources: ingested_sources,
+		ingested_sources: ingested_sources,
 		indexed: index_wiki(root),
 	};
 }
