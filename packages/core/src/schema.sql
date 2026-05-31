@@ -24,6 +24,20 @@ CREATE TABLE IF NOT EXISTS page_links (
 	created_at TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS page_chunks (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	page_id INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+	path TEXT NOT NULL,
+	title TEXT NOT NULL,
+	heading TEXT,
+	body TEXT NOT NULL,
+	start_line INTEGER NOT NULL,
+	end_line INTEGER NOT NULL,
+	sequence INTEGER NOT NULL,
+	created_at TEXT DEFAULT (datetime('now')),
+	UNIQUE(page_id, sequence)
+);
+
 CREATE TABLE IF NOT EXISTS facts (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	page_id INTEGER REFERENCES pages(id) ON DELETE SET NULL,
@@ -41,3 +55,4 @@ CREATE TABLE IF NOT EXISTS wiki_meta (
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_pages USING fts5(path, title, body);
+CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_chunks USING fts5(chunk_id UNINDEXED, path, title, heading, body);

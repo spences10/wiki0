@@ -134,3 +134,18 @@ Completed in this dogfood run:
   prompts when remote, candidate facts, and open questions.
 - Replaced remaining `node:sqlite` `as unknown as` row casts with
   explicit row-normalization helpers for graph edges and backlinks.
+
+## Chunk context dogfood
+
+- Added chunk-level indexing for wiki pages so context results cite
+  `wiki/path.md:start-end` instead of only whole pages.
+- Added direct indexed chunk lookup for page or `page:line` targets
+  through CLI `wiki0 show` and core `show_wiki_chunk`.
+- Dogfooding
+  `wiki0 context "chunk context path line citations source ingestion" --root . --json`
+  returned section-level results with headings and full chunk bodies.
+- Dogfooding
+  `wiki0 show dogfooding/tool-improvements.md:127 --root . --json`
+  returned the expected source-ingestion section chunk.
+- MCP exposure is implemented as `show_wiki_chunk`; restart the dev
+  MCP process before validating that new tool path.

@@ -26,7 +26,7 @@ describe('index_wiki', () => {
 		expect(result.pageCount).toBe(2);
 		expect(result.linkCount).toBe(1);
 		expect(result.indexedAt).toEqual(expect.any(String));
-		expect(result.schemaVersion).toBe(1);
+		expect(result.schemaVersion).toBe(2);
 		expect(result.packageVersion).toBe(current_index_package_version);
 
 		const results = search_wiki('inspectable', root);

@@ -1,10 +1,15 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database } from './database.js';
 import { resolve_page_path } from './pages.js';
+import { resolve_wiki_root } from './paths.js';
 import type {
 	BacklinkResult,
+	ChunkSearchResult,
 	ContextResult,
 	SearchResult,
+	ShowChunkResult,
 } from './types.js';
 
 export function search_wiki(
@@ -101,12 +106,95 @@ function quote_fts_term(term: string): string {
 	return `"${term.replace(/"/gu, '""')}"`;
 }
 
+export function search_wiki_chunks(
+	query: string,
+	root = '.',
+	limit = 10,
+): ChunkSearchResult[] {
+	const db = open_wiki_database(root);
+	const statement = db.prepare(
+		`SELECT fts_page_chunks.chunk_id AS chunkId,
+			fts_page_chunks.path,
+			fts_page_chunks.title,
+			page_chunks.heading,
+			page_chunks.body,
+			page_chunks.start_line AS startLine,
+			page_chunks.end_line AS endLine,
+			snippet(fts_page_chunks, 4, '[', ']', '…', 12) AS snippet,
+			bm25(fts_page_chunks) AS rank
+		FROM fts_page_chunks
+		JOIN page_chunks ON page_chunks.id = fts_page_chunks.chunk_id
+		WHERE fts_page_chunks MATCH ?
+		ORDER BY rank
+		LIMIT ?`,
+	);
+	const fts_query = plain_text_fts_query(query);
+	if (!fts_query) {
+		db.close();
+		return [];
+	}
+
+	try {
+		const rows = statement.all(
+			fts_query,
+			limit,
+		) as ChunkSearchResult[];
+		if (rows.length > 0) return rows;
+
+		const relaxed_query = relaxed_plain_text_fts_query(query);
+		if (!relaxed_query || relaxed_query === fts_query) return rows;
+		return statement.all(relaxed_query, limit) as ChunkSearchResult[];
+	} catch (error) {
+		throw new Error(`Invalid wiki chunk search query: ${query}`, {
+			cause: error,
+		});
+	} finally {
+		db.close();
+	}
+}
+
+export function show_wiki_chunk(
+	target: string,
+	root = '.',
+): ShowChunkResult | null {
+	const { path, line } = parse_chunk_target(target, root);
+	const db = open_wiki_database(root);
+	const row = db
+		.prepare(
+			`SELECT id AS chunkId, path, title, heading, body,
+				start_line AS startLine, end_line AS endLine,
+				body AS snippet, 0 AS rank
+			FROM page_chunks
+			WHERE path = ? AND (? IS NULL OR (start_line <= ? AND end_line >= ?))
+			ORDER BY sequence
+			LIMIT 1`,
+		)
+		.get(path, line, line, line) as ShowChunkResult | undefined;
+	db.close();
+	return row ?? null;
+}
+
+function parse_chunk_target(
+	target: string,
+	root: string,
+): { path: string; line: number | null } {
+	const match = target.match(/^(.*?)(?::(\d+))?$/u);
+	const title = match?.[1]?.trim() ?? target;
+	const line = match?.[2] ? Number(match[2]) : null;
+	const wiki_root = resolve_wiki_root(root);
+	const direct_path = title.endsWith('.md') ? title : `${title}.md`;
+	if (existsSync(join(wiki_root, 'wiki', direct_path))) {
+		return { path: direct_path, line };
+	}
+	return { path: resolve_page_path(title, root), line };
+}
+
 export function get_wiki_context(
 	query: string,
 	root = '.',
 	limit = 5,
 ): ContextResult {
-	const results = search_wiki(query, root, limit);
+	const results = search_wiki_chunks(query, root, limit);
 	return {
 		query,
 		results,
@@ -116,7 +204,7 @@ export function get_wiki_context(
 
 export function format_context_markdown(
 	query: string,
-	results: SearchResult[],
+	results: ChunkSearchResult[],
 ): string {
 	const lines = [`# wiki0 context: ${query}`, ''];
 
@@ -126,11 +214,13 @@ export function format_context_markdown(
 	}
 
 	for (const [index, result] of results.entries()) {
+		const line_range = `${result.startLine}-${result.endLine}`;
 		lines.push(
 			`## ${index + 1}. ${result.title}`,
-			`Source: \`wiki/${result.path}\``,
+			`Source: \`wiki/${result.path}:${line_range}\``,
+			result.heading ? `Heading: ${result.heading}` : '',
 			'',
-			result.snippet.replace(/\s+/gu, ' ').trim(),
+			result.body.trim(),
 			'',
 		);
 	}

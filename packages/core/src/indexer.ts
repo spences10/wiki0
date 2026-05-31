@@ -9,7 +9,7 @@ import {
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
-export const current_index_schema_version = 1;
+export const current_index_schema_version = 2;
 export const current_index_package_version = read_package_version();
 
 export function index_wiki(root = '.'): IndexResult {
@@ -40,8 +40,17 @@ export function index_wiki(root = '.'): IndexResult {
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`);
 	const clear_fts = db.prepare('DELETE FROM fts_pages');
+	const clear_chunks = db.prepare('DELETE FROM page_chunks');
+	const clear_chunk_fts = db.prepare('DELETE FROM fts_page_chunks');
 	const insert_fts = db.prepare(
 		'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
+	);
+	const insert_chunk = db.prepare(`
+		INSERT INTO page_chunks (page_id, path, title, heading, body, start_line, end_line, sequence)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	`);
+	const insert_chunk_fts = db.prepare(
+		'INSERT INTO fts_page_chunks (chunk_id, path, title, heading, body) VALUES (?, ?, ?, ?, ?)',
 	);
 	const set_meta = db.prepare(`
 		INSERT INTO wiki_meta (key, value, updated_at)
@@ -74,6 +83,8 @@ export function index_wiki(root = '.'): IndexResult {
 	try {
 		indexed_at = new Date().toISOString();
 		clear_fts.run();
+		clear_chunks.run();
+		clear_chunk_fts.run();
 		for (const page of pages) {
 			const file_path = join(wiki_root, 'wiki', page.path);
 			const modified_at = statSync(file_path).mtime.toISOString();
@@ -110,6 +121,25 @@ export function index_wiki(root = '.'): IndexResult {
 				link_count += 1;
 			}
 			insert_fts.run(page.path, page.title, page.content);
+			for (const chunk of chunk_page_body(page.body)) {
+				const chunk_result = insert_chunk.run(
+					row.id,
+					page.path,
+					page.title,
+					chunk.heading,
+					chunk.body,
+					chunk.startLine,
+					chunk.endLine,
+					chunk.sequence,
+				);
+				insert_chunk_fts.run(
+					chunk_result.lastInsertRowid,
+					page.path,
+					page.title,
+					chunk.heading,
+					chunk.body,
+				);
+			}
 			page_count += 1;
 		}
 
@@ -142,6 +172,50 @@ export function index_wiki(root = '.'): IndexResult {
 		schemaVersion: current_index_schema_version,
 		packageVersion: current_index_package_version,
 	};
+}
+
+type PageChunk = {
+	heading: string | null;
+	body: string;
+	startLine: number;
+	endLine: number;
+	sequence: number;
+};
+
+export function chunk_page_body(body: string): PageChunk[] {
+	const lines = body.split(/\r?\n/u);
+	const heading_lines = lines
+		.map((line, index) => ({ line, index }))
+		.filter(({ line }) => /^#{1,6}\s+\S/u.test(line));
+
+	if (heading_lines.length === 0) {
+		return [
+			{
+				heading: null,
+				body: body.trim(),
+				startLine: 1,
+				endLine: Math.max(lines.length, 1),
+				sequence: 0,
+			},
+		];
+	}
+
+	return heading_lines.map((heading, sequence) => {
+		const next_heading = heading_lines[sequence + 1];
+		const end_index = next_heading
+			? next_heading.index - 1
+			: lines.length - 1;
+		return {
+			heading: heading.line.replace(/^#{1,6}\s+/u, '').trim(),
+			body: lines
+				.slice(heading.index, end_index + 1)
+				.join('\n')
+				.trim(),
+			startLine: heading.index + 1,
+			endLine: end_index + 1,
+			sequence,
+		};
+	});
 }
 
 export function index_status(root = '.'): IndexStatus {

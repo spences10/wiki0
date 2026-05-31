@@ -17,6 +17,7 @@ import {
 	review_wiki,
 	search_wiki,
 	set_page_frontmatter,
+	show_wiki_chunk,
 	slugify_title,
 	type WikiFrontmatter,
 } from '@wiki0/core';
@@ -47,6 +48,7 @@ import {
 	ReviewWikiSchema,
 	SearchWikiSchema,
 	SetPageFrontmatterSchema,
+	ShowWikiChunkSchema,
 	SlugifyTitleSchema,
 	Wiki0InfoSchema,
 } from './schemas.js';
@@ -67,6 +69,7 @@ type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type ListFactsInput = InferInput<typeof ListFactsSchema>;
 type SearchWikiInput = InferInput<typeof SearchWikiSchema>;
 type ContextWikiInput = InferInput<typeof ContextWikiSchema>;
+type ShowWikiChunkInput = InferInput<typeof ShowWikiChunkSchema>;
 type BacklinksForPageInput = InferInput<
 	typeof BacklinksForPageSchema
 >;
@@ -255,6 +258,17 @@ export function register_wiki_tools(server: {
 		},
 		async ({ query, root, limit }: ContextWikiInput) =>
 			json_response(get_wiki_context(query, mcp_root(root), limit)),
+	);
+
+	tool(
+		{
+			name: 'show_wiki_chunk',
+			description:
+				'Return the indexed wiki chunk for a page path/title, optionally with :line',
+			schema: ShowWikiChunkSchema,
+		},
+		async ({ target, root }: ShowWikiChunkInput) =>
+			json_response(show_wiki_chunk(target, mcp_root(root))),
 	);
 
 	tool(

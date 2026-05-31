@@ -77,9 +77,19 @@ export type SearchResult = {
 	rank: number;
 };
 
+export type ChunkSearchResult = SearchResult & {
+	chunkId: number;
+	heading: string | null;
+	body: string;
+	startLine: number;
+	endLine: number;
+};
+
+export type ShowChunkResult = ChunkSearchResult;
+
 export type ContextResult = {
 	query: string;
-	results: SearchResult[];
+	results: ChunkSearchResult[];
 	markdown: string;
 };
 

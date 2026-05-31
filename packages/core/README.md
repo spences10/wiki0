@@ -8,7 +8,9 @@ Core wiki0 primitives for local-first Markdown wiki memory.
 - Obsidian-style `[[WikiLinks]]` parsing.
 - Page create/read/append/frontmatter operations.
 - SQLite indexing and FTS search.
-- Context snippets with `wiki/...` citations.
+- Chunk-level context snippets with `wiki/path.md:line-line`
+  citations.
+- Direct indexed chunk lookup for known `path:line` targets.
 - Backlinks, graph data, lint results, review queues, and structured
   facts.
 - Wiki-building workflow planning for agents that need a deterministic

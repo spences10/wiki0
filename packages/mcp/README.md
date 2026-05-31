@@ -20,6 +20,7 @@ The package exposes the `wiki0-mcp` binary.
   ingest detected source notes, and index the wiki
 - `create_page`, `read_page`, `append_page`, `set_page_frontmatter`
 - `index_wiki`, `index_status`, `search_wiki`, `get_wiki_context`
+- `show_wiki_chunk` for known page or `page:line` retrieval
 - `backlinks_for_page`, `graph_wiki`, `lint_wiki`, `review_wiki`
 - `add_fact`, `list_facts`
 

@@ -13,6 +13,7 @@ describe('main command', () => {
 			'status',
 			'search',
 			'context',
+			'show',
 			'graph',
 			'lint',
 			'backlinks',

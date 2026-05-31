@@ -16,6 +16,7 @@ import {
 	review_wiki,
 	search_wiki,
 	set_page_frontmatter,
+	show_wiki_chunk,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
 import {
@@ -404,6 +405,36 @@ export const main = defineCommand({
 						Number(args.limit ?? 10),
 					),
 				);
+			},
+		}),
+		show: defineCommand({
+			meta: {
+				description:
+					'Show the indexed wiki chunk for a page or page:line target',
+			},
+			args: {
+				target: {
+					type: 'positional',
+					required: true,
+					description: 'Page path/title, optionally with :line',
+				},
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				json: {
+					type: 'boolean',
+					description: 'Output structured JSON instead of Markdown',
+				},
+			},
+			run({ args }) {
+				const result = show_wiki_chunk(
+					String(args.target),
+					String(args.root ?? '.'),
+				);
+				if (args.json) print_json(result);
+				else console.log(result?.body ?? 'No indexed chunk found.');
 			},
 		}),
 		context: defineCommand({

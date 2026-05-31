@@ -40,6 +40,8 @@ export {
 	format_context_markdown,
 	get_wiki_context,
 	search_wiki,
+	search_wiki_chunks,
+	show_wiki_chunk,
 } from './search.js';
 export type * from './types.js';
 export {
