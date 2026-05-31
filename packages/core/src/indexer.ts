@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { open_wiki_database, wiki_db_path } from './database.js';
 import {
@@ -10,6 +10,7 @@ import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
 export const current_index_schema_version = 1;
+export const current_index_package_version = read_package_version();
 
 export function index_wiki(root = '.'): IndexResult {
 	const wiki_root = resolve_wiki_root(root);
@@ -125,6 +126,7 @@ export function index_wiki(root = '.'): IndexResult {
 			'schema_version',
 			String(current_index_schema_version),
 		);
+		set_meta.run('package_version', current_index_package_version);
 		db.exec('COMMIT');
 	} catch (error) {
 		db.exec('ROLLBACK');
@@ -138,6 +140,7 @@ export function index_wiki(root = '.'): IndexResult {
 		linkCount: link_count,
 		indexedAt: indexed_at,
 		schemaVersion: current_index_schema_version,
+		packageVersion: current_index_package_version,
 	};
 }
 
@@ -154,6 +157,8 @@ export function index_status(root = '.'): IndexStatus {
 			indexedAt: null,
 			schemaVersion: null,
 			currentSchemaVersion: current_index_schema_version,
+			packageVersion: null,
+			currentPackageVersion: current_index_package_version,
 			pageCount: page_paths.length,
 			indexedPageCount: 0,
 			stale: true,
@@ -168,6 +173,7 @@ export function index_status(root = '.'): IndexStatus {
 	const meta = new Map(meta_rows.map((row) => [row.key, row.value]));
 	const indexed_at = meta.get('indexed_at') ?? null;
 	const schema_version = Number(meta.get('schema_version') ?? NaN);
+	const package_version = meta.get('package_version') ?? null;
 	const indexed_page_count = (
 		db.prepare('SELECT COUNT(*) AS count FROM pages').get() as {
 			count: number;
@@ -181,6 +187,9 @@ export function index_status(root = '.'): IndexStatus {
 	if (!indexed_at) reasons.push('never-indexed');
 	if (schema_version !== current_index_schema_version) {
 		reasons.push('schema-version-mismatch');
+	}
+	if (package_version !== current_index_package_version) {
+		reasons.push('package-version-mismatch');
 	}
 	if (indexed_page_count !== page_paths.length) {
 		reasons.push('page-count-changed');
@@ -213,9 +222,25 @@ export function index_status(root = '.'): IndexStatus {
 			? null
 			: schema_version,
 		currentSchemaVersion: current_index_schema_version,
+		packageVersion: package_version,
+		currentPackageVersion: current_index_package_version,
 		pageCount: page_paths.length,
 		indexedPageCount: indexed_page_count,
 		stale: reasons.length > 0,
 		reasons: [...new Set(reasons)],
 	};
+}
+
+function read_package_version(): string {
+	try {
+		const package_json = JSON.parse(
+			readFileSync(
+				new URL('../package.json', import.meta.url),
+				'utf-8',
+			),
+		) as { version?: string };
+		return package_json.version ?? '0.0.0';
+	} catch {
+		return '0.0.0';
+	}
 }

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { index_status, index_wiki } from './indexer.js';
+import {
+	current_index_package_version,
+	index_status,
+	index_wiki,
+} from './indexer.js';
 import { create_page } from './pages.js';
 import { backlinks_for_page, search_wiki } from './search.js';
 import { make_wiki_root } from './test-utils.js';
@@ -23,6 +27,7 @@ describe('index_wiki', () => {
 		expect(result.linkCount).toBe(1);
 		expect(result.indexedAt).toEqual(expect.any(String));
 		expect(result.schemaVersion).toBe(1);
+		expect(result.packageVersion).toBe(current_index_package_version);
 
 		const results = search_wiki('inspectable', root);
 		expect(results).toEqual([
@@ -51,6 +56,8 @@ describe('index_wiki', () => {
 				exists: true,
 				stale: false,
 				reasons: [],
+				packageVersion: current_index_package_version,
+				currentPackageVersion: current_index_package_version,
 				pageCount: 1,
 				indexedPageCount: 1,
 			}),

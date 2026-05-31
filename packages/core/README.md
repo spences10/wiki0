@@ -18,31 +18,34 @@ Core wiki0 primitives for local-first Markdown wiki memory.
 
 ```ts
 import {
-  bootstrap_wiki,
-  create_page,
-  index_status,
-  index_wiki,
-  search_wiki,
-  get_wiki_context,
-  lint_wiki,
-  plan_wiki,
-} from "@wiki0/core";
+	bootstrap_wiki,
+	create_page,
+	index_status,
+	index_wiki,
+	search_wiki,
+	get_wiki_context,
+	lint_wiki,
+	plan_wiki,
+} from '@wiki0/core';
 
-create_page("projects/wiki0", "Local-first [[topics/memory]].", {
-  root: ".",
+create_page('projects/wiki0', 'Local-first [[topics/memory]].', {
+	root: '.',
 });
-index_wiki(".");
-console.log(index_status("."));
-console.log(search_wiki("memory", ".", 10));
-console.log(get_wiki_context("what is wiki0?", ".", 5).markdown);
-console.log(lint_wiki("."));
-console.log(plan_wiki({ sourceType: "codebase", scope: "current repo" }));
-console.log(bootstrap_wiki({ root: ".", sourceType: "docs" }));
+index_wiki('.');
+console.log(index_status('.'));
+console.log(search_wiki('memory', '.', 10));
+console.log(get_wiki_context('what is wiki0?', '.', 5).markdown);
+console.log(lint_wiki('.'));
+console.log(
+	plan_wiki({ sourceType: 'codebase', scope: 'current repo' }),
+);
+console.log(bootstrap_wiki({ root: '.', sourceType: 'docs' }));
 ```
 
 ## Storage model
 
 Markdown files under `wiki/` are canonical. The `.wiki0/wiki0.sqlite`
 database is a rebuildable cache for search, backlinks, graph data, and
-facts. `index_status` reports indexed-at time, schema version, and
-stale reasons when Markdown has changed since the last rebuild.
+facts. `index_status` reports indexed-at time, schema/package
+versions, and stale reasons when Markdown or index metadata has
+changed since the last rebuild.

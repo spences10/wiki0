@@ -52,6 +52,7 @@ export type IndexResult = {
 	linkCount: number;
 	indexedAt: string;
 	schemaVersion: number;
+	packageVersion: string;
 };
 
 export type IndexStatus = {
@@ -61,6 +62,8 @@ export type IndexStatus = {
 	indexedAt: string | null;
 	schemaVersion: number | null;
 	currentSchemaVersion: number;
+	packageVersion: string | null;
+	currentPackageVersion: string;
 	pageCount: number;
 	indexedPageCount: number;
 	stale: boolean;

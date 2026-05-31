@@ -2,6 +2,7 @@ export { open_wiki_database, wiki_db_path } from './database.js';
 export { add_fact, list_facts } from './facts.js';
 export { graph_wiki } from './graph.js';
 export {
+	current_index_package_version,
 	current_index_schema_version,
 	index_status,
 	index_wiki,

@@ -4,12 +4,12 @@
 
 ### Patch Changes
 
-- 127e5db: Add deterministic wiki planning via core workflow, CLI plan command,
-  MCP tool, prompt, and resource.
-- 0aa1a23: Add safe wiki bootstrap pages from the planning workflow across core,
-  CLI, and MCP.
-- c5534dc: Harden YAML, add index status and MCP safety, switch SQLite to
-  node:sqlite, improve bootstrap templates.
+- 127e5db: Add deterministic wiki planning via core workflow, CLI plan
+  command, MCP tool, prompt, and resource.
+- 0aa1a23: Add safe wiki bootstrap pages from the planning workflow
+  across core, CLI, and MCP.
+- c5534dc: Harden YAML, add index status and MCP safety, switch SQLite
+  to node:sqlite, improve bootstrap templates.
 - Updated dependencies [127e5db]
 - Updated dependencies [8c0fea3]
 - Updated dependencies [0aa1a23]

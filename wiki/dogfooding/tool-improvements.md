@@ -99,20 +99,21 @@ or a product improvement issue.
 
 ## Remaining backlog after wiki workflow dogfood
 
-Prioritized follow-up items:
+Completed follow-up items:
 
-1. Frontmatter/YAML hardening: replace the limited YAML-like
-   parser/serializer with a real YAML implementation or clearly
-   document the supported subset.
-2. MCP root safety: add allowed-root and read-only modes so
-   write-capable tools cannot mutate arbitrary paths by accident.
-3. Index freshness/status: track indexed-at time, schema version,
-   package version, and stale state; expose through CLI/MCP.
-4. Review queue cleanup: decide or update proposed decision pages and
-   remove `needs-review` from dogfood/product pages once accepted.
-5. Bootstrap depth: improve starter templates and eventually support
-   source ingestion/open-question/fact extraction from detected
-   material.
+- Frontmatter/YAML hardening now uses a real YAML parser/serializer.
+- MCP root safety now has allowed-root and read-only configuration.
+- Index freshness/status now tracks indexed-at time, schema version,
+  package version, and stale state through CLI and MCP.
+- Review queue cleanup accepted proposed decisions and removed stale
+  `needs-review` tags from dogfood/product pages.
+- Core SQLite access now uses Node's built-in `node:sqlite` instead of
+  `better-sqlite3`.
+
+Remaining follow-up item:
+
+- Bootstrap depth: eventually support source ingestion, open-question
+  extraction, and fact extraction from detected material.
 
 Completed in this dogfood run:
 
