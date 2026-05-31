@@ -222,6 +222,30 @@ export type WikiSourceIngestion = {
 	kind: 'file' | 'url' | 'missing';
 };
 
+export type WikiDocumentIngestOptions = {
+	root?: string;
+	sources: string[];
+	overwrite?: boolean;
+	index?: boolean;
+};
+
+export type WikiDocumentIngestion = {
+	source: string;
+	page: string;
+	kind: 'markdown' | 'text' | 'pdf' | 'docx' | 'unsupported';
+	status: 'created' | 'skipped' | 'warning';
+	warnings: string[];
+};
+
+export type WikiDocumentIngestResult = {
+	root: string;
+	sources: string[];
+	created: string[];
+	skipped: string[];
+	ingested_sources: WikiDocumentIngestion[];
+	indexed: IndexResult | null;
+};
+
 export type WikiBootstrapResult = {
 	root: string;
 	plan: WikiPlanResult;

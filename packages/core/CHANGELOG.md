@@ -4,16 +4,16 @@
 
 ### Patch Changes
 
-- c39db70: Add package version index metadata, MCP safety tests, and cleanup
-  completed dogfood backlog notes.
-- aee3b2e: Add chunk-level wiki context retrieval, line-cited snippets, and
-  direct page:line chunk lookup.
-- df757d1: Add bootstrap source ingestion, expose source options, and normalize
-  SQLite rows without unsafe casts.
-- 009e3d6: Add fact source provenance and stale-index warnings for wiki context
-  retrieval.
-- 93373b2: Add topic threads, operation logs, frontmatter ranking, and source
-  candidate fact extraction.
+- c39db70: Add package version index metadata, MCP safety tests, and
+  cleanup completed dogfood backlog notes.
+- aee3b2e: Add chunk-level wiki context retrieval, line-cited
+  snippets, and direct page:line chunk lookup.
+- df757d1: Add bootstrap source ingestion, expose source options, and
+  normalize SQLite rows without unsafe casts.
+- 009e3d6: Add fact source provenance and stale-index warnings for
+  wiki context retrieval.
+- 93373b2: Add topic threads, operation logs, frontmatter ranking, and
+  source candidate fact extraction.
 
 ## 0.0.3
 

@@ -5,6 +5,7 @@ import {
 	CreatePageSchema,
 	GraphWikiSchema,
 	IndexWikiSchema,
+	IngestDocumentsSchema,
 	LintWikiSchema,
 	ListFactsSchema,
 	ListTopicThreadsSchema,
@@ -48,6 +49,14 @@ describe('MCP schemas', () => {
 	});
 
 	it('applies defaults for indexing and search', () => {
+		expect(
+			parse(IngestDocumentsSchema, { sources: ['docs'] }),
+		).toEqual({
+			root: '.',
+			sources: ['docs'],
+			overwrite: false,
+			index: true,
+		});
 		expect(parse(IndexWikiSchema, {})).toEqual({ root: '.' });
 		expect(parse(GraphWikiSchema, {})).toEqual({ root: '.' });
 		expect(parse(LintWikiSchema, {})).toEqual({ root: '.' });

@@ -32,6 +32,8 @@
 		"test:self": "vitest run"
 	},
 	"dependencies": {
+		"mammoth": "^1.12.0",
+		"pdf-parse": "^2.4.5",
 		"yaml": "^2.9.0"
 	},
 	"devDependencies": {

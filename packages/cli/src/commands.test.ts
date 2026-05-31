@@ -7,6 +7,7 @@ describe('main command', () => {
 			'init',
 			'page',
 			'bootstrap',
+			'ingest',
 			'plan',
 			'facts',
 			'events',

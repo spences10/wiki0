@@ -9,6 +9,7 @@ import {
 	graph_wiki,
 	index_status,
 	index_wiki,
+	ingest_documents,
 	lint_wiki,
 	list_facts,
 	list_topic_threads,
@@ -259,6 +260,43 @@ export const main = defineCommand({
 						overwrite: Boolean(args.overwrite),
 						ingest_sources: Boolean(args.ingest_sources),
 						sources: parse_sources(args.sources),
+					}),
+				);
+			},
+		}),
+		ingest: defineCommand({
+			meta: {
+				description:
+					'Ingest source documents into wiki source pages, then index the wiki',
+			},
+			args: {
+				sources: {
+					type: 'positional',
+					required: true,
+					description: 'Comma-separated source paths or directories',
+				},
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				overwrite: {
+					type: 'boolean',
+					description: 'Overwrite existing ingested source pages',
+				},
+				noIndex: {
+					type: 'boolean',
+					description:
+						'Skip rebuilding the SQLite index after ingest',
+				},
+			},
+			async run({ args }) {
+				print_json(
+					await ingest_documents({
+						root: String(args.root ?? '.'),
+						sources: parse_sources(args.sources) ?? [],
+						overwrite: Boolean(args.overwrite),
+						index: !args.noIndex,
 					}),
 				);
 			},

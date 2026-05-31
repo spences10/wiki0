@@ -8,6 +8,7 @@ import {
 	graph_wiki,
 	index_status,
 	index_wiki,
+	ingest_documents,
 	lint_wiki,
 	list_facts,
 	list_topic_threads,
@@ -41,6 +42,7 @@ import {
 	GraphWikiSchema,
 	IndexStatusSchema,
 	IndexWikiSchema,
+	IngestDocumentsSchema,
 	LintWikiSchema,
 	ListFactsSchema,
 	ListTopicThreadsSchema,
@@ -68,6 +70,7 @@ type SetPageFrontmatterInput = InferInput<
 >;
 type IndexWikiInput = InferInput<typeof IndexWikiSchema>;
 type IndexStatusInput = InferInput<typeof IndexStatusSchema>;
+type IngestDocumentsInput = InferInput<typeof IngestDocumentsSchema>;
 type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type ListFactsInput = InferInput<typeof ListFactsSchema>;
@@ -329,6 +332,31 @@ export function register_wiki_tools(server: {
 		async ({ title, body, root }: AppendPageInput) => {
 			assert_mcp_writable('append_page');
 			return json_response(append_page(title, body, mcp_root(root)));
+		},
+	);
+
+	tool(
+		{
+			name: 'ingest_documents',
+			description:
+				'Ingest source documents into wiki source pages, then index the wiki',
+			schema: IngestDocumentsSchema,
+		},
+		async ({
+			root,
+			sources,
+			overwrite,
+			index,
+		}: IngestDocumentsInput) => {
+			assert_mcp_writable('ingest_documents');
+			return json_response(
+				await ingest_documents({
+					root: mcp_root(root),
+					sources,
+					overwrite,
+					index,
+				}),
+			);
 		},
 	);
 

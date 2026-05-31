@@ -181,9 +181,45 @@ Completed in this dogfood run:
 
 ## Schema migration follow-up
 
-- The current runtime `ALTER TABLE` guards were added to keep the active dogfood SQLite index usable while iterating quickly across schema versions.
-- Because `.wiki0/wiki0.sqlite` is a rebuildable cache and wiki0 is not yet used outside this repo, this does not need to become a full migration framework immediately.
+- The current runtime `ALTER TABLE` guards were added to keep the
+  active dogfood SQLite index usable while iterating quickly across
+  schema versions.
+- Because `.wiki0/wiki0.sqlite` is a rebuildable cache and wiki0 is
+  not yet used outside this repo, this does not need to become a full
+  migration framework immediately.
 - Next iteration should decide between two explicit paths:
-  - keep the index disposable and rebuild automatically when `schema_version` changes, or
-  - add a small migration module if durable user data moves into SQLite.
-- Important distinction: facts and operation logs are currently stored in SQLite, so either they need export/rebuild semantics or they should be treated as durable enough to justify migrations.
+  - keep the index disposable and rebuild automatically when
+    `schema_version` changes, or
+  - add a small migration module if durable user data moves into
+    SQLite.
+- Important distinction: facts and operation logs are currently stored
+  in SQLite, so either they need export/rebuild semantics or they
+  should be treated as durable enough to justify migrations.
+
+## Document parsing core dogfood
+
+- Added [[product/document-ingestion]] to capture the
+  rebuildable-index ingestion plan.
+- Added core `parse_document` / `document_kind` primitives for `.md`,
+  `.txt`, `.pdf`, `.docx`, and unsupported files.
+- Added parser dependencies in `@wiki0/core`: `pdf-parse` and
+  `mammoth`.
+- Validation:
+  `pnpm --filter @wiki0/core run test:self -- documents.test.ts`,
+  `pnpm --filter @wiki0/core run check:self`, and
+  `pnpm --filter @wiki0/core run build:self` passed.
+
+## Recurring document ingest dogfood
+
+- Added core `ingest_documents` to recursively ingest supported source
+  files into Markdown source pages under `sources/ingested` and
+  rebuild the index by default.
+- Added CLI `wiki0 ingest <sources>` and MCP `ingest_documents` for
+  recurring ingestion after bootstrap.
+- Ingested source pages preserve extracted text, parser metadata,
+  parser warnings, candidate facts, and open questions in Markdown so
+  the SQLite database remains rebuildable.
+- Dogfooded the built CLI against a temporary wiki with
+  `node packages/cli/dist/index.js ingest docs --root <tmp> --json`;
+  it created `sources/ingested/docs-runtime-md.md` and indexed one
+  page.

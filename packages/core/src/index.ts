@@ -1,5 +1,13 @@
 export { open_wiki_database, wiki_db_path } from './database.js';
+export {
+	document_kind,
+	parse_document,
+	type ParsedDocument,
+	type ParsedDocumentKind,
+	type ParsedDocumentMetadata,
+} from './documents.js';
 export { list_wiki_events, log_wiki_event } from './events.js';
+export { ingest_documents } from './ingest.js';
 export { add_fact, list_facts } from './facts.js';
 export { graph_wiki } from './graph.js';
 export {
