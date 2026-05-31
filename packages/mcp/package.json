@@ -1,6 +1,6 @@
 {
 	"name": "@wiki0/mcp",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "MCP server for wiki0 local-first Markdown memory",
 	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/mcp#readme",
 	"license": "MIT",

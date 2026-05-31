@@ -1,5 +1,18 @@
 # @wiki0/core
 
+## 0.0.5
+
+### Patch Changes
+
+- 0ff1af5: Improve document ingest sync, full-text preservation, extraction
+  interfaces, and Markdown frontmatter parsing.
+- 87937d8: Replace ingest and bootstrap workflows with document sync commands,
+  tools, types, and documentation.
+- 532b5d5: Add document parsing and recurring ingest workflow for rebuildable
+  Markdown-backed wiki source pages.
+- fb32a79: Add recursive sync filters, derived facts, proposed pages, and real
+  PDF/DOCX smoke tests.
+
 ## 0.0.4
 
 ### Patch Changes
