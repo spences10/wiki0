@@ -1,4 +1,5 @@
 export { open_wiki_database, wiki_db_path } from './database.js';
+export { list_wiki_events, log_wiki_event } from './events.js';
 export { add_fact, list_facts } from './facts.js';
 export { graph_wiki } from './graph.js';
 export {
@@ -43,6 +44,7 @@ export {
 	search_wiki_chunks,
 	show_wiki_chunk,
 } from './search.js';
+export { list_topic_threads } from './topics.js';
 export type * from './types.js';
 export {
 	bootstrap_wiki,

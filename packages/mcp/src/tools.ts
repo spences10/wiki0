@@ -10,6 +10,8 @@ import {
 	index_wiki,
 	lint_wiki,
 	list_facts,
+	list_topic_threads,
+	list_wiki_events,
 	parse_markdown,
 	parse_wikilinks,
 	plan_wiki,
@@ -41,6 +43,8 @@ import {
 	IndexWikiSchema,
 	LintWikiSchema,
 	ListFactsSchema,
+	ListTopicThreadsSchema,
+	ListWikiEventsSchema,
 	ParseMarkdownSchema,
 	ParseWikilinksSchema,
 	PlanWikiSchema,
@@ -67,6 +71,10 @@ type IndexStatusInput = InferInput<typeof IndexStatusSchema>;
 type GraphWikiInput = InferInput<typeof GraphWikiSchema>;
 type LintWikiInput = InferInput<typeof LintWikiSchema>;
 type ListFactsInput = InferInput<typeof ListFactsSchema>;
+type ListWikiEventsInput = InferInput<typeof ListWikiEventsSchema>;
+type ListTopicThreadsInput = InferInput<
+	typeof ListTopicThreadsSchema
+>;
 type SearchWikiInput = InferInput<typeof SearchWikiSchema>;
 type ContextWikiInput = InferInput<typeof ContextWikiSchema>;
 type ShowWikiChunkInput = InferInput<typeof ShowWikiChunkSchema>;
@@ -196,6 +204,27 @@ export function register_wiki_tools(server: {
 		},
 		async ({ root, category }: ListFactsInput) =>
 			json_response(list_facts(mcp_root(root), category)),
+	);
+
+	tool(
+		{
+			name: 'list_wiki_events',
+			description: 'List recent wiki0 operation log events',
+			schema: ListWikiEventsSchema,
+		},
+		async ({ root, limit }: ListWikiEventsInput) =>
+			json_response(list_wiki_events(mcp_root(root), limit)),
+	);
+
+	tool(
+		{
+			name: 'list_topic_threads',
+			description:
+				'List lightweight topic threads from indexed wiki chunks',
+			schema: ListTopicThreadsSchema,
+		},
+		async ({ root, limit }: ListTopicThreadsInput) =>
+			json_response(list_topic_threads(mcp_root(root), limit)),
 	);
 
 	tool(

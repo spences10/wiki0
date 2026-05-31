@@ -5,6 +5,7 @@ import {
 	statSync,
 } from 'node:fs';
 import { join } from 'node:path';
+import { log_wiki_event } from './events.js';
 import { index_wiki } from './indexer.js';
 import { serialize_frontmatter } from './markdown.js';
 import { create_page } from './pages.js';
@@ -194,13 +195,21 @@ export function bootstrap_wiki(
 			)
 		: [];
 
+	const indexed = index_wiki(root);
+	log_wiki_event({
+		root,
+		operation: 'bootstrap_wiki',
+		summary: `Bootstrapped ${created.length} pages and ${ingested_sources.length} sources`,
+		target: root,
+		details: { created, skipped, ingested_sources },
+	});
 	return {
 		root,
 		plan,
 		created,
 		skipped,
 		ingested_sources: ingested_sources,
-		indexed: index_wiki(root),
+		indexed,
 	};
 }
 
@@ -318,15 +327,17 @@ function source_template(
 		tags: ['source', kind],
 		status: kind === 'missing' ? 'review' : 'draft',
 	});
-	const excerpt =
-		kind === 'file' ? source_excerpt(join(root, source)) : '';
+	const source_path = join(root, source);
+	const excerpt = kind === 'file' ? source_excerpt(source_path) : '';
+	const candidate_facts =
+		kind === 'file' ? source_candidate_facts(source_path) : [];
 	const evidence =
 		kind === 'file'
 			? `## Extracted excerpt\n\n${excerpt}\n\n`
 			: kind === 'url'
 				? '## Extraction\n\n- URL ingestion is registered; fetch and summarize this source before promoting facts.\n\n'
 				: '## Extraction\n\n- Source was listed but not found locally; confirm the path or URL.\n\n';
-	return `${frontmatter}# Source: ${source}\n\nSource kind: ${kind}\n\n${evidence}## Candidate facts\n\n- Review this source and promote durable claims with add_fact.\n\n## Open questions\n\n- What claims from this source should become stable wiki pages?\n- What needs citation, owner confirmation, or freshness review?\n`;
+	return `${frontmatter}# Source: ${source}\n\nSource kind: ${kind}\n\n${evidence}## Candidate facts\n\n${format_candidate_facts(candidate_facts)}\n\n## Open questions\n\n- What claims from this source should become stable wiki pages?\n- What needs citation, owner confirmation, or freshness review?\n`;
 }
 
 function source_excerpt(file_path: string): string {
@@ -339,6 +350,33 @@ function source_excerpt(file_path: string): string {
 	return content.length > 0
 		? `\`\`\`\n${content}\n\`\`\``
 		: '- Source file is empty.';
+}
+
+function source_candidate_facts(file_path: string): string[] {
+	const stats = statSync(file_path);
+	if (stats.isDirectory()) return [];
+	const lines = readFileSync(file_path, 'utf-8').split(/\r?\n/u);
+	return lines
+		.map((line, index) => ({
+			line: line.trim(),
+			line_number: index + 1,
+		}))
+		.filter(({ line }) =>
+			/\b(should|must|required|requirement|decision|constraint|risk|assumption|fact)\b/iu.test(
+				line,
+			),
+		)
+		.slice(0, 10)
+		.map(
+			({ line, line_number }) =>
+				`- Candidate from line ${line_number}: ${line}`,
+		);
+}
+
+function format_candidate_facts(candidate_facts: string[]): string {
+	return candidate_facts.length > 0
+		? candidate_facts.join('\n')
+		: '- Review this source and promote durable claims with add_fact.';
 }
 
 function source_slug(source: string): string {

@@ -7,6 +7,8 @@ import {
 	IndexWikiSchema,
 	LintWikiSchema,
 	ListFactsSchema,
+	ListTopicThreadsSchema,
+	ListWikiEventsSchema,
 	SearchWikiSchema,
 } from './schemas.js';
 
@@ -35,6 +37,14 @@ describe('MCP schemas', () => {
 			root: '.',
 		});
 		expect(parse(ListFactsSchema, {})).toEqual({ root: '.' });
+		expect(parse(ListWikiEventsSchema, {})).toEqual({
+			root: '.',
+			limit: 50,
+		});
+		expect(parse(ListTopicThreadsSchema, {})).toEqual({
+			root: '.',
+			limit: 50,
+		});
 	});
 
 	it('applies defaults for indexing and search', () => {

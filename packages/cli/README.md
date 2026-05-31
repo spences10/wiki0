@@ -26,6 +26,8 @@ wiki0 lint --root ./my-wiki
 wiki0 graph --root ./my-wiki
 wiki0 facts add "Markdown is source of truth" --category decision --confidence high --source decisions/storage.md:12 --root ./my-wiki
 wiki0 facts list --root ./my-wiki
+wiki0 topics --root ./my-wiki
+wiki0 events --root ./my-wiki
 wiki0 review --root ./my-wiki
 ```
 

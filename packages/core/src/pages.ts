@@ -6,6 +6,7 @@ import {
 	writeFileSync,
 } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { log_wiki_event } from './events.js';
 import {
 	page_title_from_markdown,
 	parse_markdown,
@@ -43,7 +44,14 @@ export function create_page(
 		},
 	);
 
-	return read_page(title, options.root);
+	const page = read_page(title, options.root);
+	log_wiki_event({
+		root: options.root,
+		operation: options.overwrite ? 'overwrite_page' : 'create_page',
+		summary: `Wrote wiki page ${page.path}`,
+		target: page.path,
+	});
+	return page;
 }
 
 export function read_page(title: string, root = '.'): WikiPage {
@@ -72,7 +80,14 @@ export function set_page_frontmatter(
 		file_path,
 		next_body.endsWith('\n') ? next_body : `${next_body}\n`,
 	);
-	return read_page_by_path(page_path, options.root);
+	const page = read_page_by_path(page_path, options.root);
+	log_wiki_event({
+		root: options.root,
+		operation: 'set_page_frontmatter',
+		summary: `Updated frontmatter for ${page.path}`,
+		target: page.path,
+	});
+	return page;
 }
 
 export function append_page(
@@ -90,7 +105,14 @@ export function append_page(
 			flag: 'a',
 		},
 	);
-	return read_page_by_path(page_path, root);
+	const page = read_page_by_path(page_path, root);
+	log_wiki_event({
+		root,
+		operation: 'append_page',
+		summary: `Appended wiki page ${page.path}`,
+		target: page.path,
+	});
+	return page;
 }
 
 export function resolve_page_path(title: string, root = '.'): string {

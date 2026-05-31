@@ -162,3 +162,19 @@ Completed in this dogfood run:
 - Dogfooding
   `wiki0 facts add ... --source dogfooding/tool-improvements.md:138 --root .`
   stored the expected heading, line range, and source quote.
+
+## Topic threads operation log and ranking dogfood
+
+- Added lightweight topic-thread listing from indexed headings and
+  page tags through CLI and MCP.
+- Added an operation log for page writes, indexing, fact writes, and
+  bootstrap workflows.
+- Added frontmatter-aware chunk ranking using `priority`, `status`,
+  and `tags` metadata.
+- Bootstrap source notes now extract simple candidate facts from lines
+  containing requirement-style language.
+- Dogfooding `wiki0 topics --root . --limit 3` returned project topic
+  clusters, and `wiki0 events --root . --limit 3` returned recent
+  index operations.
+- Dogfooding bootstrap against a temporary source produced a
+  `Candidate facts` chunk with extracted source lines.

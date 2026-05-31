@@ -121,6 +121,9 @@ export function search_wiki_chunks(
 			page_chunks.body,
 			page_chunks.start_line AS start_line,
 			page_chunks.end_line AS end_line,
+			page_chunks.page_priority,
+			page_chunks.page_status,
+			page_chunks.page_tags,
 			snippet(fts_page_chunks, 4, '[', ']', '…', 12) AS snippet,
 			bm25(fts_page_chunks) AS rank
 		FROM fts_page_chunks
@@ -136,21 +139,113 @@ export function search_wiki_chunks(
 	}
 
 	try {
-		const rows = statement.all(
-			fts_query,
+		const rows = boosted_chunk_rows(
+			(
+				statement.all(fts_query, limit * 5) as Record<
+					string,
+					SQLOutputValue
+				>[]
+			).map(chunk_row_from_sql),
 			limit,
-		) as ChunkSearchResult[];
+		);
 		if (rows.length > 0) return rows;
 
 		const relaxed_query = relaxed_plain_text_fts_query(query);
 		if (!relaxed_query || relaxed_query === fts_query) return rows;
-		return statement.all(relaxed_query, limit) as ChunkSearchResult[];
+		return boosted_chunk_rows(
+			(
+				statement.all(relaxed_query, limit * 5) as Record<
+					string,
+					SQLOutputValue
+				>[]
+			).map(chunk_row_from_sql),
+			limit,
+		);
 	} catch (error) {
 		throw new Error(`Invalid wiki chunk search query: ${query}`, {
 			cause: error,
 		});
 	} finally {
 		db.close();
+	}
+}
+
+function chunk_row_from_sql(
+	row: Record<string, SQLOutputValue>,
+): ChunkSearchResult {
+	return {
+		chunk_id: Number(row.chunk_id),
+		path: String(row.path),
+		title: String(row.title),
+		heading: row.heading === null ? null : String(row.heading),
+		body: String(row.body),
+		start_line: Number(row.start_line),
+		end_line: Number(row.end_line),
+		page_priority: Number(row.page_priority ?? 0),
+		page_status:
+			row.page_status === null ? null : String(row.page_status),
+		page_tags: parse_page_tags(row.page_tags),
+		snippet: String(row.snippet),
+		rank: Number(row.rank),
+	};
+}
+
+function boosted_chunk_rows(
+	rows: ChunkSearchResult[],
+	limit: number,
+): ChunkSearchResult[] {
+	return rows
+		.map(normalize_chunk_row)
+		.map((row) => ({ ...row, rank: boosted_rank(row) }))
+		.sort((left, right) => left.rank - right.rank)
+		.slice(0, limit);
+}
+
+function normalize_chunk_row(
+	row: ChunkSearchResult,
+): ChunkSearchResult {
+	return {
+		...row,
+		page_tags: parse_page_tags(row.page_tags),
+	};
+}
+
+function boosted_rank(row: ChunkSearchResult): number {
+	const priority = row.page_priority ?? 0;
+	const status = (row.page_status ?? '').toLowerCase();
+	const tags = row.page_tags ?? [];
+	let rank = row.rank - priority * 0.1;
+	if (status === 'verified' || status === 'accepted') rank -= 0.5;
+	if (status === 'draft' || status === 'review') rank += 0.5;
+	if (
+		status === 'stale' ||
+		status === 'superseded' ||
+		status === 'archived'
+	) {
+		rank += 2;
+	}
+	if (tags.includes('canonical') || tags.includes('source'))
+		rank -= 0.25;
+	if (tags.includes('archive') || tags.includes('superseded'))
+		rank += 2;
+	return rank;
+}
+
+function parse_page_tags(value: unknown): string[] {
+	if (Array.isArray(value))
+		return value.filter(
+			(item): item is string => typeof item === 'string',
+		);
+	if (typeof value !== 'string') return [];
+	try {
+		const parsed = JSON.parse(value) as unknown;
+		return Array.isArray(parsed)
+			? parsed.filter(
+					(item): item is string => typeof item === 'string',
+				)
+			: [];
+	} catch {
+		return [];
 	}
 }
 

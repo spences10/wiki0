@@ -9,6 +9,8 @@ describe('main command', () => {
 			'bootstrap',
 			'plan',
 			'facts',
+			'events',
+			'topics',
 			'index',
 			'status',
 			'search',

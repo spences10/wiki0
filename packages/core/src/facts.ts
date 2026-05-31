@@ -1,5 +1,6 @@
 import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database, type WikiDatabase } from './database.js';
+import { log_wiki_event } from './events.js';
 import { resolve_page_path } from './pages.js';
 import { resolve_wiki_root } from './paths.js';
 import { show_wiki_chunk } from './search.js';
@@ -50,6 +51,16 @@ export function add_fact(fact: FactWriteOptions): Fact {
 		Number(result.lastInsertRowid),
 	);
 	db.close();
+	log_wiki_event({
+		root: wiki_root,
+		operation: 'add_fact',
+		summary: fact.summary,
+		target: page_path ?? source_chunk?.path ?? undefined,
+		details: {
+			category: fact.category,
+			confidence: inserted.confidence,
+		},
+	});
 	return inserted;
 }
 

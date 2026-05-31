@@ -39,6 +39,8 @@ wiki0 search "why sqlite"
 wiki0 context "what did we decide about memory?"
 wiki0 lint
 wiki0 graph
+wiki0 topics
+wiki0 events
 wiki0 facts add "SQLite is a rebuildable index" --category decision
 ```
 

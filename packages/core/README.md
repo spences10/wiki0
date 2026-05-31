@@ -14,6 +14,8 @@ Core wiki0 primitives for local-first Markdown wiki memory.
 - Backlinks, graph data, lint results, review queues, and structured
   facts with optional source-line provenance.
 - Stale-index warnings in context responses.
+- Lightweight topic threads and operation logs for agent workflows.
+- Frontmatter-aware chunk ranking using priority, status, and tags.
 - Wiki-building workflow planning for agents that need a deterministic
   source-to-wiki recipe.
 

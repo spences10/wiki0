@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { open_wiki_database, wiki_db_path } from './database.js';
+import { log_wiki_event } from './events.js';
 import {
 	list_markdown_page_paths,
 	read_page_by_path,
@@ -9,13 +10,14 @@ import {
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
-export const current_index_schema_version = 3;
+export const current_index_schema_version = 4;
 export const current_index_package_version = read_package_version();
 
 export function index_wiki(root = '.'): IndexResult {
 	const wiki_root = resolve_wiki_root(root);
 	const db_path = wiki_db_path(wiki_root);
 	const db = open_wiki_database(wiki_root);
+	ensure_index_schema(db);
 	let page_count = 0;
 	let link_count = 0;
 
@@ -46,8 +48,11 @@ export function index_wiki(root = '.'): IndexResult {
 		'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
 	);
 	const insert_chunk = db.prepare(`
-		INSERT INTO page_chunks (page_id, path, title, heading, body, start_line, end_line, sequence)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO page_chunks (
+			page_id, path, title, heading, body, start_line, end_line,
+			sequence, page_priority, page_status, page_tags
+		)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`);
 	const insert_chunk_fts = db.prepare(
 		'INSERT INTO fts_page_chunks (chunk_id, path, title, heading, body) VALUES (?, ?, ?, ?, ?)',
@@ -121,6 +126,13 @@ export function index_wiki(root = '.'): IndexResult {
 				link_count += 1;
 			}
 			insert_fts.run(page.path, page.title, page.content);
+			const page_priority = frontmatter_number(
+				page.frontmatter.priority,
+			);
+			const page_status = frontmatter_string(page.frontmatter.status);
+			const page_tags = frontmatter_string_array(
+				page.frontmatter.tags,
+			);
 			for (const chunk of chunk_page_body(page.body)) {
 				const chunk_result = insert_chunk.run(
 					row.id,
@@ -131,6 +143,9 @@ export function index_wiki(root = '.'): IndexResult {
 					chunk.start_line,
 					chunk.end_line,
 					chunk.sequence,
+					page_priority,
+					page_status,
+					JSON.stringify(page_tags),
 				);
 				insert_chunk_fts.run(
 					chunk_result.lastInsertRowid,
@@ -163,6 +178,17 @@ export function index_wiki(root = '.'): IndexResult {
 		throw error;
 	}
 	db.close();
+	log_wiki_event({
+		root: wiki_root,
+		operation: 'index_wiki',
+		summary: `Indexed ${page_count} pages and ${link_count} links`,
+		target: wiki_root,
+		details: {
+			page_count,
+			link_count,
+			schema_version: current_index_schema_version,
+		},
+	});
 	return {
 		root: wiki_root,
 		db_path: db_path,
@@ -172,6 +198,28 @@ export function index_wiki(root = '.'): IndexResult {
 		schema_version: current_index_schema_version,
 		package_version: current_index_package_version,
 	};
+}
+
+function ensure_index_schema(
+	db: ReturnType<typeof open_wiki_database>,
+): void {
+	const chunk_columns = new Set(
+		(
+			db.prepare('PRAGMA table_info(page_chunks)').all() as {
+				name: string;
+			}[]
+		).map((column) => column.name),
+	);
+	const migrations: Record<string, string> = {
+		page_priority:
+			'ALTER TABLE page_chunks ADD COLUMN page_priority INTEGER NOT NULL DEFAULT 0',
+		page_status:
+			'ALTER TABLE page_chunks ADD COLUMN page_status TEXT',
+		page_tags: 'ALTER TABLE page_chunks ADD COLUMN page_tags TEXT',
+	};
+	for (const [column_name, sql] of Object.entries(migrations)) {
+		if (!chunk_columns.has(column_name)) db.exec(sql);
+	}
 }
 
 type PageChunk = {
@@ -216,6 +264,25 @@ export function chunk_page_body(body: string): PageChunk[] {
 			sequence,
 		};
 	});
+}
+
+function frontmatter_string(value: unknown): string | null {
+	return typeof value === 'string' ? value : null;
+}
+
+function frontmatter_number(value: unknown): number {
+	return typeof value === 'number' && Number.isFinite(value)
+		? value
+		: 0;
+}
+
+function frontmatter_string_array(value: unknown): string[] {
+	if (Array.isArray(value)) {
+		return value.filter(
+			(item): item is string => typeof item === 'string',
+		);
+	}
+	return typeof value === 'string' ? [value] : [];
 }
 
 export function index_status(root = '.'): IndexStatus {

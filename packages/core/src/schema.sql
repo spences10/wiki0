@@ -34,6 +34,9 @@ CREATE TABLE IF NOT EXISTS page_chunks (
 	start_line INTEGER NOT NULL,
 	end_line INTEGER NOT NULL,
 	sequence INTEGER NOT NULL,
+	page_priority INTEGER NOT NULL DEFAULT 0,
+	page_status TEXT,
+	page_tags TEXT,
 	created_at TEXT DEFAULT (datetime('now')),
 	UNIQUE(page_id, sequence)
 );
@@ -57,6 +60,15 @@ CREATE TABLE IF NOT EXISTS wiki_meta (
 	key TEXT PRIMARY KEY,
 	value TEXT NOT NULL,
 	updated_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS wiki_events (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	operation TEXT NOT NULL,
+	summary TEXT NOT NULL,
+	target TEXT,
+	details TEXT,
+	created_at TEXT DEFAULT (datetime('now'))
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_pages USING fts5(path, title, body);

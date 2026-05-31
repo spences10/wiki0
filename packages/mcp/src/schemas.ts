@@ -52,6 +52,16 @@ export const ListFactsSchema = v.object({
 	category: v.optional(v.string()),
 });
 
+export const ListWikiEventsSchema = v.object({
+	root: v.optional(v.string(), '.'),
+	limit: v.optional(v.number(), 50),
+});
+
+export const ListTopicThreadsSchema = v.object({
+	root: v.optional(v.string(), '.'),
+	limit: v.optional(v.number(), 50),
+});
+
 export const IndexWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
 });

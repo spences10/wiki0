@@ -76,6 +76,27 @@ describe('context and backlinks', () => {
 		);
 	});
 
+	it('boosts chunk results with frontmatter priority and status', () => {
+		const root = make_wiki_root();
+		create_page(
+			'archive/old',
+			'---\npriority: 0\nstatus: stale\n---\n# Old\n\nAgent context ranking.',
+			{ root },
+		);
+		create_page(
+			'decisions/current',
+			'---\npriority: 20\nstatus: verified\ntags: [canonical]\n---\n# Current\n\nAgent context ranking.',
+			{ root },
+		);
+		index_wiki(root);
+
+		expect(
+			search_wiki_chunks('agent context ranking', root, 2)[0],
+		).toEqual(
+			expect.objectContaining({ path: 'decisions/current.md' }),
+		);
+	});
+
 	it('warns when context uses a stale index', () => {
 		const root = make_wiki_root();
 		create_page('projects/wiki0', 'Stable indexed text.', { root });

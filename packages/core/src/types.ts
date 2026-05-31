@@ -83,6 +83,9 @@ export type ChunkSearchResult = SearchResult & {
 	body: string;
 	start_line: number;
 	end_line: number;
+	page_priority?: number;
+	page_status?: string | null;
+	page_tags?: string[];
 };
 
 export type ShowChunkResult = ChunkSearchResult;
@@ -226,4 +229,21 @@ export type WikiBootstrapResult = {
 	skipped: string[];
 	ingested_sources: WikiSourceIngestion[];
 	indexed: IndexResult;
+};
+
+export type WikiEvent = {
+	id: number;
+	operation: string;
+	summary: string;
+	target: string | null;
+	details: string | null;
+	created_at: string;
+};
+
+export type TopicThreadResult = {
+	topic: string;
+	reference_count: number;
+	page_count: number;
+	paths: string[];
+	summary: string;
 };

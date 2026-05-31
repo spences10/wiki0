@@ -11,6 +11,8 @@ import {
 	index_wiki,
 	lint_wiki,
 	list_facts,
+	list_topic_threads,
+	list_wiki_events,
 	plan_wiki,
 	read_page,
 	review_wiki,
@@ -367,6 +369,55 @@ export const main = defineCommand({
 						);
 					},
 				}),
+			},
+		}),
+		events: defineCommand({
+			meta: { description: 'List recent wiki operation log events' },
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				limit: {
+					type: 'string',
+					description: 'Maximum number of events',
+					default: '50',
+				},
+			},
+			run({ args }) {
+				print_json(
+					list_wiki_events(
+						String(args.root ?? '.'),
+						Number(args.limit ?? 50),
+					),
+				);
+			},
+		}),
+		topics: defineCommand({
+			meta: {
+				description:
+					'List lightweight topic threads from indexed chunks',
+			},
+			args: {
+				root: {
+					type: 'string',
+					description: 'Wiki root path',
+					default: '.',
+				},
+				limit: {
+					type: 'string',
+					description: 'Maximum number of topics',
+					default: '50',
+				},
+			},
+			run({ args }) {
+				print_json(
+					list_topic_threads(
+						String(args.root ?? '.'),
+						Number(args.limit ?? 50),
+					),
+				);
 			},
 		}),
 		index: defineCommand({

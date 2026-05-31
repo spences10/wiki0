@@ -66,7 +66,7 @@ describe('wiki building workflow', () => {
 		mkdirSync(join(root, 'docs'));
 		writeFileSync(
 			join(root, 'docs/guide.md'),
-			'# Guide\n\nFact candidate.\n',
+			'# Guide\n\nThe guide should preserve source quotes.\nFact candidate.\n',
 		);
 		const result = bootstrap_wiki({
 			root,
@@ -88,12 +88,14 @@ describe('wiki building workflow', () => {
 				}),
 			]),
 		);
-		expect(
-			readFileSync(
-				join(root, 'wiki/sources/detected/docs-guide-md.md'),
-				'utf-8',
-			),
-		).toContain('Fact candidate.');
+		const source_note = readFileSync(
+			join(root, 'wiki/sources/detected/docs-guide-md.md'),
+			'utf-8',
+		);
+		expect(source_note).toContain('Fact candidate.');
+		expect(source_note).toContain(
+			'Candidate from line 3: The guide should preserve source quotes.',
+		);
 		expect(lint_wiki(root).ok).toBe(true);
 	});
 
