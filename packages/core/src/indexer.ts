@@ -9,7 +9,7 @@ import {
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
-export const current_index_schema_version = 2;
+export const current_index_schema_version = 3;
 export const current_index_package_version = read_package_version();
 
 export function index_wiki(root = '.'): IndexResult {

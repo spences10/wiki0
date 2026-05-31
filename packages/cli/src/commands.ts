@@ -313,6 +313,15 @@ export const main = defineCommand({
 							type: 'string',
 							description: 'Related page title or path',
 						},
+						source: {
+							type: 'string',
+							description:
+								'Source page or page:line target for provenance',
+						},
+						sourceQuote: {
+							type: 'string',
+							description: 'Exact source quote for provenance',
+						},
 						root: {
 							type: 'string',
 							description: 'Wiki root path',
@@ -328,6 +337,10 @@ export const main = defineCommand({
 								summary: String(args.summary),
 								body: args.body ? String(args.body) : undefined,
 								confidence: parse_fact_confidence(args.confidence),
+								source: args.source ? String(args.source) : undefined,
+								source_quote: args.sourceQuote
+									? String(args.sourceQuote)
+									: undefined,
 							}),
 						);
 					},

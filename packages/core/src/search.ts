@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database } from './database.js';
+import { index_status } from './indexer.js';
 import { resolve_page_path } from './pages.js';
 import { resolve_wiki_root } from './paths.js';
 import type {
@@ -194,19 +195,36 @@ export function get_wiki_context(
 	root = '.',
 	limit = 5,
 ): ContextResult {
+	const status = index_status(root);
+	const warnings = status.stale
+		? [
+				`Index is stale (${status.reasons.join(', ')}); run index_wiki before relying on these results.`,
+			]
+		: [];
 	const results = search_wiki_chunks(query, root, limit);
 	return {
 		query,
 		results,
-		markdown: format_context_markdown(query, results),
+		warnings,
+		markdown: format_context_markdown(query, results, warnings),
 	};
 }
 
 export function format_context_markdown(
 	query: string,
 	results: ChunkSearchResult[],
+	warnings: string[] = [],
 ): string {
 	const lines = [`# wiki0 context: ${query}`, ''];
+
+	if (warnings.length > 0) {
+		lines.push(
+			'## Warnings',
+			'',
+			...warnings.map((warning) => `- ${warning}`),
+			'',
+		);
+	}
 
 	if (results.length === 0) {
 		lines.push('No indexed wiki context found.');

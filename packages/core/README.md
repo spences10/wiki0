@@ -12,7 +12,8 @@ Core wiki0 primitives for local-first Markdown wiki memory.
   citations.
 - Direct indexed chunk lookup for known `path:line` targets.
 - Backlinks, graph data, lint results, review queues, and structured
-  facts.
+  facts with optional source-line provenance.
+- Stale-index warnings in context responses.
 - Wiki-building workflow planning for agents that need a deterministic
   source-to-wiki recipe.
 

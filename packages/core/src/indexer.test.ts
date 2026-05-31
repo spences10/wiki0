@@ -26,7 +26,7 @@ describe('index_wiki', () => {
 		expect(result.page_count).toBe(2);
 		expect(result.link_count).toBe(1);
 		expect(result.indexed_at).toEqual(expect.any(String));
-		expect(result.schema_version).toBe(2);
+		expect(result.schema_version).toBe(3);
 		expect(result.package_version).toBe(
 			current_index_package_version,
 		);

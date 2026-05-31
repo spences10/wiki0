@@ -42,6 +42,8 @@ export const AddFactSchema = v.object({
 		'unknown',
 	),
 	page: v.optional(v.string()),
+	source: v.optional(v.string()),
+	source_quote: v.optional(v.string()),
 	root: v.optional(v.string(), '.'),
 });
 

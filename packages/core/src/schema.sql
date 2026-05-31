@@ -45,6 +45,11 @@ CREATE TABLE IF NOT EXISTS facts (
 	summary TEXT NOT NULL,
 	body TEXT,
 	confidence TEXT NOT NULL DEFAULT 'unknown',
+	source_path TEXT,
+	source_heading TEXT,
+	source_start_line INTEGER,
+	source_end_line INTEGER,
+	source_quote TEXT,
 	created_at TEXT DEFAULT (datetime('now'))
 );
 

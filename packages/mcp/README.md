@@ -22,7 +22,8 @@ The package exposes the `wiki0-mcp` binary.
 - `index_wiki`, `index_status`, `search_wiki`, `get_wiki_context`
 - `show_wiki_chunk` for known page or `page:line` retrieval
 - `backlinks_for_page`, `graph_wiki`, `lint_wiki`, `review_wiki`
-- `add_fact`, `list_facts`
+- `add_fact`, `list_facts` with optional `source` / `source_quote`
+  provenance
 
 ## Prompt and resource
 

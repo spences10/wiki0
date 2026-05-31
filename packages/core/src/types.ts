@@ -90,6 +90,7 @@ export type ShowChunkResult = ChunkSearchResult;
 export type ContextResult = {
 	query: string;
 	results: ChunkSearchResult[];
+	warnings: string[];
 	markdown: string;
 };
 
@@ -136,6 +137,11 @@ export type Fact = {
 	summary: string;
 	body: string | null;
 	confidence: FactConfidence;
+	source_path: string | null;
+	source_heading: string | null;
+	source_start_line: number | null;
+	source_end_line: number | null;
+	source_quote: string | null;
 	created_at: string;
 };
 
@@ -146,6 +152,8 @@ export type FactWriteOptions = {
 	summary: string;
 	body?: string;
 	confidence?: FactConfidence;
+	source?: string;
+	source_quote?: string;
 };
 
 export type ReviewResult = {

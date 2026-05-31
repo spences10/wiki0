@@ -24,7 +24,7 @@ wiki0 context "what is wiki0?" --root ./my-wiki
 wiki0 show topics/memory.md:12 --root ./my-wiki
 wiki0 lint --root ./my-wiki
 wiki0 graph --root ./my-wiki
-wiki0 facts add "Markdown is source of truth" --category decision --confidence high --root ./my-wiki
+wiki0 facts add "Markdown is source of truth" --category decision --confidence high --source decisions/storage.md:12 --root ./my-wiki
 wiki0 facts list --root ./my-wiki
 wiki0 review --root ./my-wiki
 ```

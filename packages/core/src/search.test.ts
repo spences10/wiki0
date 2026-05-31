@@ -29,6 +29,7 @@ describe('context and backlinks', () => {
 		const context = get_wiki_context('agent', root, 1);
 		expect(context).toEqual({
 			query: 'agent',
+			warnings: [],
 			results: [
 				expect.objectContaining({
 					path: 'topics/memory.md',
@@ -71,6 +72,20 @@ describe('context and backlinks', () => {
 			expect.objectContaining({
 				path: 'projects/wiki0.md',
 				heading: 'Retrieval',
+			}),
+		);
+	});
+
+	it('warns when context uses a stale index', () => {
+		const root = make_wiki_root();
+		create_page('projects/wiki0', 'Stable indexed text.', { root });
+		index_wiki(root);
+		create_page('projects/new', 'Fresh unindexed text.', { root });
+
+		expect(get_wiki_context('indexed', root, 1)).toEqual(
+			expect.objectContaining({
+				warnings: [expect.stringContaining('Index is stale')],
+				markdown: expect.stringContaining('## Warnings'),
 			}),
 		);
 	});

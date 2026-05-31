@@ -44,6 +44,8 @@ export function wiki0_info(): Wiki0Info {
 			'wiki-lint',
 			'wiki-review',
 			'wiki-facts',
+			'wiki-fact-provenance',
+			'wiki-stale-context-warnings',
 			'wiki-planning',
 			'wiki-building-prompt',
 			'wiki-bootstrap',

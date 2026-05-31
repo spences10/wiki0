@@ -149,3 +149,16 @@ Completed in this dogfood run:
   returned the expected source-ingestion section chunk.
 - MCP exposure is implemented as `show_wiki_chunk`; restart the dev
   MCP process before validating that new tool path.
+
+## Fact provenance and stale context dogfood
+
+- Added optional fact provenance through `source` and `source_quote`
+  inputs.
+- Facts can now store source path, heading, line range, and quote
+  alongside page/category/confidence metadata.
+- `get_wiki_context` now reports stale-index warnings in structured
+  output and Markdown instead of silently returning potentially
+  outdated context.
+- Dogfooding
+  `wiki0 facts add ... --source dogfooding/tool-improvements.md:138 --root .`
+  stored the expected heading, line range, and source quote.
