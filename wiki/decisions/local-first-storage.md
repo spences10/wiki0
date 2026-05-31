@@ -20,3 +20,10 @@ rebuildable local index/cache.
 - SQLite gives agents fast FTS, backlinks, and graph queries.
 - Git or cloud-folder sync can move the wiki between machines before
   hosted mode exists.
+
+## Web app implication
+
+The local web UI follows the same storage model. `wiki0 serve [root]`
+receives a Markdown wiki root, not a database path, as the normal user
+entry point. The SQLite database powers fast reads and analysis, but
+Markdown remains canonical.

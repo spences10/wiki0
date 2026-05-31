@@ -24,3 +24,15 @@ The wiki0 CLI is the local command interface for a wiki.
 
 The CLI should be published to npm as the user binary, likely `wiki0`.
 It depends on [[packages/core]].
+
+## Serve command
+
+`wiki0 serve [root]` is the planned local web UI entry point. It should
+prepare the wiki index for `root`, set the active web UI root, start the
+local web server, and open the browser.
+
+The current implementation is a monorepo/development bridge: it refreshes
+the index when stale and launches `wiki0-web` through the workspace dev
+script with `WIKI0_ROOT` set. A packaged release should replace this with
+a bundled static/server build so users do not need the source monorepo or
+pnpm workspace.

@@ -17,6 +17,7 @@ describe('main command', () => {
 			'search',
 			'show',
 			'context',
+			'serve',
 			'graph',
 			'lint',
 			'backlinks',

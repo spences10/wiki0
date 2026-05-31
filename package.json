@@ -26,6 +26,7 @@
 	"scripts": {
 		"build": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter wiki0-web run build",
 		"check": "pnpm --filter \"./packages/*\" run build:self && pnpm --filter \"./packages/*\" run check:self && pnpm --filter wiki0-web run check",
+		"dev": "pnpm --filter wiki0-web run dev",
 		"dev:web": "pnpm --filter wiki0-web run dev",
 		"format": "vp check --fix && pnpm --filter wiki0-web exec vp check --fix",
 		"lint": "vp lint && pnpm --filter wiki0-web run lint",
