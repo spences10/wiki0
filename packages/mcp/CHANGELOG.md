@@ -1,5 +1,14 @@
 # @wiki0/mcp
 
+## 0.0.6
+
+### Patch Changes
+
+- 772f5c3: Add configurable wiki content directory, enabling
+  docs-backed pages, indexing, MCP tools, and gitignored local cache.
+- Updated dependencies [772f5c3]
+  - @wiki0/core@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes

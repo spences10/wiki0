@@ -40,8 +40,8 @@ The serve command should find or create the wiki SQLite index under
 `.wiki0/`, keep it fresh, and expose a browser UI for that local wiki.
 
 Users should not need to select the SQLite database during normal
-onboarding. Direct database selection can exist as an advanced mode for
-inspection or debugging.
+onboarding. Direct database selection can exist as an advanced mode
+for inspection or debugging.
 
 ## Data model
 
@@ -55,8 +55,8 @@ inspection or debugging.
 ## Initial product surface
 
 - Search indexed pages, chunks, and facts.
-- Open a page with Markdown content, frontmatter, wikilinks, backlinks,
-  and source references.
+- Open a page with Markdown content, frontmatter, wikilinks,
+  backlinks, and source references.
 - View a graph derived from indexed wiki links.
 - Review stale pages, orphan pages, duplicate names, broken links, and
   agent-written changes.
@@ -65,8 +65,9 @@ inspection or debugging.
 ## Hosted site role
 
 `wiki0.app` can start as a landing page, docs site, and demo. A hosted
-site can later connect to a local `wiki0 serve` process, but local wiki
-serving remains rooted in Markdown files and the local SQLite index.
+site can later connect to a local `wiki0 serve` process, but local
+wiki serving remains rooted in Markdown files and the local SQLite
+index.
 
 ## Serve and hosted onboarding
 
@@ -85,10 +86,11 @@ private data:
 3. `wiki0 serve` resolves the Markdown wiki root, creates or refreshes
    `.wiki0/wiki0.sqlite`, starts a localhost web server, and opens the
    browser.
-4. The local web server serves both the SvelteKit UI and local JSON/API
-   routes from the same origin so the UI can read local Markdown and the
-   SQLite index without sending wiki data to `wiki0.app`.
+4. The local web server serves both the SvelteKit UI and local
+   JSON/API routes from the same origin so the UI can read local
+   Markdown and the SQLite index without sending wiki data to
+   `wiki0.app`.
 5. A later hosted bridge may let `wiki0.app` discover a local
-   `wiki0 serve` process with an explicit one-time token, but that is a
-   follow-up. The safe default is local-first: private wiki data stays
-   on localhost.
+   `wiki0 serve` process with an explicit one-time token, but that is
+   a follow-up. The safe default is local-first: private wiki data
+   stays on localhost.

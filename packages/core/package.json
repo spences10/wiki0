@@ -1,6 +1,6 @@
 {
 	"name": "@wiki0/core",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Core wiki0 Markdown wiki indexing and retrieval primitives",
 	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/core#readme",
 	"license": "MIT",
