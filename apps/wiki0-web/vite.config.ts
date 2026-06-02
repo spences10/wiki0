@@ -5,6 +5,9 @@ import { defineConfig } from 'vite-plus';
 
 const config = {
 	plugins: [tailwindcss(), sveltekit()],
+	ssr: {
+		external: ['@wiki0/core'],
+	},
 	test: {
 		expect: { requireAssertions: true },
 		projects: [
