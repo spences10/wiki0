@@ -5,8 +5,8 @@
 		CardHeader,
 		CardTitle,
 	} from '$lib/components/ui/card';
-	import type { GraphEdge, GraphNode } from '@wiki0/core';
 	import { clamp } from '@layerstack/utils';
+	import type { GraphEdge, GraphNode } from '@wiki0/core';
 	import {
 		forceCenter,
 		forceCollide,
@@ -122,12 +122,19 @@
 		onselect?.(node.path);
 	}
 
-	function movable(node: HTMLElement | SVGElement, options: MovableOptions) {
+	function movable(
+		node: HTMLElement | SVGElement,
+		options: MovableOptions,
+	) {
 		let last_x = 0;
 		let last_y = 0;
 		let moved = false;
 
-		function move_event(event: MouseEvent, dx = 0, dy = 0): MoveEvent {
+		function move_event(
+			event: MouseEvent,
+			dx = 0,
+			dy = 0,
+		): MoveEvent {
 			return new CustomEvent('move', {
 				detail: {
 					dx,
@@ -138,35 +145,38 @@
 			});
 		}
 
-		function on_mouse_down(event: MouseEvent) {
+		const on_mouse_down: EventListener = (event) => {
+			if (!(event instanceof MouseEvent)) return;
 			last_x = event.clientX;
 			last_y = event.clientY;
 			moved = false;
 			options.onMoveStart?.();
 			window.addEventListener('mousemove', on_mouse_move);
 			window.addEventListener('mouseup', on_mouse_up);
-		}
+		};
 
-		function on_mouse_move(event: MouseEvent) {
+		const on_mouse_move: EventListener = (event) => {
+			if (!(event instanceof MouseEvent)) return;
 			moved = true;
 			const dx = event.clientX - last_x;
 			const dy = event.clientY - last_y;
 			last_x = event.clientX;
 			last_y = event.clientY;
 			options.onMove?.(move_event(event, dx, dy));
-		}
+		};
 
-		function on_mouse_up(event: MouseEvent) {
+		const on_mouse_up: EventListener = (event) => {
+			if (!(event instanceof MouseEvent)) return;
 			last_x = event.clientX;
 			last_y = event.clientY;
 			options.onMoveEnd?.(move_event(event));
 			window.removeEventListener('mousemove', on_mouse_move);
 			window.removeEventListener('mouseup', on_mouse_up);
-		}
+		};
 
-		function on_click(event: MouseEvent) {
+		const on_click: EventListener = (event) => {
 			if (moved) event.stopImmediatePropagation();
-		}
+		};
 
 		node.addEventListener('mousedown', on_mouse_down);
 		node.addEventListener('click', on_click);
@@ -246,14 +256,16 @@
 										},
 										onMove: (event) => {
 											simulation_node.fx = clamp(
-												(simulation_node.fx ?? simulation_node.x ?? 0) +
-													event.detail.dx,
+												(simulation_node.fx ??
+													simulation_node.x ??
+													0) + event.detail.dx,
 												0,
 												context.width,
 											);
 											simulation_node.fy = clamp(
-												(simulation_node.fy ?? simulation_node.y ?? 0) +
-													event.detail.dy,
+												(simulation_node.fy ??
+													simulation_node.y ??
+													0) + event.detail.dy,
 												0,
 												context.height,
 											);
