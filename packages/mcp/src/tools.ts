@@ -162,13 +162,24 @@ export function register_wiki_tools(server: {
 	tool(
 		{
 			name: 'create_page',
-			description: 'Create a Markdown page in a wiki0 wiki',
+			description:
+				'Create a Markdown page in the content folder (default wiki/; set wiki_dir to docs for project docs)',
 			schema: CreatePageSchema,
 		},
-		async ({ title, body, root, overwrite }: CreatePageInput) => {
+		async ({
+			title,
+			body,
+			root,
+			wiki_dir,
+			overwrite,
+		}: CreatePageInput) => {
 			assert_mcp_writable('create_page');
 			return json_response(
-				create_page(title, body, { root: mcp_root(root), overwrite }),
+				create_page(title, body, {
+					root: mcp_root(root),
+					wiki_dir,
+					overwrite,
+				}),
 			);
 		},
 	);
@@ -179,8 +190,8 @@ export function register_wiki_tools(server: {
 			description: 'Read a Markdown page from a wiki0 wiki',
 			schema: ReadPageSchema,
 		},
-		async ({ title, root }: ReadPageInput) =>
-			json_response(read_page(title, mcp_root(root))),
+		async ({ title, root, wiki_dir }: ReadPageInput) =>
+			json_response(read_page(title, mcp_root(root), wiki_dir)),
 	);
 
 	tool(
@@ -193,12 +204,14 @@ export function register_wiki_tools(server: {
 			title,
 			frontmatter,
 			root,
+			wiki_dir,
 			merge,
 		}: SetPageFrontmatterInput) => {
 			assert_mcp_writable('set_page_frontmatter');
 			return json_response(
 				set_page_frontmatter(title, frontmatter as WikiFrontmatter, {
 					root: mcp_root(root),
+					wiki_dir,
 					merge,
 				}),
 			);
@@ -256,9 +269,9 @@ export function register_wiki_tools(server: {
 			description: 'Rebuild the SQLite index for a wiki0 wiki',
 			schema: IndexWikiSchema,
 		},
-		async ({ root }: IndexWikiInput) => {
+		async ({ root, wiki_dir }: IndexWikiInput) => {
 			assert_mcp_writable('index_wiki');
-			return json_response(index_wiki(mcp_root(root)));
+			return json_response(index_wiki(mcp_root(root), wiki_dir));
 		},
 	);
 
@@ -268,8 +281,8 @@ export function register_wiki_tools(server: {
 			description: 'Show index freshness and schema status',
 			schema: IndexStatusSchema,
 		},
-		async ({ root }: IndexStatusInput) =>
-			json_response(index_status(mcp_root(root))),
+		async ({ root, wiki_dir }: IndexStatusInput) =>
+			json_response(index_status(mcp_root(root), wiki_dir)),
 	);
 
 	tool(
@@ -288,8 +301,8 @@ export function register_wiki_tools(server: {
 			description: 'Lint wiki links and duplicate names',
 			schema: LintWikiSchema,
 		},
-		async ({ root }: LintWikiInput) =>
-			json_response(lint_wiki(mcp_root(root))),
+		async ({ root, wiki_dir }: LintWikiInput) =>
+			json_response(lint_wiki(mcp_root(root), wiki_dir)),
 	);
 
 	tool(
@@ -308,8 +321,10 @@ export function register_wiki_tools(server: {
 			description: 'Retrieve indexed wiki0 context with citations',
 			schema: ContextWikiSchema,
 		},
-		async ({ query, root, limit }: ContextWikiInput) =>
-			json_response(get_wiki_context(query, mcp_root(root), limit)),
+		async ({ query, root, limit, wiki_dir }: ContextWikiInput) =>
+			json_response(
+				get_wiki_context(query, mcp_root(root), limit, wiki_dir),
+			),
 	);
 
 	tool(
@@ -319,8 +334,10 @@ export function register_wiki_tools(server: {
 				'Return the indexed wiki chunk for a page path/title, optionally with :line',
 			schema: ShowWikiChunkSchema,
 		},
-		async ({ target, root }: ShowWikiChunkInput) =>
-			json_response(show_wiki_chunk(target, mcp_root(root))),
+		async ({ target, root, wiki_dir }: ShowWikiChunkInput) =>
+			json_response(
+				show_wiki_chunk(target, mcp_root(root), wiki_dir),
+			),
 	);
 
 	tool(
@@ -329,8 +346,10 @@ export function register_wiki_tools(server: {
 			description: 'List resolved backlinks for a wiki0 page',
 			schema: BacklinksForPageSchema,
 		},
-		async ({ title, root }: BacklinksForPageInput) =>
-			json_response(backlinks_for_page(title, mcp_root(root))),
+		async ({ title, root, wiki_dir }: BacklinksForPageInput) =>
+			json_response(
+				backlinks_for_page(title, mcp_root(root), wiki_dir),
+			),
 	);
 
 	tool(
@@ -339,8 +358,8 @@ export function register_wiki_tools(server: {
 			description: 'List wiki0 pages marked for review',
 			schema: ReviewWikiSchema,
 		},
-		async ({ root }: ReviewWikiInput) =>
-			json_response(review_wiki(mcp_root(root))),
+		async ({ root, wiki_dir }: ReviewWikiInput) =>
+			json_response(review_wiki(mcp_root(root), wiki_dir)),
 	);
 
 	tool(
@@ -349,9 +368,11 @@ export function register_wiki_tools(server: {
 			description: 'Append Markdown to a page in a wiki0 wiki',
 			schema: AppendPageSchema,
 		},
-		async ({ title, body, root }: AppendPageInput) => {
+		async ({ title, body, root, wiki_dir }: AppendPageInput) => {
 			assert_mcp_writable('append_page');
-			return json_response(append_page(title, body, mcp_root(root)));
+			return json_response(
+				append_page(title, body, mcp_root(root), wiki_dir),
+			);
 		},
 	);
 
@@ -359,11 +380,12 @@ export function register_wiki_tools(server: {
 		{
 			name: 'sync_documents',
 			description:
-				'Sync source documents into wiki source pages, then index the wiki',
+				'Sync source documents into generated source pages, then index them (default wiki/; set wiki_dir to docs for project docs)',
 			schema: SyncDocumentsSchema,
 		},
 		async ({
 			root,
+			wiki_dir,
 			sources,
 			overwrite,
 			index,
@@ -376,6 +398,7 @@ export function register_wiki_tools(server: {
 			return json_response(
 				await sync_documents({
 					root: mcp_root(root),
+					wiki_dir,
 					sources,
 					overwrite,
 					index,

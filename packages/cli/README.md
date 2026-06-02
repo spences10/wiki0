@@ -14,6 +14,7 @@ The package exposes the `wiki0` binary.
 
 ```sh
 wiki0 init ./my-wiki
+wiki0 init ./my-project --wiki-dir docs
 wiki0 page create "projects/wiki0" --body "Local-first [[topics/memory]]." --root ./my-wiki
 wiki0 plan --source_type codebase --scope "current repository" --sources README.md,package.json
 wiki0 extract docs/guide.md --root ./my-wiki
@@ -31,6 +32,13 @@ wiki0 topics --root ./my-wiki
 wiki0 events --root ./my-wiki
 wiki0 review --root ./my-wiki
 ```
+
+## Content folder and index
+
+Page commands write under `wiki/` by default. Use `--wiki-dir docs`
+when you want wiki0-backed project documentation in `docs/` instead.
+The local SQLite index lives under `.wiki0/`; `wiki0 init` adds
+`.wiki0/` to `.gitignore` because it is rebuildable cache data.
 
 ## Output
 

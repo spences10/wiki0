@@ -4,7 +4,10 @@ import {
 } from './pages.js';
 import type { ReviewResult } from './types.js';
 
-export function review_wiki(root = '.'): ReviewResult[] {
+export function review_wiki(
+	root = '.',
+	wiki_dir = 'wiki',
+): ReviewResult[] {
 	const review_statuses = new Set([
 		'draft',
 		'proposed',
@@ -20,8 +23,8 @@ export function review_wiki(root = '.'): ReviewResult[] {
 	]);
 	const results: ReviewResult[] = [];
 
-	for (const page_path of list_markdown_page_paths(root)) {
-		const page = read_page_by_path(page_path, root);
+	for (const page_path of list_markdown_page_paths(root, wiki_dir)) {
+		const page = read_page_by_path(page_path, root, wiki_dir);
 		const status = page.frontmatter.status;
 		const tags = page.frontmatter.tags;
 		const status_text = typeof status === 'string' ? status : null;

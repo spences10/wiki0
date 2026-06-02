@@ -34,7 +34,7 @@ const supported_extensions = new Set([
 export async function sync_documents(
 	options: WikiDocumentSyncOptions,
 ): Promise<WikiDocumentSyncResult> {
-	const root = resolve_wiki_root(options.root);
+	const root = resolve_wiki_root(options.root, options.wiki_dir);
 	const sources = discover_sources(root, options.sources, {
 		include: options.include,
 		ignore: options.ignore,
@@ -54,7 +54,7 @@ export async function sync_documents(
 	for (const source of sources) {
 		const display_source = source_display_path(root, source);
 		const page = source_page_path(display_source);
-		const file_path = page_file_path(page, root);
+		const file_path = page_file_path(page, root, options.wiki_dir);
 		const page_exists = existsSync(file_path);
 		const fingerprint = source_fingerprint(source);
 		const existing_fingerprint = page_exists
@@ -98,6 +98,7 @@ export async function sync_documents(
 			source_page_template(parsed, display_source, fingerprint),
 			{
 				root,
+				wiki_dir: options.wiki_dir,
 				overwrite: options.overwrite,
 			},
 		);
@@ -109,7 +110,12 @@ export async function sync_documents(
 		}
 		if (options.propose_pages) {
 			proposed_pages.push(
-				...create_proposed_pages(parsed, display_source, root),
+				...create_proposed_pages(
+					parsed,
+					display_source,
+					root,
+					options.wiki_dir,
+				),
 			);
 		}
 		synced_sources.push({
@@ -126,7 +132,10 @@ export async function sync_documents(
 		});
 	}
 
-	const indexed = options.index === false ? null : index_wiki(root);
+	const indexed =
+		options.index === false
+			? null
+			: index_wiki(root, options.wiki_dir);
 	const derived_facts = fact_inputs.map(({ page, fact }) =>
 		add_fact({
 			root,
@@ -338,12 +347,16 @@ function create_proposed_pages(
 	parsed: ParsedDocument,
 	display_source: string,
 	root: string,
+	wiki_dir = 'wiki',
 ): string[] {
 	const pages: string[] = [];
 	for (const proposal of propose_pages(parsed, display_source)) {
-		if (existsSync(page_file_path(proposal.path, root))) continue;
+		if (existsSync(page_file_path(proposal.path, root, wiki_dir))) {
+			continue;
+		}
 		create_page(proposal.path, proposal.body, {
 			root,
+			wiki_dir,
 			overwrite: false,
 		});
 		pages.push(proposal.path);

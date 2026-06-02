@@ -7,14 +7,21 @@ import {
 	list_markdown_page_paths,
 	read_page_by_path,
 } from './pages.js';
-import { resolve_wiki_root, wikilink_target_path } from './paths.js';
+import {
+	resolve_wiki_root,
+	wiki_content_dir,
+	wikilink_target_path,
+} from './paths.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
 export const current_index_schema_version = 4;
 export const current_index_package_version = read_package_version();
 
-export function index_wiki(root = '.'): IndexResult {
-	const wiki_root = resolve_wiki_root(root);
+export function index_wiki(
+	root = '.',
+	wiki_dir = 'wiki',
+): IndexResult {
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
 	const db_path = wiki_db_path(wiki_root);
 	const db = open_wiki_database(wiki_root);
 	ensure_index_schema(db);
@@ -64,10 +71,10 @@ export function index_wiki(root = '.'): IndexResult {
 			value = excluded.value,
 			updated_at = datetime('now')
 	`);
-	const page_paths = list_markdown_page_paths(wiki_root);
+	const page_paths = list_markdown_page_paths(wiki_root, wiki_dir);
 	const known_paths = new Set(page_paths);
 	const pages = page_paths.map((page_path) =>
-		read_page_by_path(page_path, wiki_root),
+		read_page_by_path(page_path, wiki_root, wiki_dir),
 	);
 	const name_paths = new Map<string, string>();
 	for (const page of pages) {
@@ -91,7 +98,10 @@ export function index_wiki(root = '.'): IndexResult {
 		clear_chunks.run();
 		clear_chunk_fts.run();
 		for (const page of pages) {
-			const file_path = join(wiki_root, 'wiki', page.path);
+			const file_path = join(
+				wiki_content_dir(wiki_root, wiki_dir),
+				page.path,
+			);
 			const modified_at = statSync(file_path).mtime.toISOString();
 			const content_hash = createHash('sha256')
 				.update(page.body)
@@ -285,10 +295,13 @@ function frontmatter_string_array(value: unknown): string[] {
 	return typeof value === 'string' ? [value] : [];
 }
 
-export function index_status(root = '.'): IndexStatus {
-	const wiki_root = resolve_wiki_root(root);
+export function index_status(
+	root = '.',
+	wiki_dir = 'wiki',
+): IndexStatus {
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
 	const db_path = wiki_db_path(wiki_root);
-	const page_paths = list_markdown_page_paths(wiki_root);
+	const page_paths = list_markdown_page_paths(wiki_root, wiki_dir);
 	const reasons: string[] = [];
 	if (!existsSync(db_path)) {
 		return {
@@ -344,7 +357,7 @@ export function index_status(root = '.'): IndexStatus {
 		if (!current_paths.has(page.path)) reasons.push('deleted-pages');
 	}
 	for (const page_path of page_paths) {
-		const page = read_page_by_path(page_path, wiki_root);
+		const page = read_page_by_path(page_path, wiki_root, wiki_dir);
 		const current_hash = createHash('sha256')
 			.update(page.body)
 			.digest('hex');

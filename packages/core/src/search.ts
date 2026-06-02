@@ -4,7 +4,7 @@ import type { SQLOutputValue } from 'node:sqlite';
 import { open_wiki_database } from './database.js';
 import { index_status } from './indexer.js';
 import { resolve_page_path } from './pages.js';
-import { resolve_wiki_root } from './paths.js';
+import { resolve_wiki_root, wiki_content_dir } from './paths.js';
 import type {
 	BacklinkResult,
 	ChunkSearchResult,
@@ -252,8 +252,9 @@ function parse_page_tags(value: unknown): string[] {
 export function show_wiki_chunk(
 	target: string,
 	root = '.',
+	wiki_dir = 'wiki',
 ): ShowChunkResult | null {
-	const { path, line } = parse_chunk_target(target, root);
+	const { path, line } = parse_chunk_target(target, root, wiki_dir);
 	const db = open_wiki_database(root);
 	const row = db
 		.prepare(
@@ -273,24 +274,30 @@ export function show_wiki_chunk(
 function parse_chunk_target(
 	target: string,
 	root: string,
+	wiki_dir: string,
 ): { path: string; line: number | null } {
 	const match = target.match(/^(.*?)(?::(\d+))?$/u);
 	const title = match?.[1]?.trim() ?? target;
 	const line = match?.[2] ? Number(match[2]) : null;
-	const wiki_root = resolve_wiki_root(root);
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
 	const direct_path = title.endsWith('.md') ? title : `${title}.md`;
-	if (existsSync(join(wiki_root, 'wiki', direct_path))) {
+	if (
+		existsSync(
+			join(wiki_content_dir(wiki_root, wiki_dir), direct_path),
+		)
+	) {
 		return { path: direct_path, line };
 	}
-	return { path: resolve_page_path(title, root), line };
+	return { path: resolve_page_path(title, root, wiki_dir), line };
 }
 
 export function get_wiki_context(
 	query: string,
 	root = '.',
 	limit = 5,
+	wiki_dir = 'wiki',
 ): ContextResult {
-	const status = index_status(root);
+	const status = index_status(root, wiki_dir);
 	const warnings = status.stale
 		? [
 				`Index is stale (${status.reasons.join(', ')}); run index_wiki before relying on these results.`,
@@ -301,7 +308,12 @@ export function get_wiki_context(
 		query,
 		results,
 		warnings,
-		markdown: format_context_markdown(query, results, warnings),
+		markdown: format_context_markdown(
+			query,
+			results,
+			warnings,
+			wiki_dir,
+		),
 	};
 }
 
@@ -309,6 +321,7 @@ export function format_context_markdown(
 	query: string,
 	results: ChunkSearchResult[],
 	warnings: string[] = [],
+	wiki_dir = 'wiki',
 ): string {
 	const lines = [`# wiki0 context: ${query}`, ''];
 
@@ -330,7 +343,7 @@ export function format_context_markdown(
 		const line_range = `${result.start_line}-${result.end_line}`;
 		lines.push(
 			`## ${index + 1}. ${result.title}`,
-			`Source: \`wiki/${result.path}:${line_range}\``,
+			`Source: \`${wiki_dir}/${result.path}:${line_range}\``,
 			result.heading ? `Heading: ${result.heading}` : '',
 			'',
 			result.body.trim(),
@@ -344,9 +357,10 @@ export function format_context_markdown(
 export function backlinks_for_page(
 	title: string,
 	root = '.',
+	wiki_dir = 'wiki',
 ): BacklinkResult[] {
 	const db = open_wiki_database(root);
-	const page_path = resolve_page_path(title, root);
+	const page_path = resolve_page_path(title, root, wiki_dir);
 	const rows = db
 		.prepare(
 			`SELECT pages.path, pages.title, page_links.raw_text AS raw_text,

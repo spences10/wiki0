@@ -18,14 +18,14 @@ export type DerivedFactCandidate = Omit<
 };
 
 export function add_fact(fact: FactWriteOptions): Fact {
-	const wiki_root = resolve_wiki_root(fact.root);
+	const wiki_root = resolve_wiki_root(fact.root, fact.wiki_dir);
 	const db = open_wiki_database(wiki_root);
 	ensure_fact_provenance_columns(db);
 	const source_chunk = fact.source
-		? show_wiki_chunk(fact.source, wiki_root)
+		? show_wiki_chunk(fact.source, wiki_root, fact.wiki_dir)
 		: null;
 	const page_path = fact.page
-		? resolve_page_path(fact.page, wiki_root)
+		? resolve_page_path(fact.page, wiki_root, fact.wiki_dir)
 		: (source_chunk?.path ?? null);
 	const page = page_path
 		? (db

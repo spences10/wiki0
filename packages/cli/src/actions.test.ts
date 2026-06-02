@@ -43,6 +43,19 @@ describe('init_workspace', () => {
 		expect(
 			readFileSync(join(root, '.wiki0/schema.sql'), 'utf-8'),
 		).toContain('CREATE TABLE IF NOT EXISTS pages');
+		expect(readFileSync(join(root, '.gitignore'), 'utf-8')).toContain(
+			'.wiki0/',
+		);
+	});
+
+	it('can use docs as the content folder', () => {
+		const root = make_temp_root();
+
+		init_workspace(root, 'docs');
+
+		expect(existsSync(join(root, 'docs/inbox'))).toBe(true);
+		expect(existsSync(join(root, 'docs/index.md'))).toBe(true);
+		expect(existsSync(join(root, 'wiki'))).toBe(false);
 	});
 });
 

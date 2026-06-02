@@ -35,13 +35,16 @@ export type WikiPage = {
 	links: WikiLink[];
 };
 
-export type PageWriteOptions = {
+export type WikiDirOptions = {
 	root?: string;
+	wiki_dir?: string;
+};
+
+export type PageWriteOptions = WikiDirOptions & {
 	overwrite?: boolean;
 };
 
-export type PageFrontmatterOptions = {
-	root?: string;
+export type PageFrontmatterOptions = WikiDirOptions & {
 	merge?: boolean;
 };
 
@@ -148,8 +151,7 @@ export type Fact = {
 	created_at: string;
 };
 
-export type FactWriteOptions = {
-	root?: string;
+export type FactWriteOptions = WikiDirOptions & {
 	page?: string;
 	category: string;
 	summary: string;
@@ -210,8 +212,7 @@ export type WikiPlanResult = {
 	next_steps: string[];
 };
 
-export type WikiDocumentSyncOptions = {
-	root?: string;
+export type WikiDocumentSyncOptions = WikiDirOptions & {
 	sources: string[];
 	overwrite?: boolean;
 	index?: boolean;

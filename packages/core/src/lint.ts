@@ -5,14 +5,14 @@ import {
 import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { LintIssue, LintResult } from './types.js';
 
-export function lint_wiki(root = '.'): LintResult {
-	const wiki_root = resolve_wiki_root(root);
-	const page_paths = list_markdown_page_paths(wiki_root);
+export function lint_wiki(root = '.', wiki_dir = 'wiki'): LintResult {
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const page_paths = list_markdown_page_paths(wiki_root, wiki_dir);
 	const known_paths = new Set(page_paths);
 	const issues: LintIssue[] = [];
 	const names = new Map<string, string>();
 	const pages = page_paths.map((page_path) =>
-		read_page_by_path(page_path, wiki_root),
+		read_page_by_path(page_path, wiki_root, wiki_dir),
 	);
 
 	for (const page of pages) {
@@ -33,7 +33,7 @@ export function lint_wiki(root = '.'): LintResult {
 					severity: 'warning',
 					path: page.path,
 					target: name,
-					message: `Duplicate title or alias "${name}" also used by wiki/${existing_path}`,
+					message: `Duplicate title or alias "${name}" also used by ${wiki_dir}/${existing_path}`,
 				});
 				continue;
 			}

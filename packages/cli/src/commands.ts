@@ -60,6 +60,12 @@ function parse_optional_sources(
 	return parse_sources(value);
 }
 
+function wiki_dir_arg(args: { wikiDir?: unknown }): string {
+	return typeof args.wikiDir === 'string' && args.wikiDir.length > 0
+		? args.wikiDir
+		: 'wiki';
+}
+
 function resolve_cli_source(root: string, source: string): string {
 	return isAbsolute(source) ? source : resolve(root, source);
 }
@@ -93,9 +99,20 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
-				console.log(init_workspace(String(args.path ?? '.')));
+				console.log(
+					init_workspace(
+						String(args.path ?? '.'),
+						wiki_dir_arg(args),
+					),
+				);
 			},
 		}),
 		page: defineCommand({
@@ -121,6 +138,12 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 						overwrite: {
 							type: 'boolean',
 							description: 'Overwrite an existing page',
@@ -132,6 +155,7 @@ export const main = defineCommand({
 							read_markdown_input(args),
 							{
 								root: String(args.root ?? '.'),
+								wiki_dir: wiki_dir_arg(args),
 								overwrite: Boolean(args.overwrite),
 							},
 						);
@@ -151,10 +175,20 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 					},
 					run({ args }) {
 						print_json(
-							read_page(String(args.title), String(args.root ?? '.')),
+							read_page(
+								String(args.title),
+								String(args.root ?? '.'),
+								wiki_dir_arg(args),
+							),
 						);
 					},
 				}),
@@ -178,6 +212,12 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 						merge: {
 							type: 'boolean',
 							description: 'Merge with existing frontmatter',
@@ -189,6 +229,7 @@ export const main = defineCommand({
 							parse_frontmatter_json(args.data),
 							{
 								root: String(args.root ?? '.'),
+								wiki_dir: wiki_dir_arg(args),
 								merge: Boolean(args.merge),
 							},
 						);
@@ -216,12 +257,19 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 					},
 					run({ args }) {
 						const page = append_page(
 							String(args.title),
 							read_markdown_input(args),
 							String(args.root ?? '.'),
+							wiki_dir_arg(args),
 						);
 						print_json(page);
 					},
@@ -272,6 +320,12 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 				overwrite: {
 					type: 'boolean',
 					description: 'Overwrite existing synced source pages',
@@ -304,6 +358,7 @@ export const main = defineCommand({
 				print_json(
 					await sync_documents({
 						root: String(args.root ?? '.'),
+						wiki_dir: wiki_dir_arg(args),
 						sources: parse_sources(args.sources) ?? [],
 						overwrite: Boolean(args.overwrite),
 						index: !args.noIndex,
@@ -381,11 +436,18 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 					},
 					run({ args }) {
 						print_json(
 							add_fact({
 								root: String(args.root ?? '.'),
+								wiki_dir: wiki_dir_arg(args),
 								page: args.page ? String(args.page) : undefined,
 								category: String(args.category ?? 'note'),
 								summary: String(args.summary),
@@ -411,6 +473,12 @@ export const main = defineCommand({
 							description: 'Wiki root path',
 							default: '.',
 						},
+						wikiDir: {
+							type: 'string',
+							description:
+								'Content folder to store pages (for example docs)',
+							default: 'wiki',
+						},
 					},
 					run({ args }) {
 						print_json(
@@ -430,6 +498,12 @@ export const main = defineCommand({
 					type: 'string',
 					description: 'Wiki root path',
 					default: '.',
+				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
 				},
 				limit: {
 					type: 'string',
@@ -457,6 +531,12 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 				limit: {
 					type: 'string',
 					description: 'Maximum number of topics',
@@ -480,9 +560,17 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
-				print_json(index_wiki(String(args.root ?? '.')));
+				print_json(
+					index_wiki(String(args.root ?? '.'), wiki_dir_arg(args)),
+				);
 			},
 		}),
 		status: defineCommand({
@@ -493,9 +581,17 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
-				print_json(index_status(String(args.root ?? '.')));
+				print_json(
+					index_status(String(args.root ?? '.'), wiki_dir_arg(args)),
+				);
 			},
 		}),
 		search: defineCommand({
@@ -506,6 +602,12 @@ export const main = defineCommand({
 					type: 'string',
 					description: 'Wiki root path',
 					default: '.',
+				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
 				},
 				limit: {
 					type: 'string',
@@ -539,6 +641,12 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 				json: {
 					type: 'boolean',
 					description: 'Output structured JSON instead of Markdown',
@@ -548,6 +656,7 @@ export const main = defineCommand({
 				const result = show_wiki_chunk(
 					String(args.target),
 					String(args.root ?? '.'),
+					wiki_dir_arg(args),
 				);
 				if (args.json) print_json(result);
 				else console.log(result?.body ?? 'No indexed chunk found.');
@@ -564,6 +673,12 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 				limit: {
 					type: 'string',
 					description: 'Maximum number of context results',
@@ -579,6 +694,7 @@ export const main = defineCommand({
 					String(args.query),
 					String(args.root ?? '.'),
 					Number(args.limit ?? 5),
+					wiki_dir_arg(args),
 				);
 				console.log(
 					args.json
@@ -595,6 +711,12 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
 				print_json(graph_wiki(String(args.root ?? '.')));
@@ -608,9 +730,18 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
-				const result = lint_wiki(String(args.root ?? '.'));
+				const result = lint_wiki(
+					String(args.root ?? '.'),
+					wiki_dir_arg(args),
+				);
 				print_json(result);
 				if (!result.ok) process.exitCode = 1;
 			},
@@ -624,12 +755,19 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
 				print_json(
 					backlinks_for_page(
 						String(args.title),
 						String(args.root ?? '.'),
+						wiki_dir_arg(args),
 					),
 				);
 			},
@@ -644,9 +782,17 @@ export const main = defineCommand({
 					description: 'Wiki root path',
 					default: '.',
 				},
+				wikiDir: {
+					type: 'string',
+					description:
+						'Content folder to store pages (for example docs)',
+					default: 'wiki',
+				},
 			},
 			run({ args }) {
-				print_json(review_wiki(String(args.root ?? '.')));
+				print_json(
+					review_wiki(String(args.root ?? '.'), wiki_dir_arg(args)),
+				);
 			},
 		}),
 	},

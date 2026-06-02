@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, normalize, resolve } from 'node:path';
 
 export function slugify_title(title: string): string {
 	return title
@@ -11,13 +11,29 @@ export function slugify_title(title: string): string {
 		.replace(/^-+|-+$/gu, '');
 }
 
-export function resolve_wiki_root(start_path = '.'): string {
+export function normalize_wiki_dir(wiki_dir = 'wiki'): string {
+	const normalized = normalize(wiki_dir).replace(/^\/+|\/+$/gu, '');
+	if (
+		normalized.length === 0 ||
+		normalized === '.' ||
+		normalized.startsWith('..')
+	) {
+		throw new Error('wiki_dir must be a relative folder name.');
+	}
+	return normalized;
+}
+
+export function resolve_wiki_root(
+	start_path = '.',
+	wiki_dir = 'wiki',
+): string {
 	let current_path = resolve(start_path);
+	const content_dir = normalize_wiki_dir(wiki_dir);
 
 	while (true) {
 		if (
 			existsSync(join(current_path, '.wiki0')) ||
-			existsSync(join(current_path, 'wiki'))
+			existsSync(join(current_path, content_dir))
 		) {
 			return current_path;
 		}
@@ -28,6 +44,16 @@ export function resolve_wiki_root(start_path = '.'): string {
 		}
 		current_path = parent_path;
 	}
+}
+
+export function wiki_content_dir(
+	root = '.',
+	wiki_dir = 'wiki',
+): string {
+	return join(
+		resolve_wiki_root(root, wiki_dir),
+		normalize_wiki_dir(wiki_dir),
+	);
 }
 
 export function page_relative_path(title: string): string {
@@ -45,10 +71,13 @@ export function page_relative_path(title: string): string {
 	return `${path_parts.join('/')}.md`;
 }
 
-export function page_file_path(title: string, root = '.'): string {
+export function page_file_path(
+	title: string,
+	root = '.',
+	wiki_dir = 'wiki',
+): string {
 	return join(
-		resolve_wiki_root(root),
-		'wiki',
+		wiki_content_dir(root, wiki_dir),
 		page_relative_path(title),
 	);
 }

@@ -38,6 +38,22 @@ describe('page IO', () => {
 		).toBe(read.body);
 	});
 
+	it('can write pages into a docs content folder', () => {
+		const root = make_wiki_root();
+		const page = create_page('getting started', 'Project docs.', {
+			root,
+			wiki_dir: 'docs',
+		});
+
+		expect(page.path).toBe('getting-started.md');
+		expect(
+			readFileSync(join(root, 'docs/getting-started.md'), 'utf-8'),
+		).toContain('Project docs.');
+		expect(read_page('getting started', root, 'docs').path).toBe(
+			'getting-started.md',
+		);
+	});
+
 	it('sets and merges page frontmatter', () => {
 		const root = make_wiki_root();
 		create_page('interfaces/mcp', '# MCP\n\nAgent interface.', {

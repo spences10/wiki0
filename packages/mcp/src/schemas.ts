@@ -23,18 +23,21 @@ export const CreatePageSchema = v.object({
 	title: v.string(),
 	body: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	overwrite: v.optional(v.boolean(), false),
 });
 
 export const ReadPageSchema = v.object({
 	title: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const SetPageFrontmatterSchema = v.object({
 	title: v.string(),
 	frontmatter: v.record(v.string(), v.unknown()),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	merge: v.optional(v.boolean(), false),
 });
 
@@ -50,69 +53,83 @@ export const AddFactSchema = v.object({
 	source: v.optional(v.string()),
 	source_quote: v.optional(v.string()),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const ListFactsSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	category: v.optional(v.string()),
 });
 
 export const ListWikiEventsSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	limit: v.optional(v.number(), 50),
 });
 
 export const ListTopicThreadsSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	limit: v.optional(v.number(), 50),
 });
 
 export const IndexWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const IndexStatusSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const SearchWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	limit: v.optional(v.number(), 10),
 });
 
 export const ContextWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	limit: v.optional(v.number(), 5),
 });
 
 export const ShowWikiChunkSchema = v.object({
 	target: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const GraphWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const LintWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const BacklinksForPageSchema = v.object({
 	title: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const ReviewWikiSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const AppendPageSchema = v.object({
 	title: v.string(),
 	body: v.string(),
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 });
 
 export const PlanWikiSchema = v.object({
@@ -126,6 +143,7 @@ export const PlanWikiSchema = v.object({
 
 export const SyncDocumentsSchema = v.object({
 	root: v.optional(v.string(), '.'),
+	wiki_dir: v.optional(v.string(), 'wiki'),
 	sources: v.array(v.string()),
 	overwrite: v.optional(v.boolean(), false),
 	index: v.optional(v.boolean(), true),

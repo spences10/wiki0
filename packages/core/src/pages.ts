@@ -18,6 +18,7 @@ import {
 	page_file_path,
 	page_relative_path,
 	resolve_wiki_root,
+	wiki_content_dir,
 } from './paths.js';
 import type {
 	PageFrontmatterOptions,
@@ -30,7 +31,11 @@ export function create_page(
 	body: string,
 	options: PageWriteOptions = {},
 ): WikiPage {
-	const file_path = page_file_path(title, options.root);
+	const file_path = page_file_path(
+		title,
+		options.root,
+		options.wiki_dir,
+	);
 	const page_body = body.match(/^#\s+/mu)
 		? body
 		: `# ${display_page_title(title)}\n\n${body}`;
@@ -44,7 +49,7 @@ export function create_page(
 		},
 	);
 
-	const page = read_page(title, options.root);
+	const page = read_page(title, options.root, options.wiki_dir);
 	log_wiki_event({
 		root: options.root,
 		operation: options.overwrite ? 'overwrite_page' : 'create_page',
@@ -54,9 +59,13 @@ export function create_page(
 	return page;
 }
 
-export function read_page(title: string, root = '.'): WikiPage {
-	const page_path = resolve_page_path(title, root);
-	return read_page_by_path(page_path, root);
+export function read_page(
+	title: string,
+	root = '.',
+	wiki_dir = 'wiki',
+): WikiPage {
+	const page_path = resolve_page_path(title, root, wiki_dir);
+	return read_page_by_path(page_path, root, wiki_dir);
 }
 
 export function set_page_frontmatter(
@@ -64,10 +73,13 @@ export function set_page_frontmatter(
 	frontmatter: Parameters<typeof serialize_frontmatter>[0],
 	options: PageFrontmatterOptions = {},
 ): WikiPage {
-	const page_path = resolve_page_path(title, options.root);
+	const page_path = resolve_page_path(
+		title,
+		options.root,
+		options.wiki_dir,
+	);
 	const file_path = join(
-		resolve_wiki_root(options.root),
-		'wiki',
+		wiki_content_dir(options.root, options.wiki_dir),
 		page_path,
 	);
 	const body = readFileSync(file_path, 'utf-8');
@@ -80,7 +92,11 @@ export function set_page_frontmatter(
 		file_path,
 		next_body.endsWith('\n') ? next_body : `${next_body}\n`,
 	);
-	const page = read_page_by_path(page_path, options.root);
+	const page = read_page_by_path(
+		page_path,
+		options.root,
+		options.wiki_dir,
+	);
 	log_wiki_event({
 		root: options.root,
 		operation: 'set_page_frontmatter',
@@ -94,9 +110,10 @@ export function append_page(
 	title: string,
 	body: string,
 	root = '.',
+	wiki_dir = 'wiki',
 ): WikiPage {
-	const page_path = resolve_page_path(title, root);
-	const file_path = join(resolve_wiki_root(root), 'wiki', page_path);
+	const page_path = resolve_page_path(title, root, wiki_dir);
+	const file_path = join(wiki_content_dir(root, wiki_dir), page_path);
 	const append_body = body.startsWith('\n') ? body : `\n${body}`;
 	writeFileSync(
 		file_path,
@@ -105,7 +122,7 @@ export function append_page(
 			flag: 'a',
 		},
 	);
-	const page = read_page_by_path(page_path, root);
+	const page = read_page_by_path(page_path, root, wiki_dir);
 	log_wiki_event({
 		root,
 		operation: 'append_page',
@@ -115,16 +132,24 @@ export function append_page(
 	return page;
 }
 
-export function resolve_page_path(title: string, root = '.'): string {
-	const wiki_root = resolve_wiki_root(root);
+export function resolve_page_path(
+	title: string,
+	root = '.',
+	wiki_dir = 'wiki',
+): string {
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const content_dir = wiki_content_dir(wiki_root, wiki_dir);
 	const direct_path = page_relative_path(title);
-	if (existsSync(join(wiki_root, 'wiki', direct_path))) {
+	if (existsSync(join(content_dir, direct_path))) {
 		return direct_path;
 	}
 
 	const normalized_title = title.trim().toLowerCase();
-	for (const page_path of list_markdown_page_paths(wiki_root)) {
-		const page = read_page_by_path(page_path, wiki_root);
+	for (const page_path of list_markdown_page_paths(
+		wiki_root,
+		wiki_dir,
+	)) {
+		const page = read_page_by_path(page_path, wiki_root, wiki_dir);
 		const aliases = page.frontmatter.aliases;
 		const alias_list = Array.isArray(aliases)
 			? aliases.filter((alias) => typeof alias === 'string')
@@ -140,10 +165,13 @@ export function resolve_page_path(title: string, root = '.'): string {
 	return direct_path;
 }
 
-export function list_markdown_page_paths(root = '.'): string[] {
-	const wiki_root = resolve_wiki_root(root);
-	const wiki_dir = join(wiki_root, 'wiki');
-	if (!existsSync(wiki_dir)) return [];
+export function list_markdown_page_paths(
+	root = '.',
+	wiki_dir = 'wiki',
+): string[] {
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const content_dir = wiki_content_dir(wiki_root, wiki_dir);
+	if (!existsSync(content_dir)) return [];
 
 	const page_paths: string[] = [];
 	const visit_dir = (dir_path: string) => {
@@ -156,20 +184,24 @@ export function list_markdown_page_paths(root = '.'): string[] {
 				continue;
 			}
 			if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
-			page_paths.push(relative(wiki_dir, entry_path));
+			page_paths.push(relative(content_dir, entry_path));
 		}
 	};
 
-	visit_dir(wiki_dir);
+	visit_dir(content_dir);
 	return page_paths.sort();
 }
 
 export function read_page_by_path(
 	page_path: string,
 	root = '.',
+	wiki_dir = 'wiki',
 ): WikiPage {
-	const wiki_root = resolve_wiki_root(root);
-	const file_path = join(wiki_root, 'wiki', page_path);
+	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const file_path = join(
+		wiki_content_dir(wiki_root, wiki_dir),
+		page_path,
+	);
 	const body = readFileSync(file_path, 'utf-8');
 	const title_fallback = display_page_title(
 		page_path.replace(/\.md$/u, ''),
