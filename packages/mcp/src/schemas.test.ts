@@ -22,6 +22,7 @@ describe('MCP schemas', () => {
 			title: 'Test',
 			body: 'Body',
 			root: '.',
+			wiki_dir: 'wiki',
 			overwrite: false,
 		});
 	});
@@ -37,14 +38,20 @@ describe('MCP schemas', () => {
 			summary: 'Local first',
 			confidence: 'unknown',
 			root: '.',
+			wiki_dir: 'wiki',
 		});
-		expect(parse(ListFactsSchema, {})).toEqual({ root: '.' });
+		expect(parse(ListFactsSchema, {})).toEqual({
+			root: '.',
+			wiki_dir: 'wiki',
+		});
 		expect(parse(ListWikiEventsSchema, {})).toEqual({
 			root: '.',
+			wiki_dir: 'wiki',
 			limit: 50,
 		});
 		expect(parse(ListTopicThreadsSchema, {})).toEqual({
 			root: '.',
+			wiki_dir: 'wiki',
 			limit: 50,
 		});
 	});
@@ -62,17 +69,30 @@ describe('MCP schemas', () => {
 		expect(parse(SyncDocumentsSchema, { sources: ['docs'] })).toEqual(
 			{
 				root: '.',
+				wiki_dir: 'wiki',
 				sources: ['docs'],
 				overwrite: false,
 				index: true,
+				derive_facts: true,
+				propose_pages: false,
 			},
 		);
-		expect(parse(IndexWikiSchema, {})).toEqual({ root: '.' });
-		expect(parse(GraphWikiSchema, {})).toEqual({ root: '.' });
-		expect(parse(LintWikiSchema, {})).toEqual({ root: '.' });
+		expect(parse(IndexWikiSchema, {})).toEqual({
+			root: '.',
+			wiki_dir: 'wiki',
+		});
+		expect(parse(GraphWikiSchema, {})).toEqual({
+			root: '.',
+			wiki_dir: 'wiki',
+		});
+		expect(parse(LintWikiSchema, {})).toEqual({
+			root: '.',
+			wiki_dir: 'wiki',
+		});
 		expect(parse(SearchWikiSchema, { query: 'agent' })).toEqual({
 			query: 'agent',
 			root: '.',
+			wiki_dir: 'wiki',
 			limit: 10,
 		});
 	});
