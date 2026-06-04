@@ -7,7 +7,7 @@ minimumReleaseAge: 2880
 catalog:
   '@types/node': ^25.8.0
   typescript: ^6.0.3
-  vite-plus: ^0.1.22
+  vite-plus: ^0.1.24
   vitest: 4.1.7
 allowBuilds:
   '@tailwindcss/oxide': true
