@@ -58,7 +58,7 @@ importers:
         version: 1.61.1
       prettier:
         specifier: ^3.7.3
-        version: 3.9.3
+        version: 3.9.4
       svelte:
         specifier: ^5.56.1
         version: 5.56.4
@@ -2133,8 +2133,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.9.3:
-    resolution: {integrity: sha512-HWmu+K+zvHNpaMfSnYeqdqrDbR16cuIXaPx8WoHaviQkDJh1/0BNtOZmHVQI5jc3wXv0H1yXc9wjvFdXh+n3hQ==}
+  prettier@3.9.4:
+    resolution: {integrity: sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4170,7 +4170,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.9.3: {}
+  prettier@3.9.4: {}
 
   pretty-format@27.5.1:
     dependencies:
