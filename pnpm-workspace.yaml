@@ -6,7 +6,7 @@ minimumReleaseAge: 2880
 
 catalog:
   '@types/node': ^25.8.0
-  typescript: ^6.0.3
+  typescript: ^7.0.0
   vite-plus: ^0.2.0
   vitest: 4.1.9
 allowBuilds:
