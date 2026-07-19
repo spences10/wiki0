@@ -100,7 +100,7 @@ importers:
         version: 1.0.1
       '@lucide/svelte':
         specifier: ^1.17.0
-        version: 1.23.0(svelte@5.56.4)
+        version: 1.25.0(svelte@5.56.4)
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.61.1
@@ -409,8 +409,8 @@ packages:
   '@layerstack/utils@2.0.0-next.18':
     resolution: {integrity: sha512-EYILHpfBRYMMEahajInu9C2AXQom5IcAEdtCeucD3QIl/fdDgRbtzn6/8QW9ewumfyNZetdUvitOksmI1+gZYQ==}
 
-  '@lucide/svelte@1.23.0':
-    resolution: {integrity: sha512-3LQbKXx9vId6Nx4E2Nu2qwgJfdmr5+CVeVJbxe5cy+HcnCRd9QVVtZXqvgBYAV1OJrPmQAf9/3gJWLCpASC/Ng==}
+  '@lucide/svelte@1.25.0':
+    resolution: {integrity: sha512-v9m+dD68jxVnqkU3K59mG/RSRFlPGzmKCGSyMfnXcaGv9jODDQMyQkcp1CGvk3Y/cUj9v7f8rw1n//K0B53xGQ==}
     peerDependencies:
       svelte: ^5
 
@@ -2832,7 +2832,7 @@ snapshots:
       d3-time: 3.1.0
       d3-time-format: 4.1.0
 
-  '@lucide/svelte@1.23.0(svelte@5.56.4)':
+  '@lucide/svelte@1.25.0(svelte@5.56.4)':
     dependencies:
       svelte: 5.56.4
 
