@@ -46,7 +46,7 @@
 		"@types/node": "catalog:",
 		"@vitest/browser-playwright": "^4.1.8",
 		"mdsvex": "^0.12.7",
-		"oxfmt": "0.56.0",
+		"oxfmt": "0.60.0",
 		"playwright": "^1.59.1",
 		"prettier": "^3.7.3",
 		"svelte": "^5.56.1",
