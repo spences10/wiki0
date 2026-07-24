@@ -49,7 +49,7 @@ importers:
         version: 4.1.9(playwright@1.61.1)(vite@8.1.5(@types/node@25.9.5)(jiti@2.7.0)(yaml@2.9.0))(vitest@4.1.9)
       mdsvex:
         specifier: ^0.12.7
-        version: 0.12.7(svelte@5.56.4)
+        version: 0.12.8(svelte@5.56.4)
       oxfmt:
         specifier: 0.56.0
         version: 0.56.0(svelte@5.56.4)(vite-plus@0.2.1(@types/node@25.9.5)(@vitest/browser-playwright@4.1.9)(jiti@2.7.0)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.5(@types/node@25.9.5)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0))
@@ -145,7 +145,7 @@ importers:
         version: 2.0.0-next.65(@sveltejs/kit@2.69.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.5(@types/node@25.9.5)(jiti@2.7.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.5(@types/node@25.9.5)(jiti@2.7.0)(yaml@2.9.0)))(svelte@5.56.4)
       mdsvex:
         specifier: ^0.12.7
-        version: 0.12.7(svelte@5.56.4)
+        version: 0.12.8(svelte@5.56.4)
       playwright:
         specifier: ^1.59.1
         version: 1.61.1
@@ -1238,6 +1238,9 @@ packages:
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
 
+  '@types/unist@3.0.3':
+    resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
+
   '@valibot/to-json-schema@1.7.0':
     resolution: {integrity: sha512-Y3pPVibbIOHzohrlxSINvO7w/bvXkoYS3BQHoImV9ynE+bXKf171bdMucPurV2zp7gdmt0L1HCcNAsbo7cFRQw==}
     peerDependencies:
@@ -2022,8 +2025,8 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
-  mdsvex@0.12.7:
-    resolution: {integrity: sha512-gx4bReLCUvq+MPErHXYeyX+TEq1hsS2KfiZtEOMNTcbibSouFy8AHc5h04KbGCl+g5tLuo4/lbgRVYRnc7bJZw==}
+  mdsvex@0.12.8:
+    resolution: {integrity: sha512-v2sbRA9QWf0tpYWfREI5Kq7OqqrqoUzfmMKbgdOoWGfPDLc1JYU4EgDDF0N9WFhmjFW5agKrYwo/mDVutBKWKw==}
     peerDependencies:
       svelte: ^3.56.0 || ^4.0.0 || ^5.0.0-next.120
 
@@ -3431,7 +3434,7 @@ snapshots:
 
   '@types/mdast@4.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/node@12.20.55': {}
 
@@ -3442,6 +3445,8 @@ snapshots:
   '@types/trusted-types@2.0.7': {}
 
   '@types/unist@2.0.11': {}
+
+  '@types/unist@3.0.3': {}
 
   '@valibot/to-json-schema@1.7.0(valibot@1.4.2(typescript@6.0.3))':
     dependencies:
@@ -4119,7 +4124,7 @@ snapshots:
       underscore: 1.13.8
       xmlbuilder: 10.1.1
 
-  mdsvex@0.12.7(svelte@5.56.4):
+  mdsvex@0.12.8(svelte@5.56.4):
     dependencies:
       '@types/mdast': 4.0.4
       '@types/unist': 2.0.11
