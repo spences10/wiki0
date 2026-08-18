@@ -36,7 +36,7 @@
 	},
 	"dependencies": {
 		"@tmcp/adapter-valibot": "^0.1.5",
-		"@tmcp/transport-stdio": "^0.4.1",
+		"@tmcp/transport-stdio": "^0.5.0",
 		"@wiki0/core": "workspace:*",
 		"tmcp": "^1.18.1",
 		"valibot": "^1.2.0"
