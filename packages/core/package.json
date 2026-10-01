@@ -29,12 +29,12 @@
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && cp src/schema.sql dist/schema.sql",
 		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
-		"test:self": "vitest run"
+		"test:self": "vp test"
 	},
 	"dependencies": {
-		"mammoth": "^1.12.0",
-		"pdf-parse": "^2.4.5",
-		"yaml": "^2.9.0"
+		"mammoth": "catalog:",
+		"pdf-parse": "catalog:",
+		"yaml": "catalog:"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

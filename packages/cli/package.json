@@ -32,11 +32,11 @@
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
 		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
-		"test:self": "vitest run"
+		"test:self": "vp test"
 	},
 	"dependencies": {
 		"@wiki0/core": "workspace:*",
-		"citty": "^0.2.2"
+		"citty": "catalog:"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

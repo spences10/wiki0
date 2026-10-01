@@ -30,7 +30,7 @@ wiki0/
   packages/core/    # schema, indexing, wikilinks, search primitives
   packages/cli/     # wiki0 init/index/search/context/lint/graph/facts
   packages/mcp/     # MCP server wrapping core operations
-  apps/web/         # SvelteKit/mdsvex human interface
+  apps/wiki0-web/   # SvelteKit/mdsvex human interface
 ```
 
 ## Planned workflow

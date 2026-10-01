@@ -22,14 +22,15 @@ pnpm --filter wiki0-web dev       # start the Vite dev server
 pnpm --filter wiki0-web build     # build for production
 pnpm --filter wiki0-web preview   # preview the production build
 pnpm --filter wiki0-web lint      # run Vite+ lint
-pnpm --filter wiki0-web check     # run Vite+ checks and svelte-check
+pnpm --filter wiki0-web check     # run svelte-check with TypeScript 7
 pnpm --filter wiki0-web test      # run unit/component and e2e tests
 ```
 
 ## Tooling
 
 - SvelteKit + Svelte 5
-- Vite+ for dev/build/preview/lint/check
+- Vite+ for dev/build/preview, workspace linting, and unit tests
+- svelte-check with the TypeScript 7 native checker
 - Vitest + Playwright for tests
 - Tailwind CSS via the Vite plugin
 - mdsvex for Markdown/Svelte content

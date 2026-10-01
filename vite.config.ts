@@ -21,7 +21,6 @@ const config = {
 	},
 	lint: {
 		ignorePatterns: [
-			'apps/wiki0-web/**',
 			'apps/wiki0-web/.svelte-kit/**',
 			'apps/wiki0-web/build/**',
 			'apps/wiki0-web/dist/**',

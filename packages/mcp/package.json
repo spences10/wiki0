@@ -32,14 +32,14 @@
 	"scripts": {
 		"build:self": "vp exec tsc -p tsconfig.build.json && chmod +x dist/index.js",
 		"check:self": "vp exec tsc --noEmit -p tsconfig.json",
-		"test:self": "vitest run"
+		"test:self": "vp test"
 	},
 	"dependencies": {
-		"@tmcp/adapter-valibot": "^0.1.5",
-		"@tmcp/transport-stdio": "^0.5.0",
+		"@tmcp/adapter-valibot": "catalog:",
+		"@tmcp/transport-stdio": "catalog:",
 		"@wiki0/core": "workspace:*",
-		"tmcp": "^1.18.1",
-		"valibot": "^1.2.0"
+		"tmcp": "catalog:",
+		"valibot": "catalog:"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

@@ -15,17 +15,23 @@
 			"groupSlug": "svelte-packages"
 		},
 		{
-			"description": "Keep test tooling aligned across the workspace",
+			"description": "Keep Vite+ and its Vitest peers aligned",
 			"matchManagers": ["npm"],
 			"matchPackageNames": [
-				"/^@playwright\\//",
-				"playwright",
+				"vite-plus",
 				"/^@vitest\\//",
 				"vitest",
 				"vitest-browser-svelte"
 			],
-			"groupName": "Test tooling",
-			"groupSlug": "test-tooling"
+			"groupName": "Vite+ test stack",
+			"groupSlug": "vite-plus-test-stack"
+		},
+		{
+			"description": "Keep Playwright packages aligned",
+			"matchManagers": ["npm"],
+			"matchPackageNames": ["/^@playwright\\//", "playwright"],
+			"groupName": "Playwright",
+			"groupSlug": "playwright"
 		},
 		{
 			"description": "Group GitHub Actions updates",

@@ -1,9 +1,0 @@
-{
-	"useTabs": true,
-	"singleQuote": true,
-	"printWidth": 70,
-	"trailingComma": "all",
-	"proseWrap": "always",
-	"svelte": true,
-	"ignorePatterns": [".svelte-kit/**", "build/**", "dist/**"]
-}

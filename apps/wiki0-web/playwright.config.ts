@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 	webServer: {
-		command: 'npm run build && npm run preview',
+		command: 'vp preview',
 		port: 4173,
 	},
 	testMatch: '**/*.e2e.{ts,js}',

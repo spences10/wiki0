@@ -35,27 +35,6 @@ const config = {
 			},
 		],
 	},
-	fmt: {
-		ignorePatterns: ['.svelte-kit/**', 'build/**', 'dist/**'],
-		useTabs: true,
-		singleQuote: true,
-		printWidth: 70,
-		trailingComma: 'all',
-		proseWrap: 'always',
-		svelte: true,
-	},
-	lint: {
-		ignorePatterns: [
-			'.svelte-kit/**',
-			'build/**',
-			'dist/**',
-			'src/lib/vitest-examples/Welcome.svelte.spec.ts',
-		],
-		options: {
-			typeAware: false,
-			typeCheck: false,
-		},
-	},
 };
 
 export default defineConfig(config as never);
