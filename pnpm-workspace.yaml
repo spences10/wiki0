@@ -22,7 +22,7 @@ catalog:
   '@types/d3-shape': ^3.1.8
   '@types/node': ^24.0.0
   '@typescript/native': npm:typescript@^7.0.2
-  '@vitest/browser-playwright': 4.1.11
+  '@vitest/browser-playwright': 5.0.3
   bits-ui: ^2.19.3
   citty: ^0.2.2
   clsx: ^2.1.1
@@ -44,8 +44,8 @@ catalog:
   typescript: ^7.0.2
   valibot: ^1.5.0
   vite: npm:@voidzero-dev/vite-plus-core@0.3.3
-  vite-plus: 0.3.3
-  vitest: 4.1.11
+  vite-plus: 1.0.0
+  vitest: 5.0.3
   vitest-browser-svelte: ^3.1.0
   yaml: ^2.9.1
 
