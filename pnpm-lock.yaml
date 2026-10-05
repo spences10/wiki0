@@ -220,7 +220,7 @@ catalogs:
       version: 4.1.11
     bits-ui:
       specifier: ^2.19.3
-      version: 2.19.4
+      version: 2.19.5
     citty:
       specifier: ^0.2.2
       version: 0.2.2
@@ -371,7 +371,7 @@ importers:
         version: link:../../packages/core
       bits-ui:
         specifier: 'catalog:'
-        version: 2.19.4(@internationalized/date@3.12.4)(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1)(typescript@6.0.3))(svelte@5.57.1)
+        version: 2.19.5(@internationalized/date@3.12.4)(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1)(typescript@6.0.3))(svelte@5.57.1)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -1734,8 +1734,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  bits-ui@2.19.4:
-    resolution: {integrity: sha512-HTnJAqqxYq6u30c9jrxMjsV4xZfJsUb/KEzmdiENLgC3LEAaSXdDscpx/EKyk48YKmzO2z1+GQ6r/UO1POA6Wg==}
+  bits-ui@2.19.5:
+    resolution: {integrity: sha512-TEwkLSYElE5SE0fIdcItiFPfyg9vrR67N1Mt6VvZCqZo24dwTA1MpGVV3WeyIg7rfVAaZ0So8a0/dcnPngCoew==}
     engines: {node: '>=20'}
     peerDependencies:
       '@internationalized/date': ^3.8.1
@@ -3665,7 +3665,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  bits-ui@2.19.4(@internationalized/date@3.12.4)(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1)(typescript@6.0.3))(svelte@5.57.1):
+  bits-ui@2.19.5(@internationalized/date@3.12.4)(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.0)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.1)(typescript@6.0.3))(svelte@5.57.1):
     dependencies:
       '@floating-ui/core': 1.8.0
       '@floating-ui/dom': 1.8.0
