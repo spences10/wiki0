@@ -181,7 +181,7 @@ catalogs:
       version: 1.0.1
     '@lucide/svelte':
       specifier: ^1.48.0
-      version: 1.49.0
+      version: 1.53.0
     '@playwright/test':
       specifier: ^1.63.0
       version: 1.63.0
@@ -338,7 +338,7 @@ importers:
         version: 1.0.1
       '@lucide/svelte':
         specifier: 'catalog:'
-        version: 1.49.0(svelte@5.57.1)
+        version: 1.53.0(svelte@5.57.1)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.63.0
@@ -661,8 +661,8 @@ packages:
   '@layerstack/utils@2.0.0-next.19':
     resolution: {integrity: sha512-HyXCEz9pge4rFWklrSgFr3YIwdE1gP8WM6GPetmnKPDfYLF1/oetRFKI9FqiE+dw4brnULGPKJsVhjM3vQfD4A==}
 
-  '@lucide/svelte@1.49.0':
-    resolution: {integrity: sha512-RFH6Vx7dj6hshcBa1qJ0nKAWwkh385jJbDwF1WVg7yflC89310BsA55SEmJnaSRfr03dAyZMMLUC1EMGBu0Z0Q==}
+  '@lucide/svelte@1.53.0':
+    resolution: {integrity: sha512-RZTHcLAwwjAz+rO1S4IPQSTzDycGZWhSYa0GS3sXAoJ3GTHdBZyHCXutIxJketIAoaIkcmFK5Ucfo2+WBYpKLA==}
     peerDependencies:
       svelte: ^5
 
@@ -2900,7 +2900,7 @@ snapshots:
       d3-time: 3.1.0
       d3-time-format: 4.1.0
 
-  '@lucide/svelte@1.49.0(svelte@5.57.1)':
+  '@lucide/svelte@1.53.0(svelte@5.57.1)':
     dependencies:
       svelte: 5.57.1
 
