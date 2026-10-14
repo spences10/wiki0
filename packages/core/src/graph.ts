@@ -1,55 +1,59 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { resolve_wiki_root, wikilink_target_path } from './paths.js';
+import { resolve_wiki_root } from './paths.js';
 import { open_index_or_throw } from './storage.js';
 import type { GraphEdge, GraphNode, GraphResult } from './types.js';
 
 export function graph_wiki(root = '.'): GraphResult {
-	const wiki_root = resolve_wiki_root(root);
-	const db = open_index_or_throw(wiki_root);
-	const nodes = db
-		.prepare('SELECT path, title FROM pages ORDER BY path')
-		.all() as GraphNode[];
-	const edge_rows = db
-		.prepare(
-			`SELECT pages.path AS "from",
-				COALESCE(page_links.to_path, page_links.target) AS "to",
-				page_links.target,
-				page_links.raw_text AS raw_text,
-				page_links.alias,
-				page_links.embed,
-				page_links.status
-			FROM page_links
-			JOIN pages ON pages.id = page_links.from_page_id
-			ORDER BY pages.path, page_links.target`,
-		)
-		.all() as Record<string, SQLOutputValue>[];
-	db.close();
-
-	const edges = edge_rows.map(graph_edge_from_row);
-	return {
-		root: wiki_root,
-		nodes,
-		edges: edges.map((edge) => ({
-			...edge,
-			to:
-				edge.status === 'resolved'
-					? edge.to
-					: wikilink_target_path(edge.target),
-			embed: Boolean(edge.embed),
-		})),
-	};
+	const project_root = resolve_wiki_root(root);
+	const db = open_index_or_throw(project_root);
+	try {
+		const edges = (
+			db
+				.prepare(
+					`SELECT from_path, to_path, to_anchor, target, raw_text, alias,
+						kind, line, status
+					FROM links
+					ORDER BY from_path, line, target`,
+				)
+				.all() as Record<string, SQLOutputValue>[]
+		).map(edge_from_row);
+		const linked = new Set(
+			edges
+				.filter(
+					(edge) =>
+						edge.status === 'resolved' && edge.from !== edge.to,
+				)
+				.map((edge) => edge.to),
+		);
+		const nodes = (
+			db
+				.prepare(
+					'SELECT path, title, status, doc_type FROM pages ORDER BY path',
+				)
+				.all() as Omit<GraphNode, 'orphan'>[]
+		).map((node) => ({ ...node, orphan: !linked.has(node.path) }));
+		return { root: project_root, nodes, edges };
+	} finally {
+		db.close();
+	}
 }
 
-function graph_edge_from_row(
+function edge_from_row(
 	row: Record<string, SQLOutputValue>,
 ): GraphEdge {
+	const link_status = String(row.status);
 	return {
-		from: String(row.from),
-		to: String(row.to),
+		from: String(row.from_path),
+		to:
+			row.to_path === null ? String(row.target) : String(row.to_path),
+		to_anchor: row.to_anchor === null ? null : String(row.to_anchor),
 		target: String(row.target),
 		raw_text: String(row.raw_text),
 		alias: row.alias === null ? null : String(row.alias),
-		embed: Boolean(row.embed),
-		status: row.status === 'resolved' ? 'resolved' : 'unresolved',
+		embed: row.kind === 'embed',
+		kind: String(row.kind),
+		line: Number(row.line),
+		status: link_status === 'resolved' ? 'resolved' : 'unresolved',
+		link_status,
 	};
 }

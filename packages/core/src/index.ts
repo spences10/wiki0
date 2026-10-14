@@ -24,6 +24,19 @@ export {
 	index_status,
 	index_wiki,
 } from './indexer.js';
+export {
+	extract_anchors,
+	extract_links,
+	link_resolver,
+	type Anchor,
+	type AnchorKind,
+	type ExtractedLink,
+	type LinkKind,
+	type LinkStatus,
+	type LinkTargetDocument,
+	type MatchQuality,
+	type ResolvedLink,
+} from './links.js';
 export { lint_wiki } from './lint.js';
 export {
 	page_title_from_markdown,

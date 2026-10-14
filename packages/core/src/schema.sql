@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS pages (
 	body TEXT NOT NULL,
 	content_hash TEXT NOT NULL,
 	modified_at TEXT NOT NULL,
+	line_count INTEGER NOT NULL DEFAULT 0,
 	kind TEXT NOT NULL DEFAULT 'markdown',
 	status TEXT,
 	doc_type TEXT,
@@ -21,16 +22,33 @@ CREATE TABLE IF NOT EXISTS pages (
 	updated_at TEXT DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS page_links (
+CREATE TABLE IF NOT EXISTS links (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	from_page_id INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
-	to_path TEXT,
+	from_path TEXT NOT NULL,
+	line INTEGER NOT NULL,
+	kind TEXT NOT NULL,
 	raw_text TEXT NOT NULL,
 	target TEXT NOT NULL,
 	alias TEXT,
-	embed INTEGER NOT NULL DEFAULT 0,
-	status TEXT NOT NULL DEFAULT 'unresolved',
-	created_at TEXT DEFAULT (datetime('now'))
+	to_path TEXT,
+	to_anchor TEXT,
+	status TEXT NOT NULL,
+	quality TEXT,
+	candidates TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE INDEX IF NOT EXISTS links_to_path ON links(to_path);
+
+CREATE TABLE IF NOT EXISTS anchors (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	page_id INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+	path TEXT NOT NULL,
+	kind TEXT NOT NULL,
+	slug TEXT NOT NULL,
+	text TEXT NOT NULL,
+	depth INTEGER NOT NULL,
+	line INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS page_chunks (

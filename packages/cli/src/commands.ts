@@ -732,10 +732,7 @@ export const main = defineCommand({
 				},
 			},
 			run({ args }) {
-				const result = lint_wiki(
-					String(args.root ?? '.'),
-					wiki_dir_arg(args),
-				);
+				const result = lint_wiki(String(args.root ?? '.'));
 				print_json(result);
 				if (!result.ok) process.exitCode = 1;
 			},

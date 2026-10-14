@@ -75,6 +75,9 @@
 				id: edge.to,
 				path: edge.to,
 				title: edge.target,
+				status: null,
+				doc_type: null,
+				orphan: false,
 				degree: degree[edge.to] ?? 0,
 			}));
 		return [...resolved, ...unresolved];

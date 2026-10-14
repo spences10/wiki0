@@ -301,8 +301,8 @@ export function register_wiki_tools(server: {
 			description: 'Lint wiki links and duplicate names',
 			schema: LintWikiSchema,
 		},
-		async ({ root, wiki_dir }: LintWikiInput) =>
-			json_response(lint_wiki(mcp_root(root), wiki_dir)),
+		async ({ root }: LintWikiInput) =>
+			json_response(lint_wiki(mcp_root(root))),
 	);
 
 	tool(

@@ -1,9 +1,17 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, globSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join, matchesGlob } from 'node:path';
 import type { Wiki0Config } from './config.js';
 
 const always_skipped = ['.git', 'node_modules', '.wiki0'];
+
+// Every project file (dotfiles included) that git or the walker sees.
+export function list_all_project_files(root: string): string[] {
+	return (git_files(root) ?? walked_files(root))
+		.filter((path) => !is_always_skipped(path))
+		.filter((path) => is_file(join(root, path)))
+		.sort();
+}
 
 // Project-relative paths (forward slashes) of files to index, sorted.
 export function list_project_files(
@@ -47,13 +55,21 @@ function git_files(root: string): string[] | null {
 }
 
 function walked_files(root: string): string[] {
-	return globSync('**/*', {
-		cwd: root,
-		exclude: (path) =>
-			always_skipped.some(
-				(name) => path === name || path.endsWith(`/${name}`),
-			),
-	}).map((path) => path.replaceAll('\\', '/'));
+	const files: string[] = [];
+	const visit = (relative: string): void => {
+		for (const entry of readdirSync(join(root, relative), {
+			withFileTypes: true,
+		})) {
+			if (always_skipped.includes(entry.name)) continue;
+			const path = relative
+				? `${relative}/${entry.name}`
+				: entry.name;
+			if (entry.isDirectory()) visit(path);
+			else if (entry.isFile()) files.push(path);
+		}
+	};
+	visit('');
+	return files;
 }
 
 function is_always_skipped(path: string): boolean {

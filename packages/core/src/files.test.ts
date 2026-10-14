@@ -2,7 +2,10 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
-import { list_project_files } from './files.js';
+import {
+	list_all_project_files,
+	list_project_files,
+} from './files.js';
 import { make_wiki_root } from './test-utils.js';
 
 function write(root: string, path: string, body = 'x'): void {
@@ -48,5 +51,18 @@ describe('list_project_files', () => {
 		expect(
 			list_project_files(root, { include: ['**/*.md'], exclude: [] }),
 		).toEqual(['docs/kept.md']);
+	});
+});
+
+describe('list_all_project_files', () => {
+	it('includes dot folders so links into them resolve', () => {
+		const root = make_wiki_root();
+		write(root, '.agents/skills/a/SKILL.md');
+		write(root, 'README.md');
+
+		expect(list_all_project_files(root)).toEqual([
+			'.agents/skills/a/SKILL.md',
+			'README.md',
+		]);
 	});
 });

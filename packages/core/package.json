@@ -32,6 +32,7 @@
 		"test:self": "vp test"
 	},
 	"dependencies": {
+		"github-slugger": "catalog:",
 		"mammoth": "catalog:",
 		"marked": "catalog:",
 		"pdf-parse": "catalog:",

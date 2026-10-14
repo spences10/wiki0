@@ -9,8 +9,18 @@ import {
 import { read_config } from './config.js';
 import { document_kind, parse_document } from './documents.js';
 import { log_wiki_event } from './events.js';
-import { list_project_files } from './files.js';
-import { parse_markdown, parse_wikilinks } from './markdown.js';
+import {
+	list_all_project_files,
+	list_project_files,
+} from './files.js';
+import {
+	extract_anchors,
+	extract_links,
+	link_resolver,
+	type Anchor,
+	type ExtractedLink,
+} from './links.js';
+import { parse_markdown } from './markdown.js';
 import { resolve_wiki_root } from './paths.js';
 import { index_schema_version } from './schema.js';
 import {
@@ -23,7 +33,6 @@ import type {
 	IndexResult,
 	IndexStatus,
 	WikiFrontmatter,
-	WikiLink,
 } from './types.js';
 
 export const current_index_schema_version = index_schema_version;
@@ -47,9 +56,11 @@ type IndexedDocument = {
 	text: string;
 	content_hash: string;
 	modified_at: string;
+	line_count: number;
 	meta: DocumentMeta;
 	chunks: DocumentChunk[];
-	links: WikiLink[];
+	links: ExtractedLink[];
+	anchors: Anchor[];
 };
 
 export async function index_wiki(root = '.'): Promise<IndexResult> {
@@ -75,19 +86,35 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 	try {
 		// The index is a cache, so each run rebuilds it from the files.
 		db.exec(
-			'DELETE FROM fts_pages; DELETE FROM fts_page_chunks; DELETE FROM page_chunks; DELETE FROM page_links; DELETE FROM pages;',
+			'DELETE FROM fts_pages; DELETE FROM fts_page_chunks; DELETE FROM page_chunks; DELETE FROM links; DELETE FROM anchors; DELETE FROM pages;',
 		);
-		const resolve_link = link_resolver(documents);
+		const resolve_link = link_resolver(
+			documents.map((document) => ({
+				path: document.path,
+				title: document.title,
+				aliases: document.meta.aliases,
+				anchors: document.anchors,
+				line_count: document.line_count,
+			})),
+			list_all_project_files(project_root),
+		);
 		const insert_page = db.prepare(`
 			INSERT INTO pages (
-				path, title, body, content_hash, modified_at, kind, status,
-				doc_type, doc_date, priority, aliases, tags, supersedes,
-				superseded_by
+				path, title, body, content_hash, modified_at, line_count,
+				kind, status, doc_type, doc_date, priority, aliases, tags,
+				supersedes, superseded_by
 			)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`);
 		const insert_link = db.prepare(`
-			INSERT INTO page_links (from_page_id, to_path, raw_text, target, alias, embed, status)
+			INSERT INTO links (
+				from_page_id, from_path, line, kind, raw_text, target, alias,
+				to_path, to_anchor, status, quality, candidates
+			)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		`);
+		const insert_anchor = db.prepare(`
+			INSERT INTO anchors (page_id, path, kind, slug, text, depth, line)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 		`);
 		const insert_fts = db.prepare(
@@ -113,6 +140,7 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 				document.text,
 				document.content_hash,
 				document.modified_at,
+				document.line_count,
 				document.kind,
 				meta.status,
 				meta.doc_type,
@@ -126,17 +154,34 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 			insert_fts.run(document.path, document.title, document.text);
 
 			for (const link of document.links) {
-				const to_path = resolve_link(link.target);
+				const resolved = resolve_link(document.path, link);
+				if (resolved.status === 'external') continue;
 				insert_link.run(
 					page_id,
-					to_path,
-					link.raw,
-					link.target,
-					link.alias ?? null,
-					link.embed ? 1 : 0,
-					to_path ? 'resolved' : 'unresolved',
+					document.path,
+					resolved.line,
+					resolved.kind,
+					resolved.raw,
+					resolved.target,
+					resolved.alias,
+					resolved.to_path,
+					resolved.to_anchor,
+					resolved.status,
+					resolved.quality,
+					JSON.stringify(resolved.candidates),
 				);
 				link_count += 1;
+			}
+			for (const anchor of document.anchors) {
+				insert_anchor.run(
+					page_id,
+					document.path,
+					anchor.kind,
+					anchor.slug,
+					anchor.text,
+					anchor.depth,
+					anchor.line,
+				);
 			}
 
 			for (const chunk of document.chunks) {
@@ -253,9 +298,11 @@ async function read_project_document(
 			text: content,
 			content_hash,
 			modified_at,
+			line_count: source.split('\n').length,
 			meta: document_meta(frontmatter),
 			chunks: chunk_markdown(content, title, line_offset),
-			links: parse_wikilinks(content),
+			links: extract_links(content, line_offset, frontmatter),
+			anchors: extract_anchors(content, line_offset),
 		};
 	}
 
@@ -271,37 +318,11 @@ async function read_project_document(
 		text: parsed.text,
 		content_hash,
 		modified_at,
+		line_count: parsed.text.split('\n').length,
 		meta: document_meta({}),
 		chunks: chunk_plain_text(parsed.text, title),
 		links: [],
-	};
-}
-
-// Resolves a wikilink target to an indexed path: exact path, unique
-// path suffix, then title or alias.
-function link_resolver(
-	documents: IndexedDocument[],
-): (target: string) => string | null {
-	const paths = new Set(documents.map((document) => document.path));
-	const names = new Map<string, string>();
-	for (const document of documents) {
-		for (const name of [document.title, ...document.meta.aliases]) {
-			const key = name.trim().toLowerCase();
-			if (key && !names.has(key)) names.set(key, document.path);
-		}
-	}
-	return (raw_target) => {
-		const target = raw_target.split('#')[0]?.trim() ?? '';
-		if (!target) return null;
-		const with_extension = target.endsWith('.md')
-			? target
-			: `${target}.md`;
-		if (paths.has(with_extension)) return with_extension;
-		const suffix_matches = [...paths].filter((path) =>
-			path.endsWith(`/${with_extension}`),
-		);
-		if (suffix_matches.length === 1) return suffix_matches[0] ?? null;
-		return names.get(target.toLowerCase()) ?? null;
+		anchors: [],
 	};
 }
 

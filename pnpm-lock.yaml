@@ -233,6 +233,9 @@ catalogs:
     d3-shape:
       specifier: ^3.2.0
       version: 3.2.0
+    github-slugger:
+      specifier: ^2.0.0
+      version: 2.0.0
     layerchart:
       specifier: 2.5.0
       version: 2.5.0
@@ -457,6 +460,9 @@ importers:
 
   packages/core:
     dependencies:
+      github-slugger:
+        specifier: 'catalog:'
+        version: 2.0.0
       mammoth:
         specifier: 'catalog:'
         version: 1.13.0
@@ -2004,6 +2010,9 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  github-slugger@2.0.0:
+    resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
@@ -3909,6 +3918,8 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
+
+  github-slugger@2.0.0: {}
 
   graceful-fs@4.2.11: {}
 

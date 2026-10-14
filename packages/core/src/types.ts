@@ -106,6 +106,8 @@ export type ContextResult = {
 export type BacklinkResult = {
 	path: string;
 	title: string;
+	line: number;
+	kind: string;
 	raw_text: string;
 	alias: string | null;
 	embed: boolean;
@@ -114,6 +116,9 @@ export type BacklinkResult = {
 export type GraphNode = {
 	path: string;
 	title: string;
+	status: string | null;
+	doc_type: string | null;
+	orphan: boolean;
 };
 
 export type GraphEdge = {
@@ -124,6 +129,10 @@ export type GraphEdge = {
 	alias: string | null;
 	embed: boolean;
 	status: 'resolved' | 'unresolved';
+	link_status: string;
+	kind: string;
+	line: number;
+	to_anchor: string | null;
 };
 
 export type GraphResult = {
@@ -172,18 +181,23 @@ export type ReviewResult = {
 	reason: string;
 };
 
+export type LintSeverity = 'error' | 'warning' | 'info';
+
 export type LintIssue = {
-	code: string;
-	severity: 'error' | 'warning';
+	rule: string;
+	severity: LintSeverity;
 	path: string;
+	line: number | null;
 	message: string;
 	target?: string;
+	suggestions?: string[];
 };
 
 export type LintResult = {
 	root: string;
 	ok: boolean;
 	issue_count: number;
+	counts: Record<LintSeverity, number>;
 	issues: LintIssue[];
 };
 

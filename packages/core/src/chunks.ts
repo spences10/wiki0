@@ -22,7 +22,7 @@ const min_chunk_tokens = 60;
 const max_chunk_tokens = 800;
 const split_target_tokens = 600;
 
-type Block = {
+export type Block = {
 	token: Token;
 	start_line: number;
 	end_line: number;
@@ -122,7 +122,10 @@ export function chunk_plain_text(
 	return chunks;
 }
 
-function lex_blocks(content: string, line_offset: number): Block[] {
+export function lex_blocks(
+	content: string,
+	line_offset: number,
+): Block[] {
 	const source = content.replace(/\r\n?/gu, '\n');
 	const blocks: Block[] = [];
 	let cursor = 0;

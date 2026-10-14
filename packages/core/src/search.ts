@@ -372,12 +372,12 @@ export function backlinks_for_page(
 	const page_path = find_indexed_path(db, title);
 	const rows = db
 		.prepare(
-			`SELECT pages.path, pages.title, page_links.raw_text AS raw_text,
-				page_links.alias, page_links.embed
-			FROM page_links
-			JOIN pages ON pages.id = page_links.from_page_id
-			WHERE page_links.to_path = ?
-			ORDER BY pages.path`,
+			`SELECT pages.path, pages.title, links.line, links.kind,
+				links.raw_text AS raw_text, links.alias
+			FROM links
+			JOIN pages ON pages.id = links.from_page_id
+			WHERE links.to_path = ? AND links.status IN ('resolved', 'ambiguous')
+			ORDER BY pages.path, links.line`,
 		)
 		.all(page_path) as Record<string, SQLOutputValue>[];
 	db.close();
@@ -390,8 +390,10 @@ function backlink_from_row(
 	return {
 		path: String(row.path),
 		title: String(row.title),
+		line: Number(row.line),
+		kind: String(row.kind),
 		raw_text: String(row.raw_text),
 		alias: row.alias === null ? null : String(row.alias),
-		embed: Boolean(row.embed),
+		embed: row.kind === 'embed',
 	};
 }
