@@ -1,0 +1,16 @@
+[
+	{
+		"path": "wiki/decisions/0002-index-in-project-folder.md",
+		"title": "Index in the project folder",
+		"source": "---\ntitle: Index in the project folder\ntype: decision\nstatus: superseded\nsuperseded_by: wiki/decisions/0006-index-in-user-cache.md\ndate: 2026-05-31\n---\n\n# Index in the project folder\n\n## Decision\n\nStore the index at `.wiki0/wiki0.sqlite` in the project root, and have\n`wiki0 init` add `.wiki0/` to the project's `.gitignore`.\n\n## Why it was replaced\n\nRunning wiki0 on someone else's repo created a folder and edited their\n`.gitignore`. Replaced by [[decisions/0006-index-in-user-cache]].\n",
+		"status": "superseded",
+		"superseded_by": "wiki/decisions/0006-index-in-user-cache.md"
+	},
+	{
+		"path": "wiki/decisions/0006-index-in-user-cache.md",
+		"title": "Index in the user cache",
+		"source": "---\ntitle: Index in the user cache\ntype: decision\nstatus: accepted\nsupersedes: [wiki/decisions/0002-index-in-project-folder.md]\ndate: 2026-10-14\n---\n\n# Index in the user cache\n\n## Decision\n\nBy default the index lives in the user cache, keyed per worktree:\n`~/.cache/wiki0/<folder>-<hash>/index.db`. Nothing is written to the\nproject. A project can opt into `.wiki0/index.db` with `wiki0.toml`.\nDetails: [Storage](../reference/storage.md).\n\n## Why\n\n- wiki0 has to work on repos it does not own without adding files or\n  editing `.gitignore`.\n- The index is a rebuildable cache, which is what the cache directory\n  is for.\n- Keying by worktree keeps branches in separate worktrees from sharing\n  an index of different files.\n\n## Consequences\n\n- The index is invisible, so `wiki0 status` prints its path.\n- The CLI and an MCP server can run with different environments and\n  resolve different paths; `WIKI0_INDEX` pins one file for both.\n- Moving a repo leaves its old index behind in the cache.\n",
+		"status": "accepted",
+		"superseded_by": null
+	}
+]

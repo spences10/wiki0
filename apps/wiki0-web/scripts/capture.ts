@@ -30,6 +30,10 @@ const cli = join(repo, 'packages/cli/dist/index.js');
 const ui = join(repo, 'packages/ui/dist/bin.js');
 
 const query = 'index in the project folder';
+const story_documents = [
+	'wiki/decisions/0002-index-in-project-folder.md',
+	'wiki/decisions/0006-index-in-user-cache.md',
+];
 
 const work = await mkdtemp(join(tmpdir(), 'wiki0-capture-'));
 // Named so the UI sidebar shows the project as "wiki0"
@@ -226,6 +230,25 @@ try {
 		const base = new URL(server.url);
 		await save('chunks', await api(base, '/api/chunks'));
 		await save('graph', await api(base, '/api/graph'));
+		// The two decisions the story follows, as whole files
+		await save(
+			'documents',
+			await Promise.all(
+				story_documents.map(async (path) => {
+					const document = (await api(
+						base,
+						`/api/doc?path=${encodeURIComponent(path)}`,
+					)) as Record<string, unknown>;
+					return {
+						path,
+						title: document.title,
+						source: document.source,
+						status: document.status,
+						superseded_by: document.superseded_by,
+					};
+				}),
+			),
+		);
 		await screenshots(base);
 	} finally {
 		server.stop();
