@@ -53,6 +53,7 @@ export {
 	show,
 } from './search.js';
 export {
+	IndexMissingError,
 	open_index,
 	open_index_or_throw,
 	open_index_readonly,

@@ -154,13 +154,22 @@ export function open_index_readonly(
 	return db;
 }
 
-export function open_index_or_throw(start_path = '.'): WikiDatabase {
-	const db = open_index_readonly(start_path);
-	if (!db) {
-		throw new Error(
+// Thrown by read functions when the project has no usable index, so
+// callers can check `code` instead of matching the message.
+export class IndexMissingError extends Error {
+	readonly code = 'not-indexed';
+
+	constructor() {
+		super(
 			'No usable wiki0 index for this project. Run `wiki0 index` first.',
 		);
+		this.name = 'IndexMissingError';
 	}
+}
+
+export function open_index_or_throw(start_path = '.'): WikiDatabase {
+	const db = open_index_readonly(start_path);
+	if (!db) throw new IndexMissingError();
 	return db;
 }
 

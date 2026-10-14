@@ -99,7 +99,9 @@ describe('open_index_readonly', () => {
 
 		expect(open_index_readonly(root)).toBeNull();
 		expect(existsSync(resolve_index(root).index_path)).toBe(false);
-		expect(() => open_index_or_throw(root)).toThrow(/wiki0 index/u);
+		expect(() => open_index_or_throw(root)).toThrow(
+			expect.objectContaining({ code: 'not-indexed' }),
+		);
 	});
 
 	it('opens an index created by open_index', () => {
