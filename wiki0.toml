@@ -1,0 +1,2 @@
+# The synthetic benchmark corpus is test data, not this project's docs.
+exclude = ["bench/corpus/**"]
