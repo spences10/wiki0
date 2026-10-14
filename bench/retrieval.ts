@@ -3,7 +3,11 @@
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fresh_corpus, load_tasks } from './shared.ts';
+import {
+	fresh_corpus,
+	load_tasks,
+	parse_corpus_args,
+} from './shared.ts';
 
 process.env.WIKI0_CACHE_DIR = mkdtempSync(
 	join(tmpdir(), 'wiki0-bench-cache-'),
@@ -11,7 +15,8 @@ process.env.WIKI0_CACHE_DIR = mkdtempSync(
 const { index_wiki, search } =
 	await import('../packages/core/dist/index.js');
 
-const root = fresh_corpus();
+const corpus_args = parse_corpus_args();
+const root = fresh_corpus(corpus_args);
 await index_wiki(root);
 
 let reciprocal_sum = 0;
@@ -20,7 +25,7 @@ let stale_above = 0;
 let stale_tasks = 0;
 const rows: string[] = [];
 
-const tasks = load_tasks().filter(
+const tasks = load_tasks(corpus_args).filter(
 	(task) => task.authoritative.length,
 );
 for (const task of tasks) {

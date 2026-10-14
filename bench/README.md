@@ -33,3 +33,10 @@ tokens, cache reads, cost and turns. Raw runs go to `results/`
 The corpus is small and written for these tasks, so a perfect
 retrieval score means no regressions, not that ranking is solved. Add
 tasks whenever a real search goes wrong.
+
+## Another corpus
+
+Both scripts take `--corpus <dir> --tasks <file>` to run against
+another project's git-tracked Markdown with your own task file in the
+same format as `tasks.json`. Keep task files for private projects
+outside this repo.

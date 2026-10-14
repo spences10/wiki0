@@ -2,7 +2,8 @@
 // tools and with the wiki0 MCP server, then compares tokens, answer
 // correctness and cited sources. Uses your Claude usage.
 //
-//   node bench/agent.ts --reps 3 --model claude-sonnet-5-5 [--tasks a,b]
+//   node bench/agent.ts --reps 3 --model claude-sonnet-5-5 [--only a,b]
+//     [--corpus <dir> --tasks <file>]
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -10,6 +11,7 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import {
 	bench_dir,
+	corpus_options,
 	fresh_corpus,
 	load_tasks,
 	median,
@@ -20,14 +22,16 @@ const { values } = parseArgs({
 	options: {
 		reps: { type: 'string', default: '3' },
 		model: { type: 'string', default: 'claude-sonnet-5-5' },
-		tasks: { type: 'string' },
+		only: { type: 'string' },
 		arms: { type: 'string', default: 'grep,wiki0' },
+		...corpus_options,
 	},
 });
+const corpus_args = { corpus: values.corpus, tasks: values.tasks };
 const reps = Number(values.reps);
 const arms = (values.arms ?? '').split(',') as Arm[];
-const wanted = values.tasks?.split(',');
-const tasks = load_tasks().filter(
+const wanted = values.only?.split(',');
+const tasks = load_tasks(corpus_args).filter(
 	(task) => !wanted || wanted.includes(task.id),
 );
 const mcp_entry = join(
@@ -74,7 +78,7 @@ async function run_once(
 	arm: Arm,
 	rep: number,
 ): Promise<Run> {
-	const root = fresh_corpus();
+	const root = fresh_corpus(corpus_args);
 	const args = [
 		'-p',
 		prompt(task),
