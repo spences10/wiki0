@@ -12,6 +12,8 @@ const config = {
 		printWidth: 70,
 		trailingComma: 'all',
 		proseWrap: 'always',
+		// Skill loaders need the frontmatter description on one line.
+		ignorePatterns: ['.agents/skills/**/SKILL.md'],
 		overrides: [
 			{
 				files: ['apps/wiki0-web/**/*.svelte'],

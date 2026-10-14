@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach } from 'vitest';
+import { afterEach } from 'vite-plus/test';
 
 const temp_roots: string[] = [];
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { list_wiki_events, log_wiki_event } from './events.js';
 import { make_wiki_root } from './test-utils.js';
 

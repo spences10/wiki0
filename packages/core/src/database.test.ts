@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { open_wiki_database, wiki_db_path } from './database.js';
 import { make_wiki_root } from './test-utils.js';
 

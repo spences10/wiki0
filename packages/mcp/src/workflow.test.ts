@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { register_wiki_workflow } from './workflow.js';
 
 describe('register_wiki_workflow', () => {

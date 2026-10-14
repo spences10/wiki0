@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { create_page } from './pages.js';
 import { review_wiki } from './review.js';
 import { make_wiki_root } from './test-utils.js';

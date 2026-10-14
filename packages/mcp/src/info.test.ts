@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { wiki0_info } from './info.js';
 
 describe('wiki0_info', () => {

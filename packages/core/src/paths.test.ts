@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { page_relative_path, slugify_title } from './paths.js';
 
 describe('slugify_title', () => {
