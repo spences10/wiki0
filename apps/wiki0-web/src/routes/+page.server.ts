@@ -163,38 +163,6 @@ function skyline(limit: number): Skyline {
 	};
 }
 
-// What an agent opens when it reads whole files: the wiki and the
-// READMEs, longest first, at their full length in lines, with the two
-// decisions the story follows among them.
-function whole_files(
-	story: string[],
-): { path: string; lines: number }[] {
-	const files = chunks
-		.map((document) => ({
-			path: document.path,
-			lines: Math.max(
-				0,
-				...document.chunks.map((chunk) => chunk.end_line),
-			),
-		}))
-		.filter(
-			(document) =>
-				document.path.startsWith('wiki/') ||
-				document.path.endsWith('README.md'),
-		)
-		.sort((a, b) => b.lines - a.lines);
-	const kept = files
-		.filter((file) => !story.includes(file.path))
-		.slice(0, 14);
-	const story_files = files.filter((file) =>
-		story.includes(file.path),
-	);
-	// The story's files sit among the others, not at the end
-	kept.splice(5, 0, story_files[0]!);
-	kept.splice(9, 0, story_files[1]!);
-	return kept;
-}
-
 const mcp_config = JSON.stringify(
 	{
 		mcpServers: {
@@ -242,6 +210,51 @@ function excerpt(document: StoryDocument, citation: string) {
 	};
 }
 
+// The first search result as the agent receives it, trimmed to the
+// fields the page explains, with the lines each field spans
+function first_result() {
+	const [top, ...rest] = search.results;
+	if (!top) throw new Error('the captured search has no results');
+	const shown = {
+		citation: top.citation,
+		breadcrumb: top.breadcrumb,
+		status: top.status,
+		doc_type: top.doc_type,
+		date: top.date,
+		snippet: top.snippet,
+		score: top.score,
+		superseded_by: top.superseded_by,
+	};
+	const text = JSON.stringify(shown, null, 2);
+	const lines = text.split('\n');
+	const spans: Record<string, [number, number]> = {};
+	for (const key of Object.keys(shown)) {
+		const start = lines.findIndex((line) =>
+			line.startsWith(`  "${key}"`),
+		);
+		let end = start;
+		if (lines[start]?.trimEnd().endsWith('[')) {
+			while (
+				end < lines.length &&
+				!lines[end]?.trim().startsWith(']')
+			) {
+				end += 1;
+			}
+		}
+		spans[key] = [start + 1, end + 1];
+	}
+	return {
+		query: search.query,
+		html: highlight(text, 'json'),
+		spans,
+		rest: rest.map((result) => ({
+			citation: result.citation,
+			status: result.status,
+			superseded_by: result.superseded_by,
+		})),
+	};
+}
+
 export const load: PageServerLoad = () => {
 	const [superseded_path, current_path] = documents.map(
 		(document) => document.path,
@@ -260,7 +273,7 @@ export const load: PageServerLoad = () => {
 		superseded,
 		current,
 		current_chunks: chunks_of(current.path),
-		whole_files: whole_files([superseded.path, current.path]),
+		answer: first_result(),
 		rank: rank_rows(),
 		show: {
 			citation: show.citation,

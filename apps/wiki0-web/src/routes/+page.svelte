@@ -3,7 +3,7 @@
 	import Hero from '#lib/sections/hero.svelte';
 	import IndexSection from '#lib/sections/index-section.svelte';
 	import Links from '#lib/sections/links.svelte';
-	import Problem from '#lib/sections/problem.svelte';
+	import Answer from '#lib/sections/answer.svelte';
 	import Rerank from '#lib/sections/rerank.svelte';
 	import UiSection from '#lib/sections/ui-section.svelte';
 	import UseIt from '#lib/sections/use-it.svelte';
@@ -38,11 +38,7 @@
 />
 
 <main id="main">
-	<Problem
-		files={data.whole_files}
-		superseded={data.superseded}
-		current={data.current}
-	/>
+	<Answer answer={data.answer} />
 	<IndexSection
 		current={data.current}
 		chunks={data.current_chunks}

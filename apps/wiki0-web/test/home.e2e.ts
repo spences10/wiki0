@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 
 const sections = [
-	'Agents read whole files',
+	'What your agent gets back',
 	'It indexes the docs you already have',
 	'Current docs rank first',
 	'Agents read the cited lines',
@@ -65,11 +65,11 @@ test('shows the finished story with reduced motion', async ({
 	});
 	const page = await context.newPage();
 	await page.goto('/');
-	const answer = page.getByText(
-		"The agent's answer, quoted from a decision you replaced:",
-	);
-	await answer.scrollIntoViewIfNeeded();
-	await expect(answer).toBeVisible();
+	const fields = page.getByRole('list', {
+		name: 'What each field is for',
+	});
+	await fields.scrollIntoViewIfNeeded();
+	await expect(fields).toBeVisible();
 	const ranked = page.getByRole('list', { name: 'Search results' });
 	await ranked.scrollIntoViewIfNeeded();
 	await expect(ranked.getByRole('listitem').first()).toContainText(
