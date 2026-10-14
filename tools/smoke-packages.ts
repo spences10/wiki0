@@ -18,6 +18,15 @@ const packages = [
 		executable: 'package/dist/index.js',
 	},
 	{
+		name: '@wiki0/ui',
+		files: [
+			'package/dist/index.js',
+			'package/dist/bin.js',
+			'package/dist/web/index.html',
+		],
+		executable: 'package/dist/bin.js',
+	},
+	{
 		name: '@wiki0/mcp',
 		files: ['package/dist/index.js'],
 		executable: 'package/dist/index.js',
@@ -130,6 +139,15 @@ try {
 		throw new Error('CLI help smoke test returned unexpected output');
 	}
 	console.log('Verified @wiki0/cli binary');
+
+	const ui = run(process.execPath, [
+		'packages/ui/dist/bin.js',
+		'--help',
+	]);
+	if (!ui.stdout.includes('Usage: wiki0-ui')) {
+		throw new Error('UI help smoke test returned unexpected output');
+	}
+	console.log('Verified @wiki0/ui binary');
 
 	run(process.execPath, ['packages/mcp/dist/index.js'], '');
 	console.log('Verified @wiki0/mcp binary');

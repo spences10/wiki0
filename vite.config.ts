@@ -17,7 +17,10 @@ const config = {
 		ignorePatterns: ['.agents/skills/**/SKILL.md'],
 		overrides: [
 			{
-				files: ['apps/wiki0-web/**/*.svelte'],
+				files: [
+					'apps/wiki0-web/**/*.svelte',
+					'packages/ui/**/*.svelte',
+				],
 				options: { svelte: true },
 			},
 		],
@@ -27,6 +30,7 @@ const config = {
 			'apps/wiki0-web/.svelte-kit/**',
 			'apps/wiki0-web/build/**',
 			'apps/wiki0-web/dist/**',
+			'packages/ui/dist/**',
 		],
 		options: {
 			typeAware: true,

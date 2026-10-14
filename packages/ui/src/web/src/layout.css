@@ -1,0 +1,299 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/mona-sans/wdth.css';
+@import '@fontsource-variable/martian-mono';
+@import './lib/markdown/twinkleplop.css';
+
+@custom-variant dark (&:is(.dark *));
+@plugin '@tailwindcss/typography';
+
+:root {
+	--background: #f5f6f7;
+	--foreground: #15171c;
+	--card: #eef0f2;
+	--card-foreground: #15171c;
+	--popover: #ffffff;
+	--popover-foreground: #15171c;
+	--primary: #15171c;
+	--primary-foreground: #f5f6f7;
+	--secondary: #e7e9ec;
+	--secondary-foreground: #15171c;
+	--muted: #e9ebee;
+	--muted-foreground: #5a5f6b;
+	/* accent is the text-safe link colour; signal is the raw fill */
+	--accent: #c83200;
+	--accent-foreground: #ffffff;
+	--signal: #ff3e00;
+	--destructive: #c4262e;
+	--warning: #a15c00;
+	--border: #dadde2;
+	--input: #dadde2;
+	--ring: #ff3e00;
+	--radius: 0.5rem;
+	--chart-1: #ff3e00;
+	--chart-2: #2f6fdb;
+	--chart-3: #1f9d6b;
+	--chart-4: #a15cd6;
+	--chart-5: #d69a00;
+	--sidebar: #eef0f2;
+	--sidebar-foreground: #15171c;
+	--sidebar-primary: #15171c;
+	--sidebar-primary-foreground: #f5f6f7;
+	--sidebar-accent: #e2e5e9;
+	--sidebar-accent-foreground: #15171c;
+	--sidebar-border: #dadde2;
+	--sidebar-ring: #ff3e00;
+}
+
+.dark {
+	--background: #101114;
+	--foreground: #ecedef;
+	--card: #17191d;
+	--card-foreground: #ecedef;
+	--popover: #17191d;
+	--popover-foreground: #ecedef;
+	--primary: #ecedef;
+	--primary-foreground: #101114;
+	--secondary: #1f2126;
+	--secondary-foreground: #ecedef;
+	--muted: #1b1d22;
+	--muted-foreground: #9499a3;
+	--accent: #ff6a3d;
+	--accent-foreground: #101114;
+	--signal: #ff3e00;
+	--destructive: #f0616a;
+	--warning: #e0a030;
+	--border: #26282e;
+	--input: #26282e;
+	--ring: #ff3e00;
+	--chart-1: #ff6a3d;
+	--chart-2: #6f9cf0;
+	--chart-3: #45c491;
+	--chart-4: #c08cf0;
+	--chart-5: #f0c040;
+	--sidebar: #141519;
+	--sidebar-foreground: #ecedef;
+	--sidebar-primary: #ecedef;
+	--sidebar-primary-foreground: #101114;
+	--sidebar-accent: #1f2126;
+	--sidebar-accent-foreground: #ecedef;
+	--sidebar-border: #26282e;
+	--sidebar-ring: #ff3e00;
+}
+
+@theme inline {
+	--font-sans:
+		'Mona Sans Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-ui: var(--font-sans);
+	--font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-warning: var(--warning);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-signal: var(--signal);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	html {
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+	}
+	body {
+		@apply bg-background text-foreground;
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		line-height: 1.6;
+		font-feature-settings: 'ss01';
+	}
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-stretch: 112%;
+		font-weight: 680;
+		letter-spacing: -0.025em;
+		text-wrap: balance;
+	}
+	::selection {
+		background: color-mix(in oklab, var(--signal) 28%, transparent);
+	}
+}
+
+/* Rendered docs */
+.prose {
+	--tw-prose-body: var(--foreground);
+	--tw-prose-headings: var(--foreground);
+	--tw-prose-links: var(--accent);
+	--tw-prose-bold: var(--foreground);
+	--tw-prose-code: var(--foreground);
+	--tw-prose-quotes: var(--muted-foreground);
+	--tw-prose-quote-borders: var(--signal);
+	--tw-prose-bullets: var(--muted-foreground);
+	--tw-prose-counters: var(--muted-foreground);
+	--tw-prose-hr: var(--border);
+	--tw-prose-th-borders: var(--border);
+	--tw-prose-td-borders: var(--border);
+	font-family: var(--font-sans);
+	font-size: 1.0625rem;
+	line-height: 1.75;
+	max-width: 46rem;
+}
+
+.prose :where(h1, h2, h3, h4, h5, h6, [data-line]) {
+	scroll-margin-top: 5rem;
+}
+
+.prose :where(a) {
+	color: var(--accent);
+	text-decoration-color: color-mix(
+		in oklab,
+		var(--accent) 40%,
+		transparent
+	);
+	text-underline-offset: 3px;
+	transition: text-decoration-color 0.15s;
+}
+
+.prose :where(a):hover {
+	text-decoration-color: var(--accent);
+}
+
+.prose :where(code):not(:where(pre *)) {
+	font-family: var(--font-mono);
+	font-size: 0.8em;
+	padding: 2px 5px;
+	border-radius: var(--radius-sm);
+	background: var(--muted);
+}
+
+.prose :where(code):not(:where(pre *))::before,
+.prose :where(code):not(:where(pre *))::after {
+	content: '' !important;
+}
+
+/* Links core could not resolve */
+.prose :where(.wiki0-broken) {
+	color: var(--destructive);
+	text-decoration: line-through wavy;
+	text-decoration-color: color-mix(
+		in oklab,
+		var(--destructive) 50%,
+		transparent
+	);
+	cursor: help;
+}
+
+/* Lines a search hit or line link points at */
+.prose :where([data-highlighted]) {
+	background: color-mix(in oklab, var(--signal) 9%, transparent);
+	box-shadow: -1rem 0 0 color-mix(in oklab, var(--signal) 9%, transparent);
+	border-radius: var(--radius-sm);
+	transition: background 0.4s;
+}
+
+/* shadcn custom variants */
+@custom-variant data-open {
+	&:where([data-state='open']),
+	&:where([data-open]:not([data-open='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-closed {
+	&:where([data-state='closed']),
+	&:where([data-closed]:not([data-closed='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-checked {
+	&:where([data-state='checked']),
+	&:where([data-checked]:not([data-checked='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-unchecked {
+	&:where([data-state='unchecked']),
+	&:where([data-unchecked]:not([data-unchecked='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-selected {
+	&:where([data-selected]) {
+		@slot;
+	}
+}
+
+@custom-variant data-disabled {
+	&:where([data-disabled='true']),
+	&:where([data-disabled]:not([data-disabled='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-active {
+	&:where([data-state='active']),
+	&:where([data-active]:not([data-active='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-horizontal {
+	&:where([data-orientation='horizontal']) {
+		@slot;
+	}
+}
+
+@custom-variant data-vertical {
+	&:where([data-orientation='vertical']) {
+		@slot;
+	}
+}
+
+@utility no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}

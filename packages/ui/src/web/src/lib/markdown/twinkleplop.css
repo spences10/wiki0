@@ -1,0 +1,149 @@
+/* Twinkleplop theme built from the shadcn tokens in layout.css,
+   so it follows the `.dark` class without its own palette.
+   Syntax hues rotate off --accent, then mix towards --foreground so
+   contrast holds on --muted in both modes. */
+
+.twinkleplop {
+	--twp-hue: color-mix(
+		in oklch,
+		var(--accent) 70%,
+		var(--foreground)
+	);
+	--twp-background: var(--muted);
+	--twp-identifier: var(--foreground);
+	--twp-comment: var(--muted-foreground);
+	--twp-punctuation: color-mix(
+		in oklch,
+		var(--foreground) 70%,
+		var(--muted-foreground)
+	);
+	--twp-keyword: var(--twp-hue);
+	--twp-string: oklch(
+		from var(--twp-hue) l calc(c * 0.8) calc(h + 110)
+	);
+	--twp-type: oklch(
+		from var(--twp-hue) l calc(c * 0.7) calc(h + 170)
+	);
+	--twp-function: oklch(from var(--twp-hue) l c calc(h + 230));
+	--twp-property: oklch(from var(--twp-hue) l c calc(h + 290));
+	--twp-constant: oklch(from var(--twp-hue) l c calc(h + 50));
+	--twp-highlight: color-mix(
+		in oklch,
+		var(--accent) 10%,
+		transparent
+	);
+
+	color: var(--twp-identifier);
+	background: var(--twp-background);
+	font-family:
+		var(--font-mono, ui-monospace), SFMono-Regular, Menlo, Consolas,
+		monospace;
+	font-size: 0.875em;
+	line-height: 1.7;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	overflow-wrap: normal;
+	tab-size: 2;
+	hyphens: none;
+	overflow: auto;
+	/* The gutter lives on each line so highlights run edge to edge */
+	padding-inline: 0;
+}
+
+/* Each line is a full width row, as wide as the longest line when the
+   block scrolls */
+.twinkleplop code {
+	display: grid;
+	min-width: 100%;
+	width: max-content;
+	color: inherit;
+	font: inherit;
+	white-space: inherit;
+}
+
+.twinkleplop .l {
+	min-height: 1lh;
+	padding-inline: var(--code-gutter, 1.25rem);
+}
+
+/* `{1,3-4}` fence meta */
+.twinkleplop .l.highlight {
+	background: var(--twp-highlight);
+	box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.twinkleplop .comment {
+	color: var(--twp-comment);
+	font-style: italic;
+}
+
+.twinkleplop :is(.punctuation, .operator, .attr_sigil) {
+	color: var(--twp-punctuation);
+}
+
+.twinkleplop
+	:is(
+		.keyword,
+		.tag,
+		.tag_name,
+		.svelte_block,
+		.svelte_directive,
+		.directive,
+		.selector
+	) {
+	color: var(--twp-keyword);
+}
+
+.twinkleplop
+	:is(.string, .template, .regex, .plain_scalar, .url, .url_link) {
+	color: var(--twp-string);
+}
+
+.twinkleplop
+	:is(.type, .class_name, .builtin, .namespace, .selector_class) {
+	color: var(--twp-type);
+}
+
+.twinkleplop :is(.function, .decorator, .entity, .prompt) {
+	color: var(--twp-function);
+}
+
+.twinkleplop :is(.property, .attr_name, .attribute, .css_variable) {
+	color: var(--twp-property);
+}
+
+.twinkleplop
+	:is(
+		.number,
+		.boolean,
+		.null,
+		.constant,
+		.string_escape,
+		.escape,
+		.unit,
+		.datetime
+	) {
+	color: var(--twp-constant);
+}
+
+.twinkleplop .output {
+	color: var(--twp-comment);
+}
+
+.twinkleplop :is(.inserted, .inserted_marker) {
+	color: var(--twp-string);
+}
+
+.twinkleplop :is(.deleted, .deleted_marker) {
+	color: var(--destructive);
+}
+
+.twinkleplop :is(.space, .tab, .newline) {
+	white-space: pre;
+}
+
+.twinkleplop ::selection {
+	background: color-mix(in oklch, var(--accent) 25%, transparent);
+}

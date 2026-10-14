@@ -1,0 +1,98 @@
+{
+	"name": "@wiki0/ui",
+	"version": "0.0.0",
+	"description": "Local docs browser for wiki0, launched with `wiki0 ui`",
+	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/ui#readme",
+	"license": "MIT",
+	"author": "Scott Spence <me@scottspence.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/spences10/wiki0.git",
+		"directory": "packages/ui"
+	},
+	"bin": {
+		"wiki0-ui": "./dist/bin.js"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"type": "module",
+	"imports": {
+		"#lib/*": "./src/web/src/lib/*"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build:self": "vp build && vp exec tsc -p tsconfig.build.json && chmod +x dist/bin.js",
+		"check:self": "vp exec tsc --noEmit -p tsconfig.json && vp exec tsc -p src/web/tsconfig.test.json && vp exec svelte-check --tsconfig src/web/tsconfig.json --tsgo-experimental-api",
+		"dev:web": "vp dev",
+		"test:self": "vp test"
+	},
+	"dependencies": {
+		"@wiki0/core": "workspace:*"
+	},
+	"devDependencies": {
+		"@fontsource-variable/martian-mono": "catalog:",
+		"@fontsource-variable/mona-sans": "catalog:",
+		"@lucide/svelte": "catalog:",
+		"@sveltejs/vite-plugin-svelte": "catalog:",
+		"@tailwindcss/typography": "catalog:",
+		"@tailwindcss/vite": "catalog:",
+		"@twinkleplop/bash": "catalog:",
+		"@twinkleplop/c": "catalog:",
+		"@twinkleplop/cpp": "catalog:",
+		"@twinkleplop/css": "catalog:",
+		"@twinkleplop/diff": "catalog:",
+		"@twinkleplop/dockerfile": "catalog:",
+		"@twinkleplop/go": "catalog:",
+		"@twinkleplop/graphql": "catalog:",
+		"@twinkleplop/html": "catalog:",
+		"@twinkleplop/ini": "catalog:",
+		"@twinkleplop/javascript": "catalog:",
+		"@twinkleplop/json": "catalog:",
+		"@twinkleplop/markdown": "catalog:",
+		"@twinkleplop/markdown-core": "catalog:",
+		"@twinkleplop/python": "catalog:",
+		"@twinkleplop/rust": "catalog:",
+		"@twinkleplop/sql": "catalog:",
+		"@twinkleplop/svelte": "catalog:",
+		"@twinkleplop/toml": "catalog:",
+		"@twinkleplop/tsx": "catalog:",
+		"@twinkleplop/typescript": "catalog:",
+		"@twinkleplop/yaml": "catalog:",
+		"@types/d3-force": "catalog:",
+		"@types/d3-scale": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript/native": "catalog:",
+		"bits-ui": "catalog:",
+		"clsx": "catalog:",
+		"d3-force": "catalog:",
+		"d3-scale": "catalog:",
+		"layerchart": "catalog:",
+		"marked": "catalog:",
+		"shadcn-svelte": "catalog:",
+		"svelte": "catalog:",
+		"svelte-check": "catalog:",
+		"tailwind-merge": "catalog:",
+		"tailwind-variants": "catalog:",
+		"tailwindcss": "catalog:",
+		"tw-animate-css": "catalog:",
+		"typescript": "catalog:typescript6",
+		"vite": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
+	},
+	"engines": {
+		"node": ">=24.15.0"
+	}
+}

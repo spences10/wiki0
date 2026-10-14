@@ -1,12 +1,13 @@
 ---
 # prettier-ignore
 name: wiki0-package-workflow
-description: Build and validate wiki0 package changes. Trigger when editing packages/core, packages/cli, packages/mcp, or exposing behavior through CLI and MCP.
+description: Build and validate wiki0 package changes. Trigger when editing packages/core, packages/cli, packages/mcp, packages/ui, or exposing behavior through CLI, MCP and the docs UI.
 ---
 
 # wiki0 package workflow
 
-Use this workflow for code changes in the core, CLI, or MCP packages.
+Use this workflow for code changes in the core, CLI, MCP or UI
+packages.
 
 ## Package boundaries
 
@@ -17,6 +18,9 @@ Use this workflow for code changes in the core, CLI, or MCP packages.
 - Expose user command workflows in `packages/cli` after core support
   exists.
 - Keep CLI and MCP thin; they should call core primitives.
+- `packages/ui` serves the local docs browser. It reads only through
+  `@wiki0/core` exports and never parses or resolves links itself;
+  ask for a core function when a view needs data core lacks.
 
 ## Validation
 
@@ -29,6 +33,9 @@ pnpm --filter @wiki0/cli run check:self
 pnpm --filter @wiki0/mcp run check:self
 pnpm --filter @wiki0/cli run build:self
 pnpm --filter @wiki0/mcp run build:self
+pnpm --filter @wiki0/ui run build:self
+pnpm --filter @wiki0/ui run check:self
+pnpm --filter @wiki0/ui run test:self
 ```
 
 After editing TypeScript files, run LSP diagnostics on changed source

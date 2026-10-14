@@ -1,0 +1,13 @@
+{
+	"extends": "../../../../tsconfig.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"lib": ["ES2024", "DOM", "DOM.Iterable"],
+		"types": ["vite/client"]
+	},
+	"include": ["src/**/*.ts", "src/**/*.svelte"],
+	"exclude": ["src/**/*.test.ts"]
+}

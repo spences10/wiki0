@@ -170,6 +170,12 @@ catalogs:
     '@fontsource-variable/inter':
       specifier: ^5.2.8
       version: 5.3.0
+    '@fontsource-variable/martian-mono':
+      specifier: ^5.3.0
+      version: 5.3.0
+    '@fontsource-variable/mona-sans':
+      specifier: ^5.3.0
+      version: 5.3.0
     '@internationalized/date':
       specifier: ^3.12.2
       version: 3.12.4
@@ -194,6 +200,9 @@ catalogs:
     '@sveltejs/vite-plugin-svelte':
       specifier: ^7.3.1
       version: 7.3.1
+    '@tailwindcss/typography':
+      specifier: ^0.5.20
+      version: 0.5.20
     '@tailwindcss/vite':
       specifier: ^4.3.3
       version: 4.3.3
@@ -203,9 +212,78 @@ catalogs:
     '@tmcp/transport-stdio':
       specifier: ^0.5.0
       version: 0.5.0
+    '@twinkleplop/bash':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/c':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/cpp':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/css':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/diff':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/dockerfile':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/go':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/graphql':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/html':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/ini':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/javascript':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/json':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/markdown':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/markdown-core':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@twinkleplop/python':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/rust':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/sql':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/svelte':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/toml':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/tsx':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/typescript':
+      specifier: ^0.1.7
+      version: 0.1.7
+    '@twinkleplop/yaml':
+      specifier: ^0.1.7
+      version: 0.1.7
     '@types/d3-force':
       specifier: ^3.0.10
       version: 3.0.10
+    '@types/d3-scale':
+      specifier: ^4.0.9
+      version: 4.0.9
     '@types/d3-shape':
       specifier: ^3.1.8
       version: 3.2.0
@@ -230,6 +308,9 @@ catalogs:
     d3-force:
       specifier: ^3.0.0
       version: 3.0.0
+    d3-scale:
+      specifier: ^4.0.2
+      version: 4.0.2
     d3-shape:
       specifier: ^3.2.0
       version: 3.2.0
@@ -523,6 +604,160 @@ importers:
         specifier: 'catalog:'
         version: 5.0.3(@types/node@24.19.2)(@vitest/browser-playwright@5.0.3)(@vitest/browser-preview@5.0.3)(@vitest/ui@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1))(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
 
+  packages/ui:
+    dependencies:
+      '@wiki0/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@fontsource-variable/martian-mono':
+        specifier: 'catalog:'
+        version: 5.3.0
+      '@fontsource-variable/mona-sans':
+        specifier: 'catalog:'
+        version: 5.3.0
+      '@lucide/svelte':
+        specifier: 'catalog:'
+        version: 1.55.0(svelte@5.57.2)
+      '@sveltejs/vite-plugin-svelte':
+        specifier: 'catalog:'
+        version: 7.3.1(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.2)
+      '@tailwindcss/typography':
+        specifier: 'catalog:'
+        version: 0.5.20(tailwindcss@4.3.3)
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
+      '@twinkleplop/bash':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/c':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/cpp':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/css':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/diff':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/dockerfile':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/go':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/graphql':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/html':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/ini':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/javascript':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/json':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/markdown':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/markdown-core':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/python':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/rust':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/sql':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/svelte':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/toml':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/tsx':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/typescript':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/yaml':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@types/d3-force':
+        specifier: 'catalog:'
+        version: 3.0.10
+      '@types/d3-scale':
+        specifier: 'catalog:'
+        version: 4.0.9
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@typescript/native':
+        specifier: 'catalog:'
+        version: typescript@7.0.2
+      bits-ui:
+        specifier: 'catalog:'
+        version: 2.19.5(@internationalized/date@3.12.4)(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.2))(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.2)(typescript@6.0.3))(svelte@5.57.2)
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
+      d3-force:
+        specifier: 'catalog:'
+        version: 3.0.0
+      d3-scale:
+        specifier: 'catalog:'
+        version: 4.0.2
+      layerchart:
+        specifier: 'catalog:'
+        version: 2.7.0(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.2))(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(svelte@5.57.2)(typescript@6.0.3))(svelte@5.57.2)
+      marked:
+        specifier: 'catalog:'
+        version: 18.1.1
+      shadcn-svelte:
+        specifier: 'catalog:'
+        version: 1.7.0(svelte@5.57.2)
+      svelte:
+        specifier: 'catalog:'
+        version: 5.57.2
+      svelte-check:
+        specifier: 'catalog:'
+        version: 4.7.6(picomatch@4.0.7)(svelte@5.57.2)(typescript@6.0.3)
+      tailwind-merge:
+        specifier: 'catalog:'
+        version: 3.7.0
+      tailwind-variants:
+        specifier: 'catalog:'
+        version: 3.3.1(tailwind-merge@3.7.0)(tailwindcss@4.3.3)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+      tw-animate-css:
+        specifier: 'catalog:'
+        version: 1.4.0
+      typescript:
+        specifier: catalog:typescript6
+        version: 6.0.3
+      vite:
+        specifier: 'catalog:'
+        version: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)'
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@types/node@24.19.2)(@vitest/browser-playwright@5.0.3)(@vitest/ui@5.0.3)(jiti@2.7.0)(playwright@1.64.0)(svelte@5.57.2)(typescript@6.0.3)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@types/node@24.19.2)(@vitest/browser-playwright@5.0.3)(@vitest/browser-preview@5.0.3)(@vitest/ui@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)
+
 packages:
 
   '@babel/code-frame@7.29.7':
@@ -635,6 +870,12 @@ packages:
 
   '@fontsource-variable/inter@5.3.0':
     resolution: {integrity: sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==}
+
+  '@fontsource-variable/martian-mono@5.3.0':
+    resolution: {integrity: sha512-0wVODx9ILwNnaYC4XCuSaFRYtj1Prd89MRVaSuv2ng6zLiQkS4SepaWEPefs7vqCZS8sbEOA8jb/4F5KNMnGdg==}
+
+  '@fontsource-variable/mona-sans@5.3.0':
+    resolution: {integrity: sha512-PkxRB3KI4z9Gjpk7vVqgO3GMSyQuOIIj4TaRDbvbcDj8SzWwI38jvLTQxJM/cTRorhcT7h8qjcllR+qjRtM/Fg==}
 
   '@internationalized/date@3.12.4':
     resolution: {integrity: sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ==}
@@ -1191,6 +1432,11 @@ packages:
     resolution: {integrity: sha512-krXjAikiaFSPaK/FkAQT5UTx3VormQaiZ5hBFlJZ9UFQGB/rwg1MZIhHAG9smMQRTdyJxP6Qt5MwMtdyU5FWrA==}
     engines: {node: '>= 20'}
 
+  '@tailwindcss/typography@0.5.20':
+    resolution: {integrity: sha512-hwbzQuNUfcPvbegQFatVPl/MY/tcM9KLl963hQ5laJKPh81TEZ1+dNG9PirGvcaDBkp+BCshExAyKVPW91dozw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >=4.0.0 || insiders'
+
   '@tailwindcss/vite@4.3.3':
     resolution: {integrity: sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw==}
     peerDependencies:
@@ -1228,6 +1474,75 @@ packages:
     peerDependencies:
       tmcp: ^1.20.0-next.0 || ^1.20.0
 
+  '@twinkleplop/bash@0.1.7':
+    resolution: {integrity: sha512-/cBFzqKcfffT6aaWlSeUhjoXJS3VhG4Tz1sg1oJILooVlbD3WX2Ke+zRWFLS+GmoXrl8hlQF/ZsMNmila41/Jw==}
+
+  '@twinkleplop/c@0.2.1':
+    resolution: {integrity: sha512-6ci5JLOw6TppOaFemiC5GtojUpB1/4Iw6JF3DVQbXBFna2DeoewJ26QtyHm0Uh+iHmtpY0pfWY0fz5fpjeRTjA==}
+
+  '@twinkleplop/core@0.3.1':
+    resolution: {integrity: sha512-fMbce7NcJlVROsyI34tz3DCWkAWRWLRlBNCbgwz36mm6yoEO09eyafi8JRN5HJGQIzMr0qjXQ3t3asc7MFSh8Q==}
+
+  '@twinkleplop/cpp@0.2.1':
+    resolution: {integrity: sha512-npIX8+BmvTzUI5XGbYFgfz3M9Q4TxdNu7wlzS+0rsxqnUXkusQ6iYEvtQh4vjXOQRQywgYrzbgp5A0euKZYLnA==}
+
+  '@twinkleplop/css@0.1.7':
+    resolution: {integrity: sha512-eznre7EgC0IBE3/jqAUKXG2S4iWLczOSAxwLnknS+9BQQGuD82u2A2rCok94E+nMpjkeshhbSvnQxDSEo8YpUA==}
+
+  '@twinkleplop/diff@0.1.7':
+    resolution: {integrity: sha512-ubzYKJwtndkWPyDUSKIm9k5/cv/TEJt8qDe8HJcA/e9S+cxQJqMNWcIQ46hz7ASh+yhV0rAvHjytSROfA+xK+w==}
+
+  '@twinkleplop/dockerfile@0.2.1':
+    resolution: {integrity: sha512-F+boDOGsbKiC4TbGqb8CE3VmvMdpyHgISJinUSPAP/iBPRxutax4fYztmvGSSysf67SQYXdiwarB9HcJVzJ8yA==}
+
+  '@twinkleplop/go@0.1.7':
+    resolution: {integrity: sha512-Jc45EY94XcA8KyRhE4Pzy1OCU+2XNsIMx8AnRVNoLHuNwUQUjDVd7nOc/IdKp6siU2jTD+FpQz+IfyoG8e+2ow==}
+
+  '@twinkleplop/graphql@0.2.1':
+    resolution: {integrity: sha512-hZeiawkMElrRICfncl5X4oW6lO+YXgwqIRMwvSHNzH/J7cpi6gHrZnwnDT5Ave4xJDTaPGj+93wB4jzW3OjTGg==}
+
+  '@twinkleplop/html@0.1.7':
+    resolution: {integrity: sha512-tpc+I1OXR5UJYkIhna74rxxEBYUJMWTNkjAVH9sA6fKeWq9lmbLRhutb10PHeMuF6BTHuHgD9oyET7yKdZGeQA==}
+
+  '@twinkleplop/ini@0.1.7':
+    resolution: {integrity: sha512-+DZ5xzX1AA1y4KYTlxOwcvD5zbQsLCrl0ElEvAcsR7RaC+vVuZ4qYjPlYew6dd5BY9CH0cLOHTSG/4lkKSLSKA==}
+
+  '@twinkleplop/javascript@0.1.7':
+    resolution: {integrity: sha512-qZDFx0bTM8YdKBTCxIS+6dZ1itaTnn1Udf2wFW5Uo+S6liGm40Lq2rlCk3PYa+Hm4lmX6HSzFeO4ZaDqk6Cn9Q==}
+
+  '@twinkleplop/json@0.1.7':
+    resolution: {integrity: sha512-3V2BmcvHCF7MTmDxNSk0sliZqwW1BDB29ZQY2W07auiOGyPQJVhYPiyeoIIN51Q02YnvSg+hxfXSRY9FptMJKg==}
+
+  '@twinkleplop/markdown-core@0.2.1':
+    resolution: {integrity: sha512-B8SBW5kKCwmVKTtm2r1hK0PyJk4qQYem33v7aIHQv0f2jNsuvnkhboM1p/oCNyt/Q8lau2yjygP4soSvTi+ALA==}
+
+  '@twinkleplop/markdown@0.2.1':
+    resolution: {integrity: sha512-uff5OXuSnlSWuPCYJWCQ+yMsOAvGCzljP8mIDQ4oj2ezkMAdhwh/McNXZ1odg4xpSp7hlwbu+UHbRl5FvG4kSQ==}
+
+  '@twinkleplop/python@0.1.7':
+    resolution: {integrity: sha512-C3DJhERSppC9qUoux4l+b88Jv0PXEkooSuYcbqTsQ3FKRALu+Ksy2ukqs9ncVkk/gVqgHT21xnR+udMR/3y+1g==}
+
+  '@twinkleplop/rust@0.1.7':
+    resolution: {integrity: sha512-xCSZtBzqrtg9ZTp4rBI/Wj+SezlQgC33JD5rokTpjiOJCgkCRudHvHqMpp8JUN+n1rN3evqe+HVRQNvuU5xhIw==}
+
+  '@twinkleplop/sql@0.1.7':
+    resolution: {integrity: sha512-H0KA5WVohc6IwEQce1S0CZQrt0eXnlkuuYlHxFa8GCj/q82mFg3YvtiPASUSmOKERWN52/yzdT6K0opvlVIT/A==}
+
+  '@twinkleplop/svelte@0.1.7':
+    resolution: {integrity: sha512-8Zz7WYm7ERGNTZeCjiceRWDB+spcrDA9ToUV/AtavMl68ZM28E1AIPOdo2ddKkBDnHim8Vs7tVlFr9T3Mq1NlA==}
+
+  '@twinkleplop/toml@0.1.7':
+    resolution: {integrity: sha512-E7iCWjUHTEEtfSBOccvrO2dI0jR88Sktqf1ZCq3Sc22TMuj6QdLhOPtaNyIfwkIstUprdTd9NcFzNIZgXwvooQ==}
+
+  '@twinkleplop/tsx@0.1.7':
+    resolution: {integrity: sha512-Vx7821K7/cciCZPpVj1gsxHp6pI75frlMVGoqtu8QjZH9l26DaiIM3wcv1NqvMDsNnQX7vOV1cTAXawJ9wyB5g==}
+
+  '@twinkleplop/typescript@0.1.7':
+    resolution: {integrity: sha512-3lVdFUnOc40QQUJPnmTsiyTf7+RSEoXhDnmMwkUQ5Kzgemkk6eeXQGietPjxro8k+QuTAY/aQuWOtR/nUgfENw==}
+
+  '@twinkleplop/yaml@0.1.7':
+    resolution: {integrity: sha512-GzsP3RuMYAnMx82pFUxICplG5s2GXxGst8dyxM7p1ONGp1f6NsFdc7OChtoIcT3PzXWQN/ctPJdv5rpr7tXs3w==}
+
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
 
@@ -1249,8 +1564,14 @@ packages:
   '@types/d3-path@3.1.1':
     resolution: {integrity: sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg==}
 
+  '@types/d3-scale@4.0.9':
+    resolution: {integrity: sha512-dLmtwB8zkAeO/juAMfnV+sItKjlsw2lKdZVVy6LRr0cBmegxSABiLEpGVmSJJ8O08i4+sGR6qQtb6WtuwJdvVw==}
+
   '@types/d3-shape@3.2.0':
     resolution: {integrity: sha512-kVd74ta9eof3eJOvbNd1vGKS/XERRyQbT26Og63hIsvDO84cjD5gEOhsXf26w3FSoNlPVz84DOFcKv/oou+fMw==}
+
+  '@types/d3-time@3.0.4':
+    resolution: {integrity: sha512-yuzZug1nkAAaBlBBikKZTgzCeA+k1uy4ZFwWANOfKw5z5LRhV0gNA7gNkKm7HoK+HRN0wX3EkxGk0fpbWhmB7g==}
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
@@ -1806,6 +2127,11 @@ packages:
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
+  cssesc@3.0.0:
+    resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
+    engines: {node: '>=4'}
+    hasBin: true
+
   d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
 
@@ -2360,6 +2686,10 @@ packages:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
     engines: {node: '>=14.19.0'}
 
+  postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
+
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2870,6 +3200,10 @@ snapshots:
 
   '@fontsource-variable/inter@5.3.0': {}
 
+  '@fontsource-variable/martian-mono@5.3.0': {}
+
+  '@fontsource-variable/mona-sans@5.3.0': {}
+
   '@internationalized/date@3.12.4':
     dependencies:
       '@swc/helpers': 0.5.23
@@ -3247,6 +3581,11 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.3.3
       '@tailwindcss/oxide-win32-x64-msvc': 4.3.3
 
+  '@tailwindcss/typography@0.5.20(tailwindcss@4.3.3)':
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.3.3
+
   '@tailwindcss/vite@4.3.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))':
     dependencies:
       '@tailwindcss/node': 4.3.3
@@ -3290,6 +3629,106 @@ snapshots:
       '@tmcp/session-manager': 0.3.0(tmcp@1.20.0(typescript@7.0.2))
       tmcp: 1.20.0(typescript@7.0.2)
 
+  '@twinkleplop/bash@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/c@0.2.1':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/core@0.3.1': {}
+
+  '@twinkleplop/cpp@0.2.1':
+    dependencies:
+      '@twinkleplop/c': 0.2.1
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/css@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/diff@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/dockerfile@0.2.1':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/go@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/graphql@0.2.1':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/html@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/css': 0.1.7
+      '@twinkleplop/javascript': 0.1.7
+
+  '@twinkleplop/ini@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/javascript@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/css': 0.1.7
+      '@twinkleplop/html': 0.1.7
+
+  '@twinkleplop/json@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/markdown-core@0.2.1':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/markdown@0.2.1':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/python@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/rust@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/sql@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/svelte@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/css': 0.1.7
+      '@twinkleplop/javascript': 0.1.7
+
+  '@twinkleplop/toml@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/tsx@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/javascript': 0.1.7
+      '@twinkleplop/typescript': 0.1.7
+
+  '@twinkleplop/typescript@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/javascript': 0.1.7
+
+  '@twinkleplop/yaml@0.1.7':
+    dependencies:
+      '@twinkleplop/core': 0.3.1
+
   '@types/aria-query@5.0.4': {}
 
   '@types/chai@5.2.3':
@@ -3310,9 +3749,15 @@ snapshots:
 
   '@types/d3-path@3.1.1': {}
 
+  '@types/d3-scale@4.0.9':
+    dependencies:
+      '@types/d3-time': 3.0.4
+
   '@types/d3-shape@3.2.0':
     dependencies:
       '@types/d3-path': 3.1.1
+
+  '@types/d3-time@3.0.4': {}
 
   '@types/deep-eql@4.0.2': {}
 
@@ -3897,6 +4342,8 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
+  cssesc@3.0.0: {}
+
   d3-array@2.12.1:
     dependencies:
       internmap: 1.0.1
@@ -4456,6 +4903,11 @@ snapshots:
       playwright-core: 1.64.0
 
   pngjs@7.0.0: {}
+
+  postcss-selector-parser@6.0.10:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
 
   postcss@8.5.28:
     dependencies:
