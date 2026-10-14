@@ -122,7 +122,7 @@ describe('access control', () => {
 	it('answers health challenges with a proof, not the token', async () => {
 		const server = await start(make_project());
 		const response = await fetch(
-			`${server.url}health?challenge=${'a'.repeat(24)}`,
+			`${server.url}_health?challenge=${'a'.repeat(24)}`,
 		);
 		const body = (await response.json()) as { proof: string };
 		expect(body.proof).toBeTruthy();
@@ -283,8 +283,10 @@ describe('API', () => {
 describe('static files', () => {
 	it('serves the app shell for client routes', async () => {
 		const server = await start(make_project());
-		const response = await fetch(`${server.url}docs/guide.md`);
-		expect(await response.text()).toContain('id="app"');
+		for (const route of ['docs/guide.md', 'health', 'health/lint']) {
+			const response = await fetch(`${server.url}${route}`);
+			expect(await response.text()).toContain('id="app"');
+		}
 	});
 });
 

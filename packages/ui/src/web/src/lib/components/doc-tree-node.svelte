@@ -31,7 +31,8 @@
 {#if node.kind === 'document'}
 	{@const document = node.document}
 	{@const superseded =
-		document.superseded_by !== null || document.status === 'superseded'}
+		document.superseded_by !== null ||
+		document.status === 'superseded'}
 	<Sidebar.MenuItem>
 		<Sidebar.MenuButton
 			isActive={active_path === node.path}
@@ -59,7 +60,9 @@
 						<ChevronRightIcon class="transition-transform" />
 						<FolderIcon />
 						<span>{node.name}</span>
-						<span class="ml-auto text-xs text-muted-foreground tabular-nums">
+						<span
+							class="ml-auto text-xs text-muted-foreground tabular-nums"
+						>
 							{node.count}
 						</span>
 					</Sidebar.MenuButton>

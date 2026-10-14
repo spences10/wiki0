@@ -33,11 +33,13 @@ export type RenderResult = {
 	unmatched: DocumentLink[];
 };
 
-const image_extensions =
-	/\.(?:png|jpe?g|gif|webp|avif|svg)$/iu;
+const image_extensions = /\.(?:png|jpe?g|gif|webp|avif|svg)$/iu;
 const external_href = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu;
 
-export function doc_route(path: string, anchor?: string | null): string {
+export function doc_route(
+	path: string,
+	anchor?: string | null,
+): string {
 	const encoded = path.split('/').map(encodeURIComponent).join('/');
 	return `/docs/${encoded}${anchor ? `#${encodeURIComponent(anchor)}` : ''}`;
 }
@@ -73,7 +75,10 @@ function blocks_with_lines(
 		blocks.push({
 			token,
 			start_line,
-			end_line: Math.max(start_line, start_line + newlines - trailing),
+			end_line: Math.max(
+				start_line,
+				start_line + newlines - trailing,
+			),
 		});
 	}
 	return blocks;
@@ -123,10 +128,14 @@ export function render_document(
 	function take(raw: string, kinds: string[]): DocumentLink | null {
 		for (const [index, link] of context.links.entries()) {
 			if (consumed.has(index)) continue;
-			if (link.line < block.start_line || link.line > block.end_line) {
+			if (
+				link.line < block.start_line ||
+				link.line > block.end_line
+			) {
 				continue;
 			}
-			if (!kinds.includes(link.kind) || link.raw_text !== raw) continue;
+			if (!kinds.includes(link.kind) || link.raw_text !== raw)
+				continue;
 			consumed.add(index);
 			return link;
 		}
@@ -157,7 +166,9 @@ export function render_document(
 		inner: string,
 		title?: string | null,
 	): string {
-		const title_attribute = title ? ` title="${escape_html(title)}"` : '';
+		const title_attribute = title
+			? ` title="${escape_html(title)}"`
+			: '';
 		if (!link) {
 			// Core stores every link it can resolve, so a link with no
 			// record is external or a website route.
@@ -166,7 +177,8 @@ export function render_document(
 			}
 			return `<span class="wiki0-route" title="${escape_html(`Site route: ${href}`)}">${inner}</span>`;
 		}
-		if (link.link_status !== 'resolved') return broken_html(link, inner);
+		if (link.link_status !== 'resolved')
+			return broken_html(link, inner);
 		return resolved_html(link, inner);
 	}
 
@@ -196,7 +208,10 @@ export function render_document(
 		let cursor = 0;
 		for (const [index, link] of context.links.entries()) {
 			if (consumed.has(index) || link.kind !== 'html') continue;
-			if (link.line < block.start_line || link.line > block.end_line) {
+			if (
+				link.line < block.start_line ||
+				link.line > block.end_line
+			) {
 				continue;
 			}
 			const at = html.indexOf(link.raw_text, cursor);
@@ -251,7 +266,9 @@ export function render_document(
 				start(source: string) {
 					const index = source.indexOf('[[');
 					if (index < 0) return undefined;
-					return index > 0 && source[index - 1] === '!' ? index - 1 : index;
+					return index > 0 && source[index - 1] === '!'
+						? index - 1
+						: index;
 				},
 				tokenizer(source: string) {
 					const match = wikilink.exec(source);
@@ -327,7 +344,10 @@ export function render_document(
 		input.markdown,
 		input.body_start_line,
 	)) {
-		if (current.token.type === 'space' || current.token.type === 'def') {
+		if (
+			current.token.type === 'space' ||
+			current.token.type === 'def'
+		) {
 			continue;
 		}
 		block = current;

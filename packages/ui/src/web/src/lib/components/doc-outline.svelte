@@ -18,14 +18,17 @@
 	$effect(() => {
 		if (!container) return;
 		const elements = headings
-			.map((heading) => container.ownerDocument.getElementById(heading.slug))
+			.map((heading) =>
+				container.ownerDocument.getElementById(heading.slug),
+			)
 			.filter((element): element is HTMLElement => element !== null);
 		const observer = new IntersectionObserver(
 			(entries) => {
 				const visible = entries
 					.filter((entry) => entry.isIntersecting)
 					.sort(
-						(a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
+						(a, b) =>
+							a.boundingClientRect.top - b.boundingClientRect.top,
 					);
 				if (visible[0]) active = visible[0].target.id;
 			},
@@ -37,12 +40,17 @@
 </script>
 
 <nav aria-label="On this page" class="space-y-2">
-	<h2 class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+	<h2
+		class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+	>
 		On this page
 	</h2>
 	<ul class="space-y-1 border-l border-border text-sm">
 		{#each headings as heading (heading.slug)}
-			<li style:padding-left="{(heading.depth - top_depth) * 0.75 + 0.75}rem">
+			<li
+				style:padding-left="{(heading.depth - top_depth) * 0.75 +
+					0.75}rem"
+			>
 				<a
 					href="#{heading.slug}"
 					class={[

@@ -34,10 +34,16 @@ export function parse_line_range(
 	return start > 0 && end >= start ? [start, end] : null;
 }
 
-export function parse_route(url: Pick<URL, 'pathname' | 'search' | 'hash'>): Route {
+export function parse_route(
+	url: Pick<URL, 'pathname' | 'search' | 'hash'>,
+): Route {
 	const params = new URLSearchParams(url.search);
 	const fragment = url.hash ? decode(url.hash.slice(1)) : null;
-	if (url.pathname === '/' || url.pathname === '/docs' || url.pathname === '/docs/') {
+	if (
+		url.pathname === '/' ||
+		url.pathname === '/docs' ||
+		url.pathname === '/docs/'
+	) {
 		return {
 			name: 'docs',
 			path: null,
@@ -61,7 +67,10 @@ export function parse_route(url: Pick<URL, 'pathname' | 'search' | 'hash'>): Rou
 	if (url.pathname === '/search') {
 		return { name: 'search', query: params.get('q') ?? '' };
 	}
-	if (url.pathname === '/health' || url.pathname.startsWith('/health/')) {
+	if (
+		url.pathname === '/health' ||
+		url.pathname.startsWith('/health/')
+	) {
 		const tab = url.pathname.split('/')[2] ?? 'status';
 		if (health_tabs.includes(tab as HealthTab) || tab === '') {
 			return { name: 'health', tab: (tab || 'status') as HealthTab };
@@ -93,13 +102,23 @@ export function hit_href(hit: {
 export function is_app_navigation(
 	event: Pick<
 		MouseEvent,
-		'button' | 'metaKey' | 'ctrlKey' | 'shiftKey' | 'altKey' | 'defaultPrevented'
+		| 'button'
+		| 'metaKey'
+		| 'ctrlKey'
+		| 'shiftKey'
+		| 'altKey'
+		| 'defaultPrevented'
 	>,
 	anchor: Pick<HTMLAnchorElement, 'target' | 'href' | 'hasAttribute'>,
 	origin: string,
 ): boolean {
 	if (event.defaultPrevented || event.button !== 0) return false;
-	if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+	if (
+		event.metaKey ||
+		event.ctrlKey ||
+		event.shiftKey ||
+		event.altKey
+	) {
 		return false;
 	}
 	if (anchor.target || anchor.hasAttribute('download')) return false;

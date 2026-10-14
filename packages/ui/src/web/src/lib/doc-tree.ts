@@ -61,7 +61,13 @@ export function build_tree(
 					child.kind === 'folder' && child.name === part,
 			);
 			if (!next) {
-				next = { kind: 'folder', name: part, path, children: [], count: 0 };
+				next = {
+					kind: 'folder',
+					name: part,
+					path,
+					children: [],
+					count: 0,
+				};
 				folder.children.push(next);
 			}
 			next.count += 1;

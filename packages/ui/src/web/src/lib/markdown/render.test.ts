@@ -6,10 +6,7 @@ import {
 	wikilink_pattern_source,
 } from '@wiki0/core';
 import { describe, expect, it } from 'vite-plus/test';
-import {
-	make_temp_dir,
-	write_file,
-} from '../../../../test-utils.js';
+import { make_temp_dir, write_file } from '../../../../test-utils.js';
 import { handle_copy_click } from './code-block.js';
 import { highlight_code } from './highlighter.js';
 import { render_document } from './render.js';
@@ -75,7 +72,8 @@ async function render_fixture(path = 'docs/guide.md') {
 	const links = list_links(path, root)!;
 	const documents = list_documents(root);
 	const headings =
-		documents.find((summary) => summary.path === path)?.headings ?? [];
+		documents.find((summary) => summary.path === path)?.headings ??
+		[];
 	const result = render_document(
 		{
 			path,

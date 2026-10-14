@@ -1,4 +1,8 @@
-import { is_app_navigation, parse_route, type Route } from './router.js';
+import {
+	is_app_navigation,
+	parse_route,
+	type Route,
+} from './router.js';
 
 class Router {
 	url = $state(new URL(window.location.href));
@@ -25,7 +29,10 @@ class Router {
 		const target = event.target;
 		if (!(target instanceof Element)) return;
 		const anchor = target.closest('a');
-		if (!anchor || !is_app_navigation(event, anchor, window.location.origin)) {
+		if (
+			!anchor ||
+			!is_app_navigation(event, anchor, window.location.origin)
+		) {
 			return;
 		}
 		event.preventDefault();

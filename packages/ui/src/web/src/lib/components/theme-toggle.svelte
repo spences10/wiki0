@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { buttonVariants } from '#lib/components/ui/button/index.js';
+	import { buttonVariants } from '#lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import { theme, type ThemeMode } from '#lib/theme.svelte.js';

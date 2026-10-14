@@ -33,7 +33,11 @@
 		highlight: typeof import('#lib/markdown/highlighter.js').highlight_code;
 	};
 
-	let { path, fragment, highlight }: {
+	let {
+		path,
+		fragment,
+		highlight,
+	}: {
 		path: string | null;
 		fragment: string | null;
 		highlight: [number, number] | null;
@@ -41,14 +45,17 @@
 
 	// The highlighter carries every grammar, so it loads once, on the
 	// first document, in its own chunk.
-	let highlighter: Promise<typeof import('#lib/markdown/highlighter.js')> | null =
-		null;
+	let highlighter: Promise<
+		typeof import('#lib/markdown/highlighter.js')
+	> | null = null;
 	function load_highlighter() {
 		highlighter ??= import('#lib/markdown/highlighter.js');
 		return highlighter;
 	}
 
-	const target = $derived(path ?? home_document(app.documents)?.path ?? null);
+	const target = $derived(
+		path ?? home_document(app.documents)?.path ?? null,
+	);
 
 	let loaded = $state.raw<Loaded | null>(null);
 	let error = $state<unknown>(null);
@@ -137,7 +144,10 @@
 
 	// Loads embedded images with the token, since <img src> can't
 	// send the Authorization header.
-	async function load_assets(container: HTMLElement, doc_path: string) {
+	async function load_assets(
+		container: HTMLElement,
+		doc_path: string,
+	) {
 		for (const url of asset_urls.splice(0)) URL.revokeObjectURL(url);
 		for (const image of container.querySelectorAll<HTMLImageElement>(
 			'img[data-wiki0-asset]',
@@ -145,7 +155,9 @@
 			const asset = image.dataset.wiki0Asset;
 			if (!asset) continue;
 			try {
-				const url = URL.createObjectURL(await api.asset(doc_path, asset));
+				const url = URL.createObjectURL(
+					await api.asset(doc_path, asset),
+				);
 				asset_urls.push(url);
 				image.src = url;
 			} catch {
@@ -173,7 +185,9 @@
 		range: [number, number] | null,
 	) {
 		await tick();
-		for (const block of container.querySelectorAll('[data-highlighted]')) {
+		for (const block of container.querySelectorAll(
+			'[data-highlighted]',
+		)) {
 			block.removeAttribute('data-highlighted');
 		}
 		const line_range = range ?? parse_line_range(fragment_value);
@@ -233,8 +247,8 @@
 			<Empty.Media variant="icon"><FileQuestionIcon /></Empty.Media>
 			<Empty.Title>Not an indexed document</Empty.Title>
 			<Empty.Description>
-				<code class="font-mono">{target}</code> isn't in the index. It may be
-				excluded, or new since the last index.
+				<code class="font-mono">{target}</code> isn't in the index. It may
+				be excluded, or new since the last index.
 			</Empty.Description>
 		</Empty.Header>
 	</Empty.Root>
@@ -330,20 +344,30 @@
 		</div>
 
 		<aside class="hidden xl:block">
-			<div class="sticky top-20 max-h-[calc(100svh-6rem)] space-y-8 overflow-y-auto pb-8">
+			<div
+				class="sticky top-20 max-h-[calc(100svh-6rem)] space-y-8 overflow-y-auto pb-8"
+			>
 				{#if summary && summary.headings.length > 1}
-					<DocOutline headings={summary.headings} container={article} />
+					<DocOutline
+						headings={summary.headings}
+						container={article}
+					/>
 				{/if}
 
 				{#if summary && summary.supersedes.length > 0}
 					<section class="space-y-2">
-						<h2 class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+						<h2
+							class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+						>
 							Replaces
 						</h2>
 						<ul class="space-y-1 text-sm">
 							{#each summary.supersedes as old (old)}
 								<li>
-									<a href={doc_href(old)} class="text-muted-foreground line-through hover:text-foreground">
+									<a
+										href={doc_href(old)}
+										class="text-muted-foreground line-through hover:text-foreground"
+									>
 										{app.title_for(old)}
 									</a>
 								</li>
@@ -353,7 +377,9 @@
 				{/if}
 
 				<section class="space-y-2">
-					<h2 class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+					<h2
+						class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+					>
 						Linked from
 						<span class="tabular-nums">({linked_from.length})</span>
 					</h2>
@@ -366,13 +392,22 @@
 							{#each linked_from as source (source.path)}
 								<li>
 									<a
-										href={doc_href(source.path, `#L${source.lines[0]}`)}
+										href={doc_href(
+											source.path,
+											`#L${source.lines[0]}`,
+										)}
 										class="group flex items-start gap-1.5 hover:text-accent"
 									>
-										<ArrowRightIcon class="mt-1 size-3 shrink-0 rotate-180 text-muted-foreground group-hover:text-accent" />
+										<ArrowRightIcon
+											class="mt-1 size-3 shrink-0 rotate-180 text-muted-foreground group-hover:text-accent"
+										/>
 										<span class="min-w-0">
-											<span class="block truncate">{source.title}</span>
-											<span class="block truncate font-mono text-xs text-muted-foreground">
+											<span class="block truncate"
+												>{source.title}</span
+											>
+											<span
+												class="block truncate font-mono text-xs text-muted-foreground"
+											>
 												{source.path}:{source.lines.join(', ')}
 											</span>
 										</span>

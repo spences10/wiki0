@@ -65,7 +65,10 @@
 	}
 
 	function handle_keydown(event: KeyboardEvent) {
-		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+		if (
+			(event.metaKey || event.ctrlKey) &&
+			event.key.toLowerCase() === 'k'
+		) {
 			event.preventDefault();
 			open = !open;
 		}
@@ -99,7 +102,9 @@
 							<span class="truncate">
 								{hit.breadcrumb.join(' › ') || hit.title}
 							</span>
-							<span class="truncate font-mono text-xs text-muted-foreground">
+							<span
+								class="truncate font-mono text-xs text-muted-foreground"
+							>
 								{hit.citation}
 								{#if hit.superseded_by}· superseded{/if}
 							</span>
@@ -132,7 +137,9 @@
 						<FileTextIcon />
 						<div class="flex min-w-0 flex-col">
 							<span class="truncate">{document.title}</span>
-							<span class="truncate font-mono text-xs text-muted-foreground">
+							<span
+								class="truncate font-mono text-xs text-muted-foreground"
+							>
 								{document.path}
 							</span>
 						</div>
@@ -147,10 +154,16 @@
 				<Command.Item value="health" onSelect={() => go('/health')}>
 					<ActivityIcon /> Index status
 				</Command.Item>
-				<Command.Item value="lint" onSelect={() => go('/health/lint')}>
+				<Command.Item
+					value="lint"
+					onSelect={() => go('/health/lint')}
+				>
 					<TriangleAlertIcon /> Lint
 				</Command.Item>
-				<Command.Item value="graph" onSelect={() => go('/health/graph')}>
+				<Command.Item
+					value="graph"
+					onSelect={() => go('/health/graph')}
+				>
 					<NetworkIcon /> Link graph
 				</Command.Item>
 				<Command.Item

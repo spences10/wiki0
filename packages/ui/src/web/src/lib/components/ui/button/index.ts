@@ -1,17 +1,10 @@
-import Root, {
-	type ButtonProps,
-	type ButtonSize,
-	type ButtonVariant,
-	buttonVariants,
-} from "./button.svelte";
+// Variants and prop types live in button.svelte's module script;
+// import them from there, as type-aware lint can't see .svelte
+// exports through this file.
+import Root from './button.svelte';
 
 export {
 	Root,
-	type ButtonProps as Props,
 	//
 	Root as Button,
-	buttonVariants,
-	type ButtonProps,
-	type ButtonSize,
-	type ButtonVariant,
 };

@@ -4,7 +4,12 @@ import type {
 	ScoreParts,
 } from '@wiki0/core';
 
-export type Bin = { label: string; start: number; end: number; count: number };
+export type Bin = {
+	label: string;
+	start: number;
+	end: number;
+	count: number;
+};
 
 const default_edges = [0, 100, 200, 400, 800, 1600];
 
@@ -26,7 +31,9 @@ export function token_histogram(
 		};
 	});
 	for (const value of tokens) {
-		const bin = bins.findLast((candidate) => value >= candidate.start);
+		const bin = bins.findLast(
+			(candidate) => value >= candidate.start,
+		);
 		if (bin) bin.count += 1;
 	}
 	return bins;
@@ -125,13 +132,25 @@ export type Tower = {
  * documents by total tokens are kept so the chart stays readable.
  */
 export function skyline(
-	documents: { path: string; title: string; chunks: ChunkSummary[] }[],
+	documents: {
+		path: string;
+		title: string;
+		chunks: ChunkSummary[];
+	}[],
 	limit = 16,
-): { towers: Tower[]; paths: string[]; positions: number[]; max: number } {
+): {
+	towers: Tower[];
+	paths: string[];
+	positions: number[];
+	max: number;
+} {
 	const kept = [...documents]
 		.map((document) => ({
 			...document,
-			total: document.chunks.reduce((sum, chunk) => sum + chunk.tokens, 0),
+			total: document.chunks.reduce(
+				(sum, chunk) => sum + chunk.tokens,
+				0,
+			),
 		}))
 		.filter((document) => document.chunks.length > 0)
 		.sort((a, b) => b.total - a.total || a.path.localeCompare(b.path))
@@ -146,7 +165,10 @@ export function skyline(
 			heading: chunk.heading,
 		})),
 	);
-	const longest = Math.max(0, ...kept.map((document) => document.chunks.length));
+	const longest = Math.max(
+		0,
+		...kept.map((document) => document.chunks.length),
+	);
 	return {
 		towers,
 		paths: kept.map((document) => document.path),
@@ -164,10 +186,15 @@ export function snippet_parts(
 ): SnippetPart[] {
 	const parts: SnippetPart[] = [];
 	let cursor = 0;
-	for (const [start, end] of [...ranges].sort((a, b) => a[0] - b[0])) {
+	for (const [start, end] of [...ranges].sort(
+		(a, b) => a[0] - b[0],
+	)) {
 		if (start < cursor || end <= start) continue;
 		if (start > cursor) {
-			parts.push({ text: snippet.slice(cursor, start), match: false });
+			parts.push({
+				text: snippet.slice(cursor, start),
+				match: false,
+			});
 		}
 		parts.push({ text: snippet.slice(start, end), match: true });
 		cursor = end;
@@ -176,4 +203,110 @@ export function snippet_parts(
 		parts.push({ text: snippet.slice(cursor), match: false });
 	}
 	return parts;
+}
+
+export type GraphNodeDatum = {
+	id: string;
+	title: string;
+	group: string;
+	orphan: boolean;
+	// A link target with no document: drawn as a broken end.
+	missing: boolean;
+	degree: number;
+};
+
+export type GraphLinkDatum = {
+	source: string;
+	target: string;
+	resolved: boolean;
+};
+
+/**
+ * Nodes and links for the force layout from core's graph. Each
+ * document is a node; an unresolved link gets a node of its own for
+ * the missing target so it can be drawn. Links to the same target
+ * from the same document are drawn once.
+ */
+export function graph_layout(
+	graph: {
+		nodes: {
+			path: string;
+			title: string;
+			status: string | null;
+			doc_type: string | null;
+			orphan: boolean;
+		}[];
+		edges: {
+			from: string;
+			to: string;
+			target: string;
+			status: string;
+		}[];
+	},
+	options: {
+		group_by: 'doc_type' | 'status' | 'folder';
+		show_unresolved: boolean;
+		show_orphans: boolean;
+	},
+): {
+	nodes: GraphNodeDatum[];
+	links: GraphLinkDatum[];
+	groups: string[];
+} {
+	const group_of = (node: (typeof graph.nodes)[number]) => {
+		if (options.group_by === 'folder') {
+			return node.path.includes('/')
+				? node.path.slice(0, node.path.lastIndexOf('/'))
+				: '(root)';
+		}
+		return node[options.group_by] ?? 'none';
+	};
+	const nodes = new Map<string, GraphNodeDatum>();
+	for (const node of graph.nodes) {
+		if (node.orphan && !options.show_orphans) continue;
+		nodes.set(node.path, {
+			id: node.path,
+			title: node.title,
+			group: group_of(node),
+			orphan: node.orphan,
+			missing: false,
+			degree: 0,
+		});
+	}
+	const links = new Map<string, GraphLinkDatum>();
+	for (const edge of graph.edges) {
+		const resolved = edge.status === 'resolved';
+		if (!resolved && !options.show_unresolved) continue;
+		if (!nodes.has(edge.from)) continue;
+		const target = resolved ? edge.to : `missing:${edge.target}`;
+		if (resolved && !nodes.has(target)) continue;
+		if (target === edge.from) continue;
+		if (!resolved && !nodes.has(target)) {
+			nodes.set(target, {
+				id: target,
+				title: edge.target,
+				group: 'missing',
+				orphan: false,
+				missing: true,
+				degree: 0,
+			});
+		}
+		const key = `${edge.from}\u0000${target}`;
+		if (links.has(key)) continue;
+		links.set(key, { source: edge.from, target, resolved });
+		nodes.get(edge.from)!.degree += 1;
+		nodes.get(target)!.degree += 1;
+	}
+	const groups = [
+		...new Set(
+			[...nodes.values()]
+				.filter((node) => !node.missing)
+				.map((node) => node.group),
+		),
+	].sort();
+	return {
+		nodes: [...nodes.values()],
+		links: [...links.values()],
+		groups,
+	};
 }

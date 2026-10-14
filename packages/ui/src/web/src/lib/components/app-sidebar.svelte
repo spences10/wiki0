@@ -18,20 +18,38 @@
 		new Set(active_path ? ancestor_folders(active_path) : []),
 	);
 	const project = $derived(
-		app.meta?.root.split(/[\\/]/u).filter(Boolean).at(-1) ?? 'project',
+		app.meta?.root.split(/[\\/]/u).filter(Boolean).at(-1) ??
+			'project',
 	);
 
 	const health = [
-		{ href: '/health', tab: 'status', label: 'Index status', icon: ActivityIcon },
-		{ href: '/health/lint', tab: 'lint', label: 'Lint', icon: TriangleAlertIcon },
-		{ href: '/health/graph', tab: 'graph', label: 'Link graph', icon: NetworkIcon },
+		{
+			href: '/health',
+			tab: 'status',
+			label: 'Index status',
+			icon: ActivityIcon,
+		},
+		{
+			href: '/health/lint',
+			tab: 'lint',
+			label: 'Lint',
+			icon: TriangleAlertIcon,
+		},
+		{
+			href: '/health/graph',
+			tab: 'graph',
+			label: 'Link graph',
+			icon: NetworkIcon,
+		},
 	] as const;
 </script>
 
 <Sidebar.Root>
 	<Sidebar.Header>
 		<a href="/" class="flex items-baseline gap-2 px-2 pt-1">
-			<span class="text-lg font-bold tracking-tight [font-stretch:112%]">
+			<span
+				class="text-lg font-bold tracking-tight [font-stretch:112%]"
+			>
 				wiki0
 			</span>
 			<span class="truncate font-mono text-xs text-muted-foreground">
@@ -40,6 +58,7 @@
 		</a>
 		<Sidebar.Input
 			bind:value={filter}
+			name="filter"
 			placeholder="Filter docs"
 			aria-label="Filter docs"
 		/>
@@ -48,7 +67,9 @@
 		<Sidebar.Group>
 			<Sidebar.GroupLabel>
 				Docs
-				<span class="ml-auto tabular-nums">{app.documents.length}</span>
+				<span class="ml-auto tabular-nums"
+					>{app.documents.length}</span
+				>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
 				<Sidebar.Menu>

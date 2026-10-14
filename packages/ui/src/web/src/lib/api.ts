@@ -121,7 +121,10 @@ async function get<T>(
 	params: Record<string, string | number | boolean> = {},
 ): Promise<T> {
 	const query = new URLSearchParams(
-		Object.entries(params).map(([key, value]) => [key, String(value)]),
+		Object.entries(params).map(([key, value]) => [
+			key,
+			String(value),
+		]),
 	).toString();
 	const response = await request(query ? `${path}?${query}` : path);
 	return (await response.json()) as T;
@@ -151,7 +154,9 @@ export const api = {
 		return response.blob();
 	},
 	async reindex(): Promise<IndexResult> {
-		const response = await request('/api/reindex', { method: 'POST' });
+		const response = await request('/api/reindex', {
+			method: 'POST',
+		});
 		return (await response.json()) as IndexResult;
 	},
 };

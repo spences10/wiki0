@@ -34,7 +34,10 @@
 				{...props}
 				variant="ghost"
 				size="sm"
-				class={['font-mono text-xs text-muted-foreground', class_name]}
+				class={[
+					'font-mono text-xs text-muted-foreground',
+					class_name,
+				]}
 				onclick={copy}
 				aria-label={label}
 			>

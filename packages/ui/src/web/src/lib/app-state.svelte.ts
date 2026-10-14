@@ -11,7 +11,9 @@ const poll_interval_ms = 15_000;
 class AppState {
 	meta = $state<Meta | null>(null);
 	documents = $state.raw<DocumentSummary[]>([]);
-	paths = $derived(new Set(this.documents.map((document) => document.path)));
+	paths = $derived(
+		new Set(this.documents.map((document) => document.path)),
+	);
 	not_indexed = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(true);
@@ -32,7 +34,8 @@ class AppState {
 				this.not_indexed = true;
 				this.documents = [];
 			} else {
-				this.error = error instanceof Error ? error.message : String(error);
+				this.error =
+					error instanceof Error ? error.message : String(error);
 			}
 		} finally {
 			this.loading = false;
@@ -46,7 +49,8 @@ class AppState {
 			await this.load();
 			this.version += 1;
 		} catch (error) {
-			this.error = error instanceof Error ? error.message : String(error);
+			this.error =
+				error instanceof Error ? error.message : String(error);
 		} finally {
 			this.reindexing = false;
 		}
@@ -54,7 +58,8 @@ class AppState {
 
 	// Picks up an index rebuilt outside the UI.
 	async check_for_changes(): Promise<void> {
-		if (this.reindexing || document.visibilityState !== 'visible') return;
+		if (this.reindexing || document.visibilityState !== 'visible')
+			return;
 		try {
 			const { status } = await api.status();
 			if (status.indexed_at !== this.#indexed_at) {
@@ -76,8 +81,8 @@ class AppState {
 
 	title_for(path: string): string {
 		return (
-			this.documents.find((document) => document.path === path)?.title ??
-			path
+			this.documents.find((document) => document.path === path)
+				?.title ?? path
 		);
 	}
 }

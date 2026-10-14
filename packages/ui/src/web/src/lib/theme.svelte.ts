@@ -18,7 +18,8 @@ class Theme {
 	mode = $state<ThemeMode>(read_mode());
 	#system_dark = $state(system_dark.matches);
 	dark = $derived(
-		this.mode === 'dark' || (this.mode === 'system' && this.#system_dark),
+		this.mode === 'dark' ||
+			(this.mode === 'system' && this.#system_dark),
 	);
 
 	constructor() {

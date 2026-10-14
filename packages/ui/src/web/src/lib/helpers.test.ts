@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { take_token } from './api.js';
 import {
 	count_by,
+	graph_layout,
 	lint_by_rule,
 	score_breakdown,
 	skyline,
@@ -130,7 +131,11 @@ describe('is_app_navigation', () => {
 
 	it('leaves external, new-tab, modified and API links alone', () => {
 		expect(
-			is_app_navigation(click, anchor('https://example.com/'), origin),
+			is_app_navigation(
+				click,
+				anchor('https://example.com/'),
+				origin,
+			),
 		).toBe(false);
 		expect(
 			is_app_navigation(
@@ -187,11 +192,15 @@ describe('build_tree', () => {
 
 	it('nests folders first, then documents by name', () => {
 		const tree = build_tree(documents);
-		expect(tree.map((node) => node.name)).toEqual(['docs', 'README.md']);
+		expect(tree.map((node) => node.name)).toEqual([
+			'docs',
+			'README.md',
+		]);
 		const docs = tree[0];
 		expect(docs?.kind === 'folder' && docs.count).toBe(3);
 		expect(
-			docs?.kind === 'folder' && docs.children.map((node) => node.name),
+			docs?.kind === 'folder' &&
+				docs.children.map((node) => node.name),
 		).toEqual(['adr', 'a.md', 'b.md']);
 	});
 
@@ -210,9 +219,9 @@ describe('build_tree', () => {
 
 	it('opens the README nearest the root at home', () => {
 		expect(home_document(documents)?.path).toBe('README.md');
-		expect(home_document([doc('z.md'), doc('docs/index.md')])?.path).toBe(
-			'docs/index.md',
-		);
+		expect(
+			home_document([doc('z.md'), doc('docs/index.md')])?.path,
+		).toBe('docs/index.md');
 		expect(home_document([])).toBeNull();
 	});
 });
@@ -228,13 +237,13 @@ describe('chart data', () => {
 	});
 
 	it('counts values, most common first', () => {
-		expect(
-			count_by(['a', 'b', null, 'a'], (value) => value),
-		).toEqual([
-			{ key: 'a', count: 2 },
-			{ key: 'b', count: 1 },
-			{ key: 'none', count: 1 },
-		]);
+		expect(count_by(['a', 'b', null, 'a'], (value) => value)).toEqual(
+			[
+				{ key: 'a', count: 2 },
+				{ key: 'b', count: 1 },
+				{ key: 'none', count: 1 },
+			],
+		);
 	});
 
 	it('groups lint issues by rule and severity', () => {
@@ -252,8 +261,20 @@ describe('chart data', () => {
 				issue('orphan-page', 'info'),
 			]),
 		).toEqual([
-			{ rule: 'orphan-page', error: 0, warning: 0, info: 2, total: 2 },
-			{ rule: 'missing-file', error: 1, warning: 0, info: 0, total: 1 },
+			{
+				rule: 'orphan-page',
+				error: 0,
+				warning: 0,
+				info: 2,
+				total: 2,
+			},
+			{
+				rule: 'missing-file',
+				error: 1,
+				warning: 0,
+				info: 0,
+				total: 1,
+			},
 		]);
 	});
 
@@ -266,11 +287,15 @@ describe('chart data', () => {
 			recency: 1,
 			priority: 1,
 		});
-		expect(parts.find((part) => part.part === 'text')?.effect).toBe(0.8);
+		expect(parts.find((part) => part.part === 'text')?.effect).toBe(
+			0.8,
+		);
 		expect(
 			parts.find((part) => part.part === 'status')?.effect,
 		).toBeCloseTo(0.2);
-		expect(parts.find((part) => part.part === 'type')?.effect).toBe(-0.5);
+		expect(parts.find((part) => part.part === 'type')?.effect).toBe(
+			-0.5,
+		);
 	});
 
 	it('keeps the largest documents for the skyline', () => {
@@ -286,7 +311,11 @@ describe('chart data', () => {
 		const result = skyline(
 			[
 				{ path: 'small.md', title: 'S', chunks: [chunk(10)] },
-				{ path: 'big.md', title: 'B', chunks: [chunk(300), chunk(50)] },
+				{
+					path: 'big.md',
+					title: 'B',
+					chunks: [chunk(300), chunk(50)],
+				},
 				{ path: 'empty.md', title: 'E', chunks: [] },
 			],
 			1,
@@ -301,5 +330,88 @@ describe('chart data', () => {
 			{ text: 'run the ', match: false },
 			{ text: 'deploy', match: true },
 		]);
+	});
+});
+
+describe('graph_layout', () => {
+	const graph = {
+		nodes: [
+			{
+				path: 'docs/a.md',
+				title: 'A',
+				status: null,
+				doc_type: 'spec',
+				orphan: false,
+			},
+			{
+				path: 'docs/b.md',
+				title: 'B',
+				status: null,
+				doc_type: null,
+				orphan: false,
+			},
+			{
+				path: 'c.md',
+				title: 'C',
+				status: null,
+				doc_type: null,
+				orphan: true,
+			},
+		],
+		edges: [
+			{
+				from: 'docs/a.md',
+				to: 'docs/b.md',
+				target: 'b.md',
+				status: 'resolved',
+			},
+			{
+				from: 'docs/a.md',
+				to: 'docs/b.md',
+				target: 'b.md#x',
+				status: 'resolved',
+			},
+			{
+				from: 'docs/a.md',
+				to: '',
+				target: 'gone.md',
+				status: 'unresolved',
+			},
+		],
+	};
+
+	it('draws each link once and broken targets as their own node', () => {
+		const layout = graph_layout(graph, {
+			group_by: 'folder',
+			show_unresolved: true,
+			show_orphans: true,
+		});
+		expect(layout.links).toEqual([
+			{ source: 'docs/a.md', target: 'docs/b.md', resolved: true },
+			{
+				source: 'docs/a.md',
+				target: 'missing:gone.md',
+				resolved: false,
+			},
+		]);
+		expect(
+			layout.nodes.find((node) => node.id === 'missing:gone.md'),
+		).toMatchObject({
+			missing: true,
+		});
+		expect(layout.groups).toEqual(['(root)', 'docs']);
+	});
+
+	it('hides broken links and orphans on request', () => {
+		const layout = graph_layout(graph, {
+			group_by: 'doc_type',
+			show_unresolved: false,
+			show_orphans: false,
+		});
+		expect(layout.nodes.map((node) => node.id)).toEqual([
+			'docs/a.md',
+			'docs/b.md',
+		]);
+		expect(layout.groups).toEqual(['none', 'spec']);
 	});
 });

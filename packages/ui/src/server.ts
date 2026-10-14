@@ -151,7 +151,8 @@ export async function start_ui_server(
 		const url = new URL(req.url ?? '/', 'http://localhost');
 		const method = req.method ?? 'GET';
 
-		if (url.pathname === '/health') {
+		// Outside the app's routes, so /health stays a page.
+		if (url.pathname === '/_health') {
 			const challenge = url.searchParams.get('challenge');
 			if (!valid_health_challenge(challenge)) {
 				return send_json(res, 400, {

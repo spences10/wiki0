@@ -60,18 +60,20 @@ export async function handle_copy_click(
 	if (status) status.textContent = message;
 	button.setAttribute('title', message);
 	const copied = message === 'Copied';
-	button.querySelector('[data-icon="copy"]')?.toggleAttribute(
-		'hidden',
-		copied,
-	);
-	button.querySelector('[data-icon="check"]')?.toggleAttribute(
-		'hidden',
-		!copied,
-	);
+	button
+		.querySelector('[data-icon="copy"]')
+		?.toggleAttribute('hidden', copied);
+	button
+		.querySelector('[data-icon="check"]')
+		?.toggleAttribute('hidden', !copied);
 	setTimeout(() => {
 		if (status) status.textContent = '';
 		button.setAttribute('title', 'Copy code');
-		button.querySelector('[data-icon="copy"]')?.removeAttribute('hidden');
-		button.querySelector('[data-icon="check"]')?.setAttribute('hidden', '');
+		button
+			.querySelector('[data-icon="copy"]')
+			?.removeAttribute('hidden');
+		button
+			.querySelector('[data-icon="check"]')
+			?.setAttribute('hidden', '');
 	}, 2000);
 }

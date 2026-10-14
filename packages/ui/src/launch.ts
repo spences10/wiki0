@@ -65,7 +65,7 @@ export async function probe_ui_server(
 		: state.host;
 	try {
 		const response = await fetch(
-			`http://${host}:${state.port}/health?challenge=${challenge}`,
+			`http://${host}:${state.port}/_health?challenge=${challenge}`,
 			{ signal: AbortSignal.timeout(1500) },
 		);
 		if (!response.ok) return false;

@@ -18,11 +18,11 @@
 		"README.md"
 	],
 	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"imports": {
 		"#lib/*": "./src/web/src/lib/*"
 	},
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
