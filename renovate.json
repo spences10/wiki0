@@ -15,9 +15,17 @@
 			"groupSlug": "svelte-packages"
 		},
 		{
+			"description": "Keep the TypeScript 6 compiler API available for Svelte tooling; TypeScript 7 is installed separately as @typescript/native",
+			"matchManagers": ["npm"],
+			"matchDepNames": ["typescript"],
+			"matchCurrentVersion": "<7",
+			"allowedVersions": "<7"
+		},
+		{
 			"description": "Keep Vite+ and its Vitest peers aligned",
 			"matchManagers": ["npm"],
 			"matchPackageNames": [
+				"vite",
 				"vite-plus",
 				"/^@vitest\\//",
 				"vitest",
