@@ -70,9 +70,7 @@ test('shows the finished story with reduced motion', async ({
 	);
 	await answer.scrollIntoViewIfNeeded();
 	await expect(answer).toBeVisible();
-	const ranked = page.getByRole('list', {
-		name: 'Order after weighing',
-	});
+	const ranked = page.getByRole('list', { name: 'Search results' });
 	await ranked.scrollIntoViewIfNeeded();
 	await expect(ranked.getByRole('listitem').first()).toContainText(
 		'Index in the user cache',
@@ -117,4 +115,33 @@ test('the built page has no local paths', async () => {
 	for (const path of [homedir(), tmpdir(), '/home/', '/Users/']) {
 		expect(html).not.toContain(path);
 	}
+});
+
+test('reranks the results when asked', async ({ page }) => {
+	await page.goto('/');
+	const ranked = page.getByRole('list', { name: 'Search results' });
+	await ranked.scrollIntoViewIfNeeded();
+	await page.getByRole('button', { name: 'By text match' }).click();
+	await expect(ranked.getByRole('listitem').first()).toContainText(
+		'Index in the project folder',
+	);
+	await page.getByRole('button', { name: 'Ranked by wiki0' }).click();
+	await expect(ranked.getByRole('listitem').first()).toContainText(
+		'Index in the user cache',
+	);
+});
+
+test('switches tabs without changing the page height', async ({
+	page,
+}) => {
+	await page.goto('/');
+	await page
+		.getByRole('tab', { name: 'MCP' })
+		.scrollIntoViewIfNeeded();
+	const height = () =>
+		page.evaluate(() => document.documentElement.scrollHeight);
+	const before = await height();
+	await page.getByRole('tab', { name: 'MCP' }).click();
+	await expect(page.getByText('"mcpServers"')).toBeVisible();
+	expect(await height()).toBe(before);
 });
