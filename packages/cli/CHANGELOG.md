@@ -1,5 +1,27 @@
 # @wiki0/cli
 
+## 0.1.0
+
+### Minor Changes
+
+- df4a36f: Add `@wiki0/ui`, a local docs browser, and the `wiki0 ui`
+  command that starts it: rendered docs with working links, search
+  with score breakdowns, and index health. It prints the URL, returns
+  when run without a terminal, and reuses a running server.
+- f68b968: Rework wiki0 into read-only cited search over existing
+  project docs; remove page writing, facts and sync.
+
+### Patch Changes
+
+- a73294f: Align Node 24 tooling, dependency catalogs, editor
+  settings, CI, tests, and package verification across wiki0.
+- Updated dependencies [79578de]
+- Updated dependencies [a73294f]
+- Updated dependencies [df4a36f]
+- Updated dependencies [f68b968]
+  - @wiki0/core@0.1.0
+  - @wiki0/ui@0.1.0
+
 ## 0.0.6
 
 ### Patch Changes

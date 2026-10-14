@@ -1,5 +1,21 @@
 # @wiki0/mcp
 
+## 0.1.0
+
+### Minor Changes
+
+- f68b968: Rework wiki0 into read-only cited search over existing
+  project docs; remove page writing, facts and sync.
+
+### Patch Changes
+
+- a73294f: Align Node 24 tooling, dependency catalogs, editor
+  settings, CI, tests, and package verification across wiki0.
+- Updated dependencies [79578de]
+- Updated dependencies [a73294f]
+- Updated dependencies [f68b968]
+  - @wiki0/core@0.1.0
+
 ## 0.0.6
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @wiki0/core
 
+## 0.1.0
+
+### Minor Changes
+
+- 79578de: Read ADR status, supersedes and amends headers from
+  document bodies, and add document, chunk and link APIs for the docs
+  browser.
+- f68b968: Rework wiki0 into read-only cited search over existing
+  project docs; remove page writing, facts and sync.
+
+### Patch Changes
+
+- a73294f: Align Node 24 tooling, dependency catalogs, editor
+  settings, CI, tests, and package verification across wiki0.
+
 ## 0.0.6
 
 ### Patch Changes
