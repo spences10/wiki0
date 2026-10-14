@@ -1,0 +1,41 @@
+{
+	"files": {
+		"deploys.md": "# Deploys\n\n## Rolling back\n\nRedeploy the previous tag.\n",
+		"runbook.md": "# Runbook\n\nIf a release breaks, follow [roll back](deploys.md#roll-back).\n\nAccess is set up in [[onboarding]].\n"
+	},
+	"lint": {
+		"ok": false,
+		"issue_count": 3,
+		"counts": {
+			"error": 2,
+			"warning": 0,
+			"info": 1
+		},
+		"issues": [
+			{
+				"rule": "orphan-page",
+				"severity": "info",
+				"path": "runbook.md",
+				"line": null,
+				"message": "No other document links here"
+			},
+			{
+				"path": "runbook.md",
+				"line": 3,
+				"target": "deploys.md#roll-back",
+				"rule": "missing-heading",
+				"severity": "error",
+				"message": "[roll back](deploys.md#roll-back): deploys.md has no matching heading",
+				"suggestions": ["rolling-back"]
+			},
+			{
+				"path": "runbook.md",
+				"line": 5,
+				"target": "onboarding",
+				"rule": "missing-file",
+				"severity": "error",
+				"message": "[[onboarding]] points to a file that does not exist"
+			}
+		]
+	}
+}

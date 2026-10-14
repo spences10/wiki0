@@ -1,0 +1,14 @@
+{
+	"path": "wiki/decisions/0006-index-in-user-cache.md",
+	"start_line": 9,
+	"end_line": 16,
+	"citation": "wiki/decisions/0006-index-in-user-cache.md:9-16",
+	"title": "Index in the user cache",
+	"breadcrumb": ["Index in the user cache", "Decision"],
+	"markdown": "# Index in the user cache\n\n## Decision\n\nBy default the index lives in the user cache, keyed per worktree:\n`~/.cache/wiki0/<folder>-<hash>/index.db`. Nothing is written to the\nproject. A project can opt into `.wiki0/index.db` with `wiki0.toml`.\nDetails: [Storage](../reference/storage.md).",
+	"tokens": 80,
+	"truncated": false,
+	"next": null,
+	"superseded_by": null,
+	"warnings": []
+}

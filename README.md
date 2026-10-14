@@ -14,16 +14,30 @@ files.
 
 ## Use
 
-```sh
-npx @wiki0/cli index
-npx @wiki0/cli search "how do deploys work"
-npx @wiki0/cli show docs/deploys.md:12-40
-npx @wiki0/cli lint
-npx @wiki0/cli ui      # browse the docs in a local web app
-```
+Ask your coding agent. It runs wiki0 for you:
 
-Agents use the same operations through the MCP server (`@wiki0/mcp`,
-binary `wiki0-mcp`).
+- "Use `pnpx @wiki0/cli` to find where we decided how deploys work."
+- "Use `pnpx @wiki0/cli` and show me the docs." The agent runs
+  `wiki0 ui`, and a local docs browser opens with rendered docs,
+  working links, search and index health.
+- "Use `pnpx @wiki0/cli lint` and fix the broken links in our docs."
+
+The agent indexes the repo, searches, and reads only the cited section
+(`path:start-end`) instead of whole files. Superseded docs rank low
+and point to their replacement.
+
+For MCP clients, add `@wiki0/mcp` (binary `wiki0-mcp`) and the agent
+gets the same operations as tools.
+
+### Commands the agent runs
+
+```sh
+npx @wiki0/cli index                       # index the project docs
+npx @wiki0/cli search "how do deploys work" # one cited section per doc
+npx @wiki0/cli show docs/deploys.md:12-40  # read a cited section
+npx @wiki0/cli lint                        # broken links and anchors
+npx @wiki0/cli ui                          # open the local docs browser
+```
 
 ## What affects ranking
 
