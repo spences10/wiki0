@@ -24,7 +24,17 @@ pnpm --filter wiki0-web preview   # preview the production build
 pnpm --filter wiki0-web lint      # run Vite+ lint
 pnpm --filter wiki0-web check     # run svelte-check with TypeScript 7
 pnpm --filter wiki0-web test      # run unit/component and e2e tests
+pnpm --filter wiki0-web share-cards # render static/og/*.png
 ```
+
+## Share cards
+
+Each page's link-preview image is a PNG in `static/og`, rendered by
+`scripts/generate-share-cards.ts` with resvg in the site's fonts and
+colours. Head tags and JSON-LD come from svead, through
+`src/lib/components/seo.svelte`. Run `share-cards` again and commit
+the PNG when the headline, the cited section in
+`src/lib/data/show.json` or the look of the hero changes.
 
 ## Tooling
 

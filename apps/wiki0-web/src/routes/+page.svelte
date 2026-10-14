@@ -1,27 +1,23 @@
 <script lang="ts">
+	import Seo from '#lib/components/seo.svelte';
+	import Answer from '#lib/sections/answer.svelte';
 	import Cite from '#lib/sections/cite.svelte';
 	import Hero from '#lib/sections/hero.svelte';
 	import IndexSection from '#lib/sections/index-section.svelte';
 	import Links from '#lib/sections/links.svelte';
-	import Answer from '#lib/sections/answer.svelte';
 	import Rerank from '#lib/sections/rerank.svelte';
 	import UiSection from '#lib/sections/ui-section.svelte';
 	import UseIt from '#lib/sections/use-it.svelte';
+	import { home_schema, home_seo } from '#lib/seo.js';
+	import { site } from '#lib/site.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	const repo = 'https://github.com/spences10/wiki0';
-	const description =
-		'wiki0 indexes the Markdown in your repo so your coding agent gets back the relevant, current section with the file and line it came from, instead of reading every file.';
+	const { repo } = site;
 </script>
 
-<svelte:head>
-	<title>wiki0: docs search for your coding agent</title>
-	<meta name="description" content={description} />
-	<meta property="og:title" content="wiki0" />
-	<meta property="og:description" content={description} />
-</svelte:head>
+<Seo page={home_seo} schema={home_schema()} />
 
 <a
 	href="#main"

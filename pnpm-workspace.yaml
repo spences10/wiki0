@@ -7,9 +7,12 @@ minimumReleaseAge: 2880
 catalog:
   '@changesets/cli': ^3.0.3
   '@fontsource-variable/martian-mono': ^5.3.0
+  '@fontsource/martian-mono': ^5.3.0
   '@fontsource-variable/mona-sans': ^5.3.0
+  '@fontsource/mona-sans': ^5.3.0
   '@lucide/svelte': ^1.55.0
   '@playwright/test': ^1.64.0
+  '@resvg/resvg-js': ^2.6.2
   '@sveltejs/adapter-static': ^4.0.0
   '@sveltejs/kit': ^3.0.1
   '@sveltejs/vite-plugin-svelte': ^7.3.1
@@ -56,6 +59,7 @@ catalog:
   playwright: ^1.64.0
   shadcn-svelte: ^1.7.0
   smol-toml: ^1.9.1
+  svead: ^0.1.0
   svelte: ^5.57.2
   svelte-check: ^4.7.6
   tailwind-merge: ^3.7.0

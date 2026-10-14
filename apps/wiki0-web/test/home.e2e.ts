@@ -145,3 +145,73 @@ test('switches tabs without changing the page height', async ({
 	await expect(page.getByText('"mcpServers"')).toBeVisible();
 	expect(await height()).toBe(before);
 });
+
+test('has share tags pointing at a card that exists', async ({
+	page,
+}) => {
+	await page.goto('/');
+	const meta = (selector: string) =>
+		page.locator(`head ${selector}`).getAttribute('content');
+
+	await expect(
+		page.locator('head link[rel="canonical"]'),
+	).toHaveAttribute('href', 'https://wiki0.app/');
+	expect(await meta('meta[property="og:url"]')).toBe(
+		'https://wiki0.app/',
+	);
+	expect(await meta('meta[name="twitter:card"]')).toBe(
+		'summary_large_image',
+	);
+	const image = await meta('meta[property="og:image"]');
+	expect(image).toBe('https://wiki0.app/og/home.png');
+	expect(await meta('meta[name="twitter:image"]')).toBe(image);
+	expect(await meta('meta[property="og:image:alt"]')).toBeTruthy();
+	// og:image:* describe the og:image before them
+	const order = await page
+		.locator('head meta[property^="og:image"]')
+		.evaluateAll((tags) =>
+			tags.map((tag) => tag.getAttribute('property')),
+		);
+	expect(order[0]).toBe('og:image');
+
+	// The card is served from this build, at the size the tags claim
+	const response = await page.request.get(new URL(image!).pathname);
+	expect(response.ok()).toBe(true);
+	const png = await response.body();
+	expect(png.readUInt32BE(16)).toBe(
+		Number(await meta('meta[property="og:image:width"]')),
+	);
+	expect(png.readUInt32BE(20)).toBe(
+		Number(await meta('meta[property="og:image:height"]')),
+	);
+});
+
+test('has structured data for the site and the CLI', async ({
+	page,
+}) => {
+	await page.goto('/');
+	const scripts = await page
+		.locator('head script[type="application/ld+json"]')
+		.allTextContents();
+	expect(scripts).toHaveLength(1);
+	const data = JSON.parse(scripts[0]!);
+	const types = data['@graph'].map(
+		(node: { '@type': string }) => node['@type'],
+	);
+	expect(types).toEqual(
+		expect.arrayContaining([
+			'WebSite',
+			'WebPage',
+			'SoftwareApplication',
+			'SoftwareSourceCode',
+		]),
+	);
+	// Every reference points at a node in the graph
+	const ids = new Set(
+		data['@graph'].map((node: { '@id'?: string }) => node['@id']),
+	);
+	const refs = JSON.stringify(data).match(/"@id":"[^"]+"/gu) ?? [];
+	for (const ref of refs) {
+		expect(ids).toContain(JSON.parse(`{${ref}}`)['@id']);
+	}
+});
