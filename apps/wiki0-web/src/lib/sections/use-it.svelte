@@ -2,33 +2,19 @@
 	import CopyButton from '#lib/components/copy-button.svelte';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
 
+	let {
+		cli,
+		mcp,
+	}: {
+		cli: { html: string; text: string };
+		mcp: { html: string; text: string };
+	} = $props();
+
 	const prompts = [
 		'Use pnpx @wiki0/cli to find where we decided how deploys work.',
 		'Use pnpx @wiki0/cli and show me the docs.',
 		'Use pnpx @wiki0/cli lint and fix the broken links in our docs.',
 	];
-	const commands = [
-		['npx @wiki0/cli index', 'index the project docs'],
-		[
-			'npx @wiki0/cli search "how do deploys work"',
-			'one cited section per doc',
-		],
-		[
-			'npx @wiki0/cli show docs/deploys.md:12-40',
-			'read a cited section',
-		],
-		['npx @wiki0/cli lint', 'broken links and anchors'],
-		['npx @wiki0/cli ui', 'open the local docs browser'],
-	];
-	const mcp_config = JSON.stringify(
-		{
-			mcpServers: {
-				wiki0: { command: 'npx', args: ['-y', '@wiki0/mcp'] },
-			},
-		},
-		null,
-		2,
-	);
 	const principles = [
 		[
 			'Never calls an LLM',
@@ -47,7 +33,26 @@
 			'The docs browser listens on 127.0.0.1 and needs a token.',
 		],
 	];
+	const tabs = [
+		['agent', 'Ask your agent'],
+		['cli', 'CLI'],
+		['mcp', 'MCP'],
+	];
+	let tab = $state('agent');
 </script>
+
+{#snippet code_block(
+	block: { html: string; text: string },
+	label: string,
+)}
+	<div class="code">
+		<div class="copy">
+			<CopyButton text={block.text} {label} />
+		</div>
+		<!-- Highlighted at build time -->
+		{@html block.html}
+	</div>
+{/snippet}
 
 <div class="band">
 	<section
@@ -63,59 +68,61 @@
 			</p>
 		</div>
 
-		<Tabs.Root value="agent" class="min-w-0">
-			<Tabs.List>
-				<Tabs.Trigger value="agent">Ask your agent</Tabs.Trigger>
-				<Tabs.Trigger value="cli">CLI</Tabs.Trigger>
-				<Tabs.Trigger value="mcp">MCP</Tabs.Trigger>
+		<Tabs.Root bind:value={tab} class="min-w-0">
+			<Tabs.List class="h-auto rounded-full border bg-card p-1">
+				{#each tabs as [value, name] (value)}
+					<Tabs.Trigger
+						{value}
+						class="rounded-full px-4 py-1.5 text-muted-foreground transition-colors hover:text-foreground data-active:bg-white data-active:text-[#2e1065] data-active:shadow-sm data-active:hover:text-[#2e1065] dark:data-active:bg-white dark:data-active:text-[#2e1065]"
+						>{name}</Tabs.Trigger
+					>
+				{/each}
 			</Tabs.List>
-			<Tabs.Content value="agent" class="mt-4">
-				<ul class="grid gap-2">
-					{#each prompts as prompt (prompt)}
-						<li
-							class="flex items-start gap-2 rounded-lg border bg-card py-2 pr-2 pl-4"
+			<div class="panels">
+				<Tabs.Content value="agent">
+					{#snippet child({ props })}
+						{@const { hidden, ...rest } = props}
+						<div {...rest} class="panel" inert={Boolean(hidden)}>
+							<ul class="grid gap-2">
+								{#each prompts as prompt (prompt)}
+									<li
+										class="flex items-start gap-2 rounded-lg border bg-card py-2 pr-2 pl-4"
+									>
+										<p class="flex-1 py-1">{prompt}</p>
+										<CopyButton text={prompt} label="Copy prompt" />
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/snippet}
+				</Tabs.Content>
+				<Tabs.Content value="cli">
+					{#snippet child({ props })}
+						{@const { hidden, ...rest } = props}
+						<div {...rest} class="panel" inert={Boolean(hidden)}>
+							{@render code_block(cli, 'Copy commands')}
+						</div>
+					{/snippet}
+				</Tabs.Content>
+				<Tabs.Content value="mcp">
+					{#snippet child({ props })}
+						{@const { hidden, ...rest } = props}
+						<div
+							{...rest}
+							class="panel grid gap-3"
+							inert={Boolean(hidden)}
 						>
-							<p class="flex-1 py-1">{prompt}</p>
-							<CopyButton text={prompt} label="Copy prompt" />
-						</li>
-					{/each}
-				</ul>
-			</Tabs.Content>
-			<Tabs.Content value="cli" class="mt-4">
-				<ul
-					class="grid gap-1 rounded-xl border bg-card p-2 font-mono text-[0.8rem]"
-				>
-					{#each commands as [command, note] (command)}
-						<li
-							class="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted"
-						>
-							<span class="min-w-0 flex-1">
-								<span class="block break-all">{command}</span>
-								<span class="block text-xs text-muted-foreground"
-									>{note}</span
-								>
-							</span>
-							<CopyButton text={command} label="Copy command" />
-						</li>
-					{/each}
-				</ul>
-			</Tabs.Content>
-			<Tabs.Content value="mcp" class="mt-4 grid gap-3">
-				<p class="text-muted-foreground">
-					For MCP clients, add <code class="font-mono text-[0.9em]"
-						>@wiki0/mcp</code
-					>. The agent gets search, show, lint, index and the link
-					graph as tools.
-				</p>
-				<div
-					class="relative rounded-xl border bg-card p-4 font-mono text-[0.8rem]"
-				>
-					<pre class="overflow-x-auto">{mcp_config}</pre>
-					<div class="absolute top-2 right-2">
-						<CopyButton text={mcp_config} label="Copy MCP config" />
-					</div>
-				</div>
-			</Tabs.Content>
+							<p class="text-muted-foreground">
+								For MCP clients, add <code
+									class="font-mono text-[0.9em]">@wiki0/mcp</code
+								>. The agent gets search, show, lint, index and the
+								link graph as tools.
+							</p>
+							{@render code_block(mcp, 'Copy MCP config')}
+						</div>
+					{/snippet}
+				</Tabs.Content>
+			</div>
 		</Tabs.Root>
 	</section>
 </div>
@@ -140,5 +147,89 @@
 		font-weight: 760;
 		line-height: 0.98;
 		letter-spacing: -0.035em;
+	}
+
+	/* Every panel shares one cell, so the box is always as tall as the
+	   tallest and switching tabs only crossfades */
+	.panels {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		margin-top: 1rem;
+	}
+
+	.panel {
+		grid-area: 1 / 1;
+		min-width: 0;
+		transition:
+			opacity 0.35s ease,
+			transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+			visibility 0s linear 0s;
+	}
+
+	.panel[data-state='inactive'] {
+		opacity: 0;
+		transform: translateY(0.5rem);
+		visibility: hidden;
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease,
+			visibility 0s linear 0.2s;
+	}
+
+	.code {
+		position: relative;
+		overflow: hidden;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-xl);
+		background: #1c0a3d;
+		color: #ede9fe;
+	}
+
+	.copy {
+		position: absolute;
+		top: 0.4rem;
+		right: 0.4rem;
+	}
+
+	.code :global(.twinkleplop) {
+		margin: 0;
+		padding: 1rem 3rem 1rem 0;
+		background: transparent;
+		color: inherit;
+		font-size: 0.82rem;
+		line-height: 1.7;
+		overflow-x: auto;
+	}
+
+	.code :global(.l) {
+		padding-inline: 1.1rem;
+	}
+
+	.code :global(:is(.comment)) {
+		color: #8b7db5;
+		font-style: normal;
+	}
+
+	.code :global(:is(.string)) {
+		color: #fde68a;
+	}
+
+	.code :global(:is(.property)) {
+		color: #c4b5fd;
+	}
+
+	.code :global(:is(.function, .command)) {
+		color: #93c5fd;
+	}
+
+	.code :global(:is(.punctuation, .operator)) {
+		color: #a99bcf;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.panel,
+		.panel[data-state='inactive'] {
+			transition: none;
+		}
 	}
 </style>

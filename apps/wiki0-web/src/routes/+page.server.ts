@@ -28,6 +28,7 @@ import {
 	type SimulationLinkDatum,
 	type SimulationNodeDatum,
 } from 'd3-force';
+import { highlight } from '#lib/highlight.server.js';
 import type { PageServerLoad } from './$types';
 
 const story_document = (path: string): StoryDocument => {
@@ -148,6 +149,7 @@ function skyline(limit: number): Skyline {
 			position,
 			tokens: chunk.tokens,
 			citation: chunk.citation,
+			heading: chunk.heading,
 		})),
 	);
 	const longest = Math.max(
@@ -193,6 +195,53 @@ function whole_files(
 	return kept;
 }
 
+const mcp_config = JSON.stringify(
+	{
+		mcpServers: {
+			wiki0: { command: 'npx', args: ['-y', '@wiki0/mcp'] },
+		},
+	},
+	null,
+	2,
+);
+
+const cli_commands = [
+	'# Index the project docs',
+	'npx @wiki0/cli index',
+	'',
+	'# One cited section per document',
+	'npx @wiki0/cli search "how do deploys work"',
+	'',
+	'# Read a cited section',
+	'npx @wiki0/cli show docs/deploys.md:12-40',
+	'',
+	'# Broken links and anchors',
+	'npx @wiki0/cli lint',
+	'',
+	'# Open the local docs browser',
+	'npx @wiki0/cli ui',
+].join('\n');
+
+// The cited lines with a few lines of the file either side, numbered
+// as in the file
+function excerpt(document: StoryDocument, citation: string) {
+	const [start, end] = (citation.split(':').at(-1) ?? '')
+		.split('-')
+		.map(Number) as [number, number];
+	const lines = document.source.replace(/\n$/u, '').split('\n');
+	const from = Math.max(1, start - 4);
+	const to = Math.min(lines.length, end + 2);
+	return {
+		from,
+		to,
+		html: highlight(
+			lines.slice(from - 1, to).join('\n'),
+			'markdown',
+			`showLineNumbers{${from}} {${start - from + 1}-${end - from + 1}}`,
+		),
+	};
+}
+
 export const load: PageServerLoad = () => {
 	const [superseded_path, current_path] = documents.map(
 		(document) => document.path,
@@ -217,6 +266,14 @@ export const load: PageServerLoad = () => {
 			citation: show.citation,
 			markdown: show.markdown,
 			tokens: show.tokens,
+			html: highlight(show.markdown, 'markdown'),
+		},
+		code: {
+			hero: excerpt(current, show.citation),
+			mcp: highlight(mcp_config, 'json'),
+			mcp_text: mcp_config,
+			cli: highlight(cli_commands, 'bash'),
+			cli_text: cli_commands,
 		},
 		skyline: skyline(12),
 		graph: { nodes: link_graph.nodes, edges: link_graph.edges },

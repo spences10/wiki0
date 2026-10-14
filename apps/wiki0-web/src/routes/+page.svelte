@@ -30,7 +30,12 @@
 	Skip to content
 </a>
 
-<Hero current={data.current} citation={data.show.citation} {repo} />
+<Hero
+	citation={data.show.citation}
+	tokens={data.current_chunks[0]?.tokens ?? data.show.tokens}
+	code={data.code.hero}
+	{repo}
+/>
 
 <main id="main">
 	<Problem
@@ -58,7 +63,10 @@
 		superseded={data.superseded.path}
 	/>
 	<UiSection />
-	<UseIt />
+	<UseIt
+		cli={{ html: data.code.cli, text: data.code.cli_text }}
+		mcp={{ html: data.code.mcp, text: data.code.mcp_text }}
+	/>
 </main>
 
 <footer

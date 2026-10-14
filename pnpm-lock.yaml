@@ -411,6 +411,18 @@ importers:
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@24.19.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
+      '@twinkleplop/bash':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/json':
+        specifier: 'catalog:'
+        version: 0.1.7
+      '@twinkleplop/markdown':
+        specifier: 'catalog:'
+        version: 0.2.1
+      '@twinkleplop/markdown-core':
+        specifier: 'catalog:'
+        version: 0.2.1
       '@types/d3-force':
         specifier: 'catalog:'
         version: 3.0.10

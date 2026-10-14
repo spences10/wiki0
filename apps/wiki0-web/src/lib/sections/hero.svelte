@@ -1,25 +1,23 @@
 <script lang="ts">
 	import CopyButton from '#lib/components/copy-button.svelte';
-	import { lines_of, type StoryDocument } from '#lib/story.js';
 
 	let {
-		current,
 		citation,
+		tokens,
+		code,
 		repo,
-	}: { current: StoryDocument; citation: string; repo: string } =
-		$props();
+	}: {
+		citation: string;
+		tokens: number;
+		code: { from: number; to: number; html: string };
+		repo: string;
+	} = $props();
 
 	const [path, range] = $derived(
 		citation.split(':') as [string, string],
 	);
-	const [start, end] = $derived(
-		range.split('-').map(Number) as [number, number],
-	);
-	const excerpt = $derived(
-		lines_of(current.source)
-			.slice(start - 1, end)
-			.map((text, offset) => ({ number: start + offset, text })),
-	);
+	const folders = $derived(path.split('/').slice(0, -1));
+	const file = $derived(path.split('/').at(-1) ?? path);
 	const prompt =
 		'Use pnpx @wiki0/cli to find where we decided how the index is stored.';
 </script>
@@ -74,7 +72,7 @@
 
 	<section
 		aria-labelledby="hero-title"
-		class="mx-auto grid max-w-7xl gap-12 px-4 pt-10 pb-24 sm:px-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-center lg:pt-20 lg:pb-32"
+		class="mx-auto grid max-w-7xl gap-12 px-4 pt-10 pb-24 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:pt-16 lg:pb-32"
 	>
 		<div class="grid content-start gap-7">
 			<h1 id="hero-title" class="headline">
@@ -85,7 +83,7 @@
 				coding agent the current section with its file and line range,
 				so it reads a section instead of whole files.
 			</p>
-			<div class="grid max-w-136 gap-2">
+			<div class="grid max-w-[34rem] gap-2">
 				<p class="text-sm text-muted-foreground">Ask your agent:</p>
 				<div
 					class="flex items-start gap-2 rounded-xl border bg-card py-2.5 pr-2 pl-4"
@@ -96,23 +94,51 @@
 			</div>
 		</div>
 
-		<figure class="card" aria-label="A wiki0 citation">
-			<p class="cite font-mono">
-				<span class="path">{path}</span><span class="range"
-					>:{range}</span
-				>
-			</p>
-			<ol class="excerpt font-mono">
-				{#each excerpt as line, index (line.number)}
-					<li style:--i={index}>
-						<span class="number">{line.number}</span>
-						<span class="text">{line.text || ' '}</span>
-					</li>
+		<figure class="editor" aria-label="The cited section, {citation}">
+			<div class="titlebar" aria-hidden="true">
+				<span class="lights">
+					<span></span><span></span><span></span>
+				</span>
+				<span class="tab">
+					<svg
+						viewBox="0 0 16 16"
+						class="size-3.5"
+						aria-hidden="true"
+					>
+						<path
+							d="M2 4.5h12v7H2zM4 9.5v-3l1.5 1.8L7 6.5v3m3-3v3m-1.3-1.3L10 9.5l1.3-1.3"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.1"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					{file}
+				</span>
+			</div>
+			<p class="crumbs">
+				{#each folders as folder (folder)}
+					<span>{folder}</span><span class="sep" aria-hidden="true"
+						>›</span
+					>
 				{/each}
-			</ol>
-			<figcaption class="text-sm text-muted-foreground">
-				The current decision on where wiki0 keeps its index, cited
-				from this repo's docs.
+				<span class="current">{file}</span>
+			</p>
+			<div class="code">
+				<!-- Highlighted at build time from this repo's own docs -->
+				{@html code.html}
+				<span
+					class="cite-tag"
+					style:--top={(Number(range.split('-')[0]) - code.from) /
+						(code.to - code.from + 1)}
+				>
+					cited :{range}
+				</span>
+			</div>
+			<figcaption class="statusbar">
+				<span>Markdown</span>
+				<span>Lines {range} cited</span>
+				<span>{tokens} tokens</span>
 			</figcaption>
 		</figure>
 	</section>
@@ -120,7 +146,7 @@
 
 <style>
 	.headline {
-		font-size: clamp(3rem, 7.4vw, 7rem);
+		font-size: clamp(3rem, 6.6vw, 6.4rem);
 		font-stretch: 125%;
 		font-weight: 800;
 		line-height: 0.92;
@@ -134,63 +160,165 @@
 		color: var(--muted-foreground);
 	}
 
-	.card {
-		display: grid;
-		gap: 1rem;
+	/* A dark editor on the violet band */
+	.editor {
+		--editor: #1c0a3d;
+		--editor-line: color-mix(in oklab, #ffffff 9%, var(--editor));
 		min-width: 0;
+		overflow: hidden;
+		border: 1px solid color-mix(in oklab, #ffffff 16%, var(--editor));
+		border-radius: 0.9rem;
+		background: var(--editor);
+		color: #ede9fe;
+		box-shadow: 0 50px 90px -40px rgb(10 2 30 / 0.85);
 	}
 
-	.cite {
-		font-size: clamp(0.85rem, 1.3vw, 1.2rem);
-		overflow-wrap: anywhere;
-		line-height: 1.4;
+	.titlebar {
+		display: flex;
+		align-items: stretch;
+		gap: 1rem;
+		padding-left: 0.9rem;
+		background: color-mix(in oklab, #000000 25%, var(--editor));
+		font-size: 0.78rem;
 	}
 
-	.path {
-		color: var(--muted-foreground);
+	.lights {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
 	}
 
-	.range {
-		padding: 0.1em 0.4em;
-		margin-left: 0.1em;
-		border-radius: var(--radius-sm);
-		background: #ffffff;
-		color: #4c1d95;
-		font-weight: 700;
+	.lights span {
+		width: 0.65rem;
+		height: 0.65rem;
+		border-radius: 999px;
+		background: color-mix(in oklab, #ffffff 22%, var(--editor));
 	}
 
-	.excerpt {
-		padding-block: 0.9rem;
-		border-radius: var(--radius-xl);
-		background: #ffffff;
-		color: #1f1235;
-		font-size: clamp(0.75rem, 1vw, 0.95rem);
-		line-height: 1.65;
-		box-shadow: 0 40px 80px -30px rgb(15 5 40 / 0.6);
+	.tab {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.55rem 0.9rem;
+		background: var(--editor);
+		border-top: 2px solid #c4b5fd;
+		font-family: var(--font-mono);
 	}
 
-	.excerpt li {
+	.crumbs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		padding: 0.45rem 1rem;
+		border-bottom: 1px solid var(--editor-line);
+		font-size: 0.75rem;
+		color: #a99bcf;
+	}
+
+	.crumbs .current {
+		color: #ede9fe;
+	}
+
+	.code {
+		position: relative;
+		font-size: clamp(0.72rem, 0.95vw, 0.88rem);
+	}
+
+	.code :global(.twinkleplop) {
+		margin: 0;
+		padding-block: 0.75rem;
+		background: transparent;
+		color: #ede9fe;
+		line-height: 1.75;
+		white-space: pre-wrap;
+		overflow: hidden;
+	}
+
+	.code :global(.twinkleplop code) {
 		display: grid;
-		grid-template-columns: 3rem minmax(0, 1fr);
-		padding-inline-end: 1rem;
-		background: color-mix(in oklab, #7c3aed 9%, transparent);
-		box-shadow: inset 3px 0 0 #7c3aed;
+		width: 100%;
 	}
 
-	.number {
-		color: #7c6a9c;
+	/* Each line wraps under its own text, its number in the gutter */
+	.code :global(.l) {
+		position: relative;
+		display: block;
+		min-height: 1lh;
+		padding: 0 1rem 0 3.75rem;
+		overflow-wrap: anywhere;
+	}
+
+	.code :global(.ln) {
+		position: absolute;
+		left: 0;
+		width: 2.75rem;
 		text-align: right;
-		padding-right: 1rem;
+		color: #7d6ea8;
 		user-select: none;
 	}
 
-	.text {
-		white-space: pre-wrap;
-		overflow-wrap: anywhere;
+	.code :global(.l.highlight) {
+		background: rgb(196 181 253 / 0.14);
+		box-shadow: inset 3px 0 0 #c4b5fd;
 	}
 
-	/* One sequence on load: the mark draws, the path types out, the
-	   range lands, then its lines unfold. */
+	.code :global(.l.highlight .ln) {
+		color: #e9d5ff;
+	}
+
+	/* Markdown tokens */
+	.code :global(.heading_marker) {
+		color: #a78bfa;
+	}
+
+	.code :global(.heading) {
+		color: #ffffff;
+		font-weight: 700;
+	}
+
+	.code :global(.code) {
+		color: #fde68a;
+	}
+
+	.code :global(:is(.link_text, .link_text_open, .link_text_close)) {
+		color: #93c5fd;
+	}
+
+	.code :global(:is(.link_destination, .url)) {
+		color: #a5b4fc;
+		text-decoration: underline;
+		text-decoration-color: rgb(165 180 252 / 0.4);
+	}
+
+	.code :global([class*='front_matter']) {
+		color: #8b7db5;
+	}
+
+	.cite-tag {
+		position: absolute;
+		top: calc(0.75rem + var(--top) * (100% - 1.5rem));
+		right: 0.75rem;
+		padding: 0.1rem 0.55rem;
+		border-radius: 999px;
+		background: #c4b5fd;
+		color: #2e1065;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		font-weight: 700;
+	}
+
+	.statusbar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.25rem;
+		padding: 0.4rem 1rem;
+		background: #6d28d9;
+		color: #f5f3ff;
+		font-size: 0.72rem;
+	}
+
+	/* One sequence on load: the mark draws, the editor settles in, then
+	   the cited lines light up and are tagged. */
 	@media (prefers-reduced-motion: no-preference) {
 		.ring,
 		.slash {
@@ -207,18 +335,15 @@
 		.headline {
 			animation: land 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
 		}
-		.cite .path {
-			display: inline-block;
-			clip-path: inset(0 100% 0 0);
-			animation: type 0.9s steps(40, end) 0.35s forwards;
+		.editor {
+			animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s both;
 		}
-		.cite .range {
-			display: inline-block;
-			animation: pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) 1.25s both;
-		}
-		.excerpt li {
-			animation: land 0.45s ease-out calc(1.6s + var(--i) * 0.05s)
+		.code :global(.l.highlight) {
+			animation: light 0.6s ease-out calc(1s + var(--i, 0) * 60ms)
 				both;
+		}
+		.cite-tag {
+			animation: pop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) 1.5s both;
 		}
 	}
 
@@ -228,23 +353,31 @@
 		}
 	}
 
-	@keyframes type {
-		to {
-			clip-path: inset(0 0 0 0);
+	@keyframes land {
+		from {
+			opacity: 0;
+			transform: translateY(0.75rem);
+		}
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(2rem) scale(0.97);
+		}
+	}
+
+	@keyframes light {
+		from {
+			background: transparent;
+			box-shadow: inset 0 0 0 #c4b5fd;
 		}
 	}
 
 	@keyframes pop {
 		from {
 			opacity: 0;
-			transform: translateY(0.4em) scale(1.5);
-		}
-	}
-
-	@keyframes land {
-		from {
-			opacity: 0;
-			transform: translateY(1rem);
+			transform: scale(0.4);
 		}
 	}
 </style>

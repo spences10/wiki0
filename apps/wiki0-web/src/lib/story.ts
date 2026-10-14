@@ -47,6 +47,7 @@ export type Tower = {
 	position: number;
 	tokens: number;
 	citation: string;
+	heading: string | null;
 };
 
 export type Skyline = {
