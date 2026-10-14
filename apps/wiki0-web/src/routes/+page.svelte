@@ -1,21 +1,77 @@
+<script lang="ts">
+	import UseIt from '#lib/sections/use-it.svelte';
+	import Cite from '#lib/sections/cite.svelte';
+	import Hero from '#lib/sections/hero.svelte';
+	import IndexSection from '#lib/sections/index-section.svelte';
+	import Links from '#lib/sections/links.svelte';
+	import Problem from '#lib/sections/problem.svelte';
+	import Rerank from '#lib/sections/rerank.svelte';
+	import UiSection from '#lib/sections/ui-section.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+
+	const repo = 'https://github.com/spences10/wiki0';
+	const description =
+		'wiki0 searches the docs already in your repo and gives your coding agent the current section with a path:start-end citation, so it reads a section instead of whole files.';
+</script>
+
 <svelte:head>
 	<title>wiki0: cited search over your project's docs</title>
-	<meta
-		name="description"
-		content="wiki0 searches the docs already in a repo and returns the right section with a path:start-end citation, so coding agents read a section instead of whole documents."
-	/>
+	<meta name="description" content={description} />
+	<meta property="og:title" content="wiki0" />
+	<meta property="og:description" content={description} />
 </svelte:head>
 
-<main
-	class="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-4 px-4"
+<a
+	href="#main"
+	class="sr-only z-50 rounded-md bg-primary px-3 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
 >
-	<h1 class="text-4xl">wiki0</h1>
-	<p class="text-muted-foreground">
-		Search a project's docs and get the right section with a
-		<code class="font-mono text-sm">path:start-end</code> citation, so agents
-		don't read whole documents.
-	</p>
-	<pre class="font-mono text-sm"><code
-			>npx @wiki0/cli search "how do deploys work"</code
-		></pre>
+	Skip to content
+</a>
+
+<Hero current={data.current} citation={data.show.citation} {repo} />
+
+<main id="main">
+	<Problem
+		files={data.whole_files}
+		superseded={data.superseded}
+		current={data.current}
+	/>
+	<IndexSection
+		current={data.current}
+		chunks={data.current_chunks}
+		skyline={data.skyline}
+		counts={data.counts}
+	/>
+	<Rerank
+		rows={data.rank}
+		query={data.query}
+		citation={data.show.citation}
+	/>
+	<Cite current={data.current} show={data.show} />
+	<Links
+		graph={data.graph}
+		lint={data.lint}
+		counts={data.counts}
+		current={data.current.path}
+		superseded={data.superseded.path}
+	/>
+	<UiSection />
+	<UseIt />
 </main>
+
+<footer
+	class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-10 text-sm text-muted-foreground sm:px-8"
+>
+	<p>wiki0 is MIT licensed.</p>
+	<ul class="flex gap-4">
+		<li><a class="hover:text-foreground" href={repo}>GitHub</a></li>
+		<li>
+			<a
+				class="hover:text-foreground"
+				href="https://www.npmjs.com/package/@wiki0/cli">npm</a
+			>
+		</li>
+	</ul>
+</footer>

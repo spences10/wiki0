@@ -159,6 +159,70 @@
 	}
 }
 
+/* A counter the scroll can animate (see the problem section) */
+@property --lines-read {
+	syntax: '<integer>';
+	inherits: true;
+	initial-value: 0;
+}
+
+/* Scroll-scrubbed motion. Without support or with reduced motion,
+   everything shows its finished state; layout never changes. */
+@keyframes scrub-lift {
+	from {
+		opacity: 0;
+		transform: translateY(4rem) scale(0.97);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	@supports (animation-timeline: view()) {
+		.scrub-in {
+			animation: scrub-lift linear both;
+			animation-timeline: view();
+			animation-range: entry 0% cover 30%;
+		}
+	}
+}
+
+/* Full-bleed violet bands for the hero and the chart showcases. They
+   redefine the tokens, so components inside need no special case. */
+.band {
+	--background: #4c1d95;
+	--foreground: #ffffff;
+	--card: color-mix(in oklab, #ffffff 9%, #4c1d95);
+	--card-foreground: #ffffff;
+	--muted: color-mix(in oklab, #ffffff 12%, #4c1d95);
+	--muted-foreground: color-mix(in oklab, #ffffff 74%, #4c1d95);
+	--border: color-mix(in oklab, #ffffff 20%, #4c1d95);
+	--input: var(--border);
+	--primary: #ffffff;
+	--primary-foreground: #4c1d95;
+	--accent: #e9d5ff;
+	--accent-foreground: #2e1065;
+	--signal: #c4b5fd;
+	--ring: #e9d5ff;
+	--destructive: #fda4af;
+	--chart-1: #e9d5ff;
+	--chart-2: #93c5fd;
+	--chart-3: #6ee7b7;
+	--chart-4: #fdba74;
+	--chart-5: #fde68a;
+	background: var(--background);
+	color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+	.band {
+		--background: #2e1065;
+		--card: color-mix(in oklab, #ffffff 7%, #2e1065);
+		--muted: color-mix(in oklab, #ffffff 10%, #2e1065);
+		--muted-foreground: color-mix(in oklab, #ffffff 70%, #2e1065);
+		--border: color-mix(in oklab, #ffffff 16%, #2e1065);
+		--primary-foreground: #2e1065;
+	}
+}
+
 /* shadcn custom variants */
 @custom-variant data-open {
 	&:where([data-state='open']),
