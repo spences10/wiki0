@@ -6,16 +6,12 @@ minimumReleaseAge: 2880
 
 catalog:
   '@changesets/cli': ^3.0.3
-  '@fontsource-variable/inter': ^5.2.8
   '@fontsource-variable/martian-mono': ^5.3.0
   '@fontsource-variable/mona-sans': ^5.3.0
-  '@internationalized/date': ^3.12.2
-  '@layerstack/svelte-actions': ^1.0.1
-  '@layerstack/utils': ^1.0.1
   '@lucide/svelte': ^1.55.0
   '@playwright/test': ^1.64.0
-  '@sveltejs/adapter-auto': ^7.0.1
-  '@sveltejs/kit': ^2.70.3
+  '@sveltejs/adapter-static': ^4.0.0
+  '@sveltejs/kit': ^3.0.1
   '@sveltejs/vite-plugin-svelte': ^7.3.1
   '@tailwindcss/typography': ^0.5.20
   '@tailwindcss/vite': ^4.3.3
@@ -45,21 +41,17 @@ catalog:
   '@twinkleplop/yaml': ^0.1.7
   '@types/d3-force': ^3.0.10
   '@types/d3-scale': ^4.0.9
-  '@types/d3-shape': ^3.1.8
   '@types/node': ^24.0.0
   '@typescript/native': npm:typescript@^7.0.2
-  '@vitest/browser-playwright': 5.0.3
   bits-ui: ^2.19.5
   citty: ^0.2.2
   clsx: ^2.1.1
   d3-force: ^3.0.0
   d3-scale: ^4.0.2
-  d3-shape: ^3.2.0
   github-slugger: ^2.0.0
   layerchart: ^2.7.0
   mammoth: ^1.13.0
   marked: ^18.1.1
-  mdsvex: ^0.12.8
   pdf-parse: ^2.4.5
   playwright: ^1.64.0
   shadcn-svelte: ^1.7.0
@@ -76,7 +68,6 @@ catalog:
   vite: npm:@voidzero-dev/vite-plus-core@1.1.0
   vite-plus: 1.1.0
   vitest: 5.0.3
-  vitest-browser-svelte: ^3.1.0
   yaml: ^2.9.1
 
 catalogs:

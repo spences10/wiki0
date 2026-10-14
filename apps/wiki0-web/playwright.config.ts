@@ -5,5 +5,6 @@ export default defineConfig({
 		command: 'vp preview',
 		port: 4173,
 	},
-	testMatch: '**/*.e2e.{ts,js}',
+	testDir: 'test',
+	testMatch: '**/*.e2e.ts',
 });

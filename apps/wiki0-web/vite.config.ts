@@ -1,40 +1,21 @@
+import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import { playwright } from 'vite-plus/test/browser-playwright';
 import { defineConfig } from 'vite-plus';
 
-const config = {
-	plugins: [tailwindcss(), sveltekit()],
-	ssr: {
-		external: ['@wiki0/core'],
-	},
-	test: {
-		expect: { requireAssertions: true },
-		projects: [
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'client',
-					browser: {
-						enabled: true,
-						provider: playwright(),
-						instances: [{ browser: 'chromium', headless: true }],
-					},
-					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/server/**'],
-				},
+export default defineConfig({
+	plugins: [
+		tailwindcss(),
+		sveltekit({
+			// Every page is prerendered; the build is a static site.
+			adapter: adapter({ strict: true }),
+			compilerOptions: {
+				// Force runes mode for the project, except for libraries.
+				runes: ({ filename }) =>
+					filename.split(/[/\\]/).includes('node_modules')
+						? undefined
+						: true,
 			},
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'server',
-					environment: 'node',
-					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-				},
-			},
-		],
-	},
-};
-
-export default defineConfig(config as never);
+		}),
+	],
+});
