@@ -1,6 +1,7 @@
 export {
 	default_detached_idle_timeout_ms,
 	launch_ui,
+	parse_port,
 	probe_ui_server,
 	serve_ui,
 	type LaunchOptions,

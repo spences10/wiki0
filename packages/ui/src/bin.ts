@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
-import { launch_ui, serve_ui } from './launch.js';
+import { launch_ui, parse_port, serve_ui } from './launch.js';
 
 const usage = `Usage: wiki0-ui [options]
 
@@ -31,15 +31,6 @@ const { positionals, values } = parseArgs({
 		help: { type: 'boolean', short: 'h' },
 	},
 });
-
-function parse_port(value: string | undefined): number | undefined {
-	if (value === undefined) return undefined;
-	const port = Number(value);
-	if (!Number.isInteger(port) || port < 0 || port > 65535) {
-		throw new Error(`Invalid port: ${value}`);
-	}
-	return port;
-}
 
 try {
 	if (values.help) {

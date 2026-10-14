@@ -11,6 +11,7 @@ import {
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
 import { print_json } from './actions.js';
+import { run_ui } from './ui.js';
 
 const root_arg = {
 	root: {
@@ -194,6 +195,54 @@ export const main = defineCommand({
 				print_json(
 					backlinks_for_page(String(args.target), String(args.root)),
 				);
+			},
+		}),
+		ui: defineCommand({
+			meta: {
+				description:
+					'Open the project docs in the browser; prints the URL and reuses a running server',
+			},
+			args: {
+				...root_arg,
+				host: {
+					type: 'string',
+					description: 'Host to bind (default: 127.0.0.1)',
+				},
+				port: {
+					type: 'string',
+					description:
+						'Port (default: 4100 or WIKI0_UI_PORT; a busy port falls back)',
+				},
+				open: {
+					type: 'boolean',
+					description:
+						'Open a browser (--no-open to only print the URL)',
+					default: true,
+				},
+				detach: {
+					type: 'boolean',
+					description:
+						'Run in the background and return (default when not in a terminal)',
+				},
+				foreground: {
+					type: 'boolean',
+					description: 'Stay in the foreground until Ctrl-C',
+				},
+				stop: {
+					type: 'boolean',
+					description: 'Stop the server for this project',
+				},
+			},
+			async run({ args }) {
+				await run_ui({
+					root: String(args.root),
+					host: args.host,
+					port: args.port,
+					open: args.open,
+					detach: args.detach,
+					foreground: args.foreground,
+					stop: args.stop,
+				});
 			},
 		}),
 	},

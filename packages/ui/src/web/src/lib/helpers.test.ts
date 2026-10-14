@@ -22,6 +22,8 @@ import {
 	parse_route,
 } from './router.js';
 
+// Only the fields the helpers read; cast so new core fields don't
+// break the fixture.
 function doc(path: string, title = path): DocumentSummary {
 	return {
 		path,
@@ -37,7 +39,7 @@ function doc(path: string, title = path): DocumentSummary {
 		headings: [],
 		in_link_count: 0,
 		out_link_count: 0,
-	};
+	} as Partial<DocumentSummary> as DocumentSummary;
 }
 
 function url(href: string): URL {

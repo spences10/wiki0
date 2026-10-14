@@ -1,8 +1,8 @@
+import { spawnSync } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -23,6 +23,7 @@ const packages = [
 			'package/dist/index.js',
 			'package/dist/bin.js',
 			'package/dist/web/index.html',
+			'package/dist/web/favicon.svg',
 		],
 		executable: 'package/dist/bin.js',
 	},
@@ -137,6 +138,16 @@ try {
 	]);
 	if (!cli.stdout.includes('USAGE')) {
 		throw new Error('CLI help smoke test returned unexpected output');
+	}
+	const cli_ui = run(process.execPath, [
+		'packages/cli/dist/index.js',
+		'ui',
+		'--help',
+	]);
+	if (!cli_ui.stdout.includes('--detach')) {
+		throw new Error(
+			'CLI ui help smoke test returned unexpected output',
+		);
 	}
 	console.log('Verified @wiki0/cli binary');
 

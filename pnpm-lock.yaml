@@ -522,6 +522,9 @@ importers:
       '@wiki0/core':
         specifier: workspace:*
         version: link:../core
+      '@wiki0/ui':
+        specifier: workspace:*
+        version: link:../ui
       citty:
         specifier: 'catalog:'
         version: 0.2.2

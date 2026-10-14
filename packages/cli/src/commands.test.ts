@@ -13,6 +13,7 @@ describe('main command', () => {
 			'graph',
 			'documents',
 			'backlinks',
+			'ui',
 		]);
 	});
 });

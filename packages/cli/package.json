@@ -36,6 +36,7 @@
 	},
 	"dependencies": {
 		"@wiki0/core": "workspace:*",
+		"@wiki0/ui": "workspace:*",
 		"citty": "catalog:"
 	},
 	"devDependencies": {

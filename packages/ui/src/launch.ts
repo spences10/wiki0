@@ -49,6 +49,18 @@ export type LaunchOptions = {
 	bin_path?: string;
 };
 
+// A port from a flag or WIKI0_UI_PORT; 0 picks a free port.
+export function parse_port(
+	value: string | undefined,
+): number | undefined {
+	if (value === undefined || value === '') return undefined;
+	const port = Number(value);
+	if (!Number.isInteger(port) || port < 0 || port > 65535) {
+		throw new Error(`Invalid port: ${value}`);
+	}
+	return port;
+}
+
 export type LaunchResult =
 	| { status: 'running' | 'started'; url: string; pid: number }
 	| { status: 'foreground'; url: string; server: RunningUiServer }

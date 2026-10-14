@@ -9,6 +9,7 @@ import {
 } from 'vite-plus/test';
 import {
 	launch_ui,
+	parse_port,
 	probe_ui_server,
 	type LaunchResult,
 } from './launch.js';
@@ -55,6 +56,17 @@ async function launch(options: Parameters<typeof launch_ui>[0]) {
 	results.push(result);
 	return result;
 }
+
+describe('parse_port', () => {
+	it('accepts 0 to 65535 and nothing else', () => {
+		expect(parse_port(undefined)).toBeUndefined();
+		expect(parse_port('')).toBeUndefined();
+		expect(parse_port('0')).toBe(0);
+		expect(parse_port('4100')).toBe(4100);
+		expect(() => parse_port('65536')).toThrow('Invalid port');
+		expect(() => parse_port('abc')).toThrow('Invalid port');
+	});
+});
 
 describe('launch_ui', () => {
 	it('prints the URL first and records the server', async () => {
