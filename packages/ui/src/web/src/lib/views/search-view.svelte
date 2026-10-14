@@ -16,6 +16,7 @@
 	import { router } from '#lib/router.svelte.js';
 	import type { SearchResponse } from '@wiki0/core';
 	import ChartBarIcon from '@lucide/svelte/icons/chart-bar';
+	import FilePenIcon from '@lucide/svelte/icons/file-pen';
 	import HistoryIcon from '@lucide/svelte/icons/history';
 	import SearchIcon from '@lucide/svelte/icons/search';
 
@@ -184,6 +185,19 @@
 										{app.title_for(hit.superseded_by)}
 									</a>
 									instead.
+								</p>
+							{:else if hit.amended_by}
+								<p
+									class="flex items-center gap-1.5 text-sm text-muted-foreground"
+								>
+									<FilePenIcon class="size-4" />
+									Partly replaced by
+									<a
+										href="/docs/{encode_doc_path(hit.amended_by)}"
+										class="font-medium text-accent underline underline-offset-3"
+									>
+										{app.title_for(hit.amended_by)}
+									</a>; read it too.
 								</p>
 							{/if}
 							<Collapsible.Root>

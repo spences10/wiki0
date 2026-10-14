@@ -21,6 +21,7 @@
 	} from '@wiki0/core';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
+	import FilePenIcon from '@lucide/svelte/icons/file-pen';
 	import HistoryIcon from '@lucide/svelte/icons/history';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import { tick } from 'svelte';
@@ -101,6 +102,17 @@
 
 	const summary = $derived(
 		app.documents.find((document) => document.path === loaded?.path),
+	);
+
+	// Documents that amend this one: still current, but partly replaced.
+	const amended_by = $derived(
+		loaded
+			? app.documents
+					.filter((document) =>
+						document.amends.includes(loaded!.path),
+					)
+					.map((document) => document.path)
+			: [],
 	);
 
 	const rendered = $derived.by(() => {
@@ -320,6 +332,26 @@
 						</Alert.Description>
 					</Alert.Root>
 				{/if}
+				{#if amended_by.length > 0}
+					<Alert.Root>
+						<FilePenIcon />
+						<Alert.Title>Partly replaced</Alert.Title>
+						<Alert.Description>
+							<p>
+								Amended by
+								{#each amended_by as path, index (path)}
+									{index > 0 ? ', ' : ''}<a
+										href={doc_href(path)}
+										class="font-medium text-accent underline underline-offset-3"
+									>
+										{app.title_for(path)}
+									</a>
+								{/each}; read
+								{amended_by.length === 1 ? 'it' : 'them'} too.
+							</p>
+						</Alert.Description>
+					</Alert.Root>
+				{/if}
 				{#each loaded.document.warnings as warning (warning)}
 					<Alert.Root>
 						<TriangleAlertIcon />
@@ -369,6 +401,28 @@
 										class="text-muted-foreground line-through hover:text-foreground"
 									>
 										{app.title_for(old)}
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</section>
+				{/if}
+
+				{#if summary && summary.amends.length > 0}
+					<section class="space-y-2">
+						<h2
+							class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+						>
+							Amends
+						</h2>
+						<ul class="space-y-1 text-sm">
+							{#each summary.amends as amended (amended)}
+								<li>
+									<a
+										href={doc_href(amended)}
+										class="text-muted-foreground hover:text-foreground"
+									>
+										{app.title_for(amended)}
 									</a>
 								</li>
 							{/each}
