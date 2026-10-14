@@ -133,7 +133,13 @@ export function search(
 		);
 		const inlinks = inlink_counts(db);
 		const successors = successor_map(db);
-		const hits = rank_candidates(candidates, inlinks, successors)
+		const amended = amended_map(db);
+		const hits = rank_candidates(
+			candidates,
+			inlinks,
+			successors,
+			amended,
+		)
 			.filter(
 				(hit) =>
 					options.include_superseded !== false || !hit.superseded,
@@ -276,6 +282,7 @@ function rank_candidates(
 	candidates: Candidate[],
 	inlinks: Map<string, number>,
 	successors: Map<string, string>,
+	amended: Map<string, string>,
 ): RankedHit[] {
 	// Normalise per relaxation stage so scores are comparable; each
 	// later stage is worth a little less than an exact-terms match.
@@ -303,10 +310,17 @@ function rank_candidates(
 				candidate.tags.some((tag) =>
 					superseded_statuses.has(tag.toLowerCase()),
 				);
+			const amended_by = superseded
+				? null
+				: (amended.get(candidate.path) ?? null);
 			const max = stage_max.get(candidate.stage) || 1;
 			const parts: ScoreParts = {
 				text: (candidate.text_score / max) * 0.9 ** candidate.stage,
-				status: status_factor(candidate.status, superseded),
+				status: status_factor(
+					candidate.status,
+					superseded,
+					amended_by !== null,
+				),
 				type: type_factor(doc_type),
 				inlinks:
 					1 + 0.1 * Math.log(1 + (inlinks.get(candidate.path) ?? 0)),
@@ -342,6 +356,7 @@ function rank_candidates(
 					score: Number(score.toFixed(4)),
 					score_parts: round_parts(parts),
 					superseded_by,
+					amended_by,
 					more_in_doc: 0,
 				},
 			};
@@ -367,8 +382,11 @@ function one_per_document(
 function status_factor(
 	status: string | null,
 	superseded: boolean,
+	amended: boolean,
 ): number {
 	if (superseded) return 0.3;
+	// A newer doc replaces part of this one.
+	if (amended) return 0.9;
 	if (trusted_statuses.has(status ?? '')) return 1.05;
 	if (tentative_statuses.has(status ?? '')) return 0.85;
 	return 1;
@@ -443,6 +461,21 @@ function inlink_counts(db: WikiDatabase): Map<string, number> {
 		)
 		.all() as { to_path: string; count: number }[];
 	return new Map(rows.map((row) => [row.to_path, row.count]));
+}
+
+// Old path -> newer path for partial replacements (`Supersedes:` or
+// `Amends:` headers on the newer doc).
+function amended_map(db: WikiDatabase): Map<string, string> {
+	const rows = db
+		.prepare("SELECT path, amends FROM pages WHERE amends != '[]'")
+		.all() as { path: string; amends: string }[];
+	const amended = new Map<string, string>();
+	for (const row of rows) {
+		for (const old of JSON.parse(row.amends) as string[]) {
+			amended.set(old, row.path);
+		}
+	}
+	return amended;
 }
 
 // Old path -> newer path, from `supersedes` and `superseded_by`

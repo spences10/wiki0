@@ -74,6 +74,8 @@ export type SearchHit = {
 	score: number;
 	score_parts: ScoreParts;
 	superseded_by: string | null;
+	// A newer doc that replaces part of this one.
+	amended_by: string | null;
 	more_in_doc: number;
 };
 
@@ -192,6 +194,7 @@ export type DocumentSummary = {
 	aliases: string[];
 	supersedes: string[];
 	superseded_by: string | null;
+	amends: string[];
 	line_count: number;
 	headings: DocumentHeading[];
 	in_link_count: number;

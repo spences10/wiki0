@@ -43,6 +43,14 @@ tags, status, type, date, priority, supersedes, superseded_by. Invalid
 YAML produces a warning in the `index` output and the file is still
 indexed.
 
+Most ADR templates write status in the body instead, so wiki0 also
+reads header lines before the first `##` heading, and a `## Status`
+section: `Status:`, `Superseded by:` / `Replaced by:`, and
+`Supersedes:` / `Replaces:` / `Amends:` / `Amended by:`. References
+resolve from links on that line, or from ADR numbers such as `ADR-12`
+or `0005` that match a file in the same folder. Code:
+`packages/core/src/lifecycle.ts`.
+
 ## Staleness
 
 The index stores a SHA-256 of each file. `wiki0 status` compares them

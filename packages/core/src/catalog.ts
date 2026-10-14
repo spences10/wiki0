@@ -25,7 +25,7 @@ export function list_documents(root = '.'): DocumentSummary[] {
 		const pages = db
 			.prepare(
 				`SELECT path, title, kind, status, doc_type, doc_date, aliases,
-					supersedes, superseded_by, line_count
+					supersedes, superseded_by, amends, line_count
 				FROM pages ORDER BY path`,
 			)
 			.all() as {
@@ -38,6 +38,7 @@ export function list_documents(root = '.'): DocumentSummary[] {
 			aliases: string;
 			supersedes: string;
 			superseded_by: string | null;
+			amends: string;
 			line_count: number;
 		}[];
 		const headings = db
@@ -88,6 +89,7 @@ export function list_documents(root = '.'): DocumentSummary[] {
 			aliases: JSON.parse(page.aliases) as string[],
 			supersedes: JSON.parse(page.supersedes) as string[],
 			superseded_by: page.superseded_by,
+			amends: JSON.parse(page.amends) as string[],
 			line_count: page.line_count,
 			headings: outline.get(page.path) ?? [],
 			in_link_count: in_links.get(page.path) ?? 0,

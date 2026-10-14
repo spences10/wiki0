@@ -13,6 +13,11 @@ import {
 	list_project_files,
 } from './files.js';
 import {
+	numbered_references,
+	read_header_lifecycle,
+	type HeaderLifecycle,
+} from './lifecycle.js';
+import {
 	extract_anchors,
 	extract_links,
 	link_resolver,
@@ -46,6 +51,9 @@ type DocumentMeta = {
 	tags: string[];
 	supersedes: string[];
 	superseded_by: string | null;
+	// Paths this document partly replaces (from body headers such as
+	// `Supersedes:` or `Amends:`).
+	amends: string[];
 };
 
 type IndexedDocument = {
@@ -60,6 +68,7 @@ type IndexedDocument = {
 	chunks: DocumentChunk[];
 	links: ExtractedLink[];
 	anchors: Anchor[];
+	header: HeaderLifecycle;
 };
 
 export async function index_wiki(root = '.'): Promise<IndexResult> {
@@ -76,6 +85,18 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 		if (document) documents.push(document);
 	}
 
+	const resolve_link = link_resolver(
+		documents.map((document) => ({
+			path: document.path,
+			title: document.title,
+			aliases: document.meta.aliases,
+			anchors: document.anchors,
+			line_count: document.line_count,
+		})),
+		list_all_project_files(project_root),
+	);
+	apply_header_lifecycle(documents, resolve_link);
+
 	const db_path = resolve_index(project_root).index_path;
 	const db = open_index(project_root);
 	const indexed_at = new Date().toISOString();
@@ -87,23 +108,13 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 		db.exec(
 			'DELETE FROM fts_chunks; DELETE FROM page_chunks; DELETE FROM links; DELETE FROM anchors; DELETE FROM pages;',
 		);
-		const resolve_link = link_resolver(
-			documents.map((document) => ({
-				path: document.path,
-				title: document.title,
-				aliases: document.meta.aliases,
-				anchors: document.anchors,
-				line_count: document.line_count,
-			})),
-			list_all_project_files(project_root),
-		);
 		const insert_page = db.prepare(`
 			INSERT INTO pages (
 				path, title, body, content_hash, modified_at, line_count,
 				kind, status, doc_type, doc_date, priority, aliases, tags,
-				supersedes, superseded_by
+				supersedes, superseded_by, amends
 			)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`);
 		const insert_link = db.prepare(`
 			INSERT INTO links (
@@ -146,6 +157,7 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 				JSON.stringify(meta.tags),
 				JSON.stringify(meta.supersedes),
 				meta.superseded_by,
+				JSON.stringify(meta.amends),
 			).lastInsertRowid;
 
 			for (const link of document.links) {
@@ -275,6 +287,9 @@ async function read_project_document(
 			string_value(frontmatter.title) ??
 			first_h1(chunks_without_title) ??
 			fallback_title;
+		const header = read_header_lifecycle(content, line_offset);
+		const meta = document_meta(frontmatter);
+		meta.status ??= header.status;
 		return {
 			path,
 			kind,
@@ -283,10 +298,11 @@ async function read_project_document(
 			content_hash,
 			modified_at,
 			line_count: source.split('\n').length,
-			meta: document_meta(frontmatter),
+			meta,
 			chunks: chunk_markdown(content, title, line_offset),
 			links: extract_links(content, line_offset, frontmatter),
 			anchors: extract_anchors(content, line_offset),
+			header,
 		};
 	}
 
@@ -307,7 +323,52 @@ async function read_project_document(
 		chunks: chunk_plain_text(parsed.text, title),
 		links: [],
 		anchors: [],
+		header: { status: null, references: [] },
 	};
+}
+
+// Turns body header references into lifecycle links between indexed
+// documents. `Superseded by` on the old doc is a full replacement;
+// `Supersedes`/`Amends` on the new doc may cover only part of the old
+// one, so they count as amendments.
+function apply_header_lifecycle(
+	documents: IndexedDocument[],
+	resolve_link: ReturnType<typeof link_resolver>,
+): void {
+	const by_path = new Map(
+		documents.map((document) => [document.path, document]),
+	);
+	const paths = [...by_path.keys()];
+	for (const document of documents) {
+		for (const reference of document.header.references) {
+			const targets = new Set<string>();
+			for (const link of document.links) {
+				if (link.line !== reference.line) continue;
+				const resolved = resolve_link(document.path, link);
+				if (resolved.to_path && by_path.has(resolved.to_path)) {
+					targets.add(resolved.to_path);
+				}
+			}
+			for (const path of numbered_references(
+				reference.text,
+				document.path,
+				paths,
+			)) {
+				targets.add(path);
+			}
+			targets.delete(document.path);
+			for (const target of targets) {
+				if (reference.relation === 'superseded_by') {
+					document.meta.superseded_by ??= target;
+				} else if (reference.relation === 'amended_by') {
+					by_path.get(target)?.meta.amends.push(document.path);
+				} else {
+					document.meta.amends.push(target);
+				}
+			}
+		}
+		document.meta.amends = [...new Set(document.meta.amends)];
+	}
 }
 
 function document_meta(frontmatter: WikiFrontmatter): DocumentMeta {
@@ -324,6 +385,7 @@ function document_meta(frontmatter: WikiFrontmatter): DocumentMeta {
 		tags: string_list(frontmatter.tags),
 		supersedes: string_list(frontmatter.supersedes),
 		superseded_by: string_value(frontmatter.superseded_by),
+		amends: [],
 	};
 }
 
