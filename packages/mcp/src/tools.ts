@@ -269,9 +269,9 @@ export function register_wiki_tools(server: {
 			description: 'Rebuild the SQLite index for a wiki0 wiki',
 			schema: IndexWikiSchema,
 		},
-		async ({ root, wiki_dir }: IndexWikiInput) => {
+		async ({ root }: IndexWikiInput) => {
 			assert_mcp_writable('index_wiki');
-			return json_response(index_wiki(mcp_root(root), wiki_dir));
+			return json_response(await index_wiki(mcp_root(root)));
 		},
 	);
 
@@ -281,8 +281,8 @@ export function register_wiki_tools(server: {
 			description: 'Show index freshness and schema status',
 			schema: IndexStatusSchema,
 		},
-		async ({ root, wiki_dir }: IndexStatusInput) =>
-			json_response(index_status(mcp_root(root), wiki_dir)),
+		async ({ root }: IndexStatusInput) =>
+			json_response(index_status(mcp_root(root))),
 	);
 
 	tool(
@@ -321,10 +321,8 @@ export function register_wiki_tools(server: {
 			description: 'Retrieve indexed wiki0 context with citations',
 			schema: ContextWikiSchema,
 		},
-		async ({ query, root, limit, wiki_dir }: ContextWikiInput) =>
-			json_response(
-				get_wiki_context(query, mcp_root(root), limit, wiki_dir),
-			),
+		async ({ query, root, limit }: ContextWikiInput) =>
+			json_response(get_wiki_context(query, mcp_root(root), limit)),
 	);
 
 	tool(
@@ -334,10 +332,8 @@ export function register_wiki_tools(server: {
 				'Return the indexed wiki chunk for a page path/title, optionally with :line',
 			schema: ShowWikiChunkSchema,
 		},
-		async ({ target, root, wiki_dir }: ShowWikiChunkInput) =>
-			json_response(
-				show_wiki_chunk(target, mcp_root(root), wiki_dir),
-			),
+		async ({ target, root }: ShowWikiChunkInput) =>
+			json_response(show_wiki_chunk(target, mcp_root(root))),
 	);
 
 	tool(
@@ -346,10 +342,8 @@ export function register_wiki_tools(server: {
 			description: 'List resolved backlinks for a wiki0 page',
 			schema: BacklinksForPageSchema,
 		},
-		async ({ title, root, wiki_dir }: BacklinksForPageInput) =>
-			json_response(
-				backlinks_for_page(title, mcp_root(root), wiki_dir),
-			),
+		async ({ title, root }: BacklinksForPageInput) =>
+			json_response(backlinks_for_page(title, mcp_root(root))),
 	);
 
 	tool(

@@ -1,8 +1,7 @@
 import type { SQLOutputValue } from 'node:sqlite';
 import { log_wiki_event } from './events.js';
-import { resolve_page_path } from './pages.js';
 import { resolve_wiki_root } from './paths.js';
-import { show_wiki_chunk } from './search.js';
+import { find_indexed_path, show_wiki_chunk } from './search.js';
 import { open_index, type WikiDatabase } from './storage.js';
 import type {
 	Fact,
@@ -22,10 +21,10 @@ export function add_fact(fact: FactWriteOptions): Fact {
 	const db = open_index(wiki_root);
 	ensure_fact_provenance_columns(db);
 	const source_chunk = fact.source
-		? show_wiki_chunk(fact.source, wiki_root, fact.wiki_dir)
+		? show_wiki_chunk(fact.source, wiki_root)
 		: null;
 	const page_path = fact.page
-		? resolve_page_path(fact.page, wiki_root, fact.wiki_dir)
+		? find_indexed_path(db, fact.page)
 		: (source_chunk?.path ?? null);
 	const page = page_path
 		? (db

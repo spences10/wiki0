@@ -22,14 +22,14 @@ function default_wiki_root() {
 	return process.cwd();
 }
 
-export const load: PageServerLoad = ({ url }) => {
+export const load: PageServerLoad = async ({ url }) => {
 	const root = resolve(
 		url.searchParams.get('root') ??
 			process.env.WIKI0_ROOT ??
 			default_wiki_root(),
 	);
 	const status = index_status(root);
-	const indexed = status.stale ? index_wiki(root) : null;
+	const indexed = status.stale ? await index_wiki(root) : null;
 	const graph = graph_wiki(root);
 	const review = review_wiki(root);
 	const query = url.searchParams.get('q')?.trim() ?? '';

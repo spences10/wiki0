@@ -133,9 +133,7 @@ export async function sync_documents(
 	}
 
 	const indexed =
-		options.index === false
-			? null
-			: index_wiki(root, options.wiki_dir);
+		options.index === false ? null : await index_wiki(root);
 	const derived_facts = fact_inputs.map(({ page, fact }) =>
 		add_fact({
 			root,

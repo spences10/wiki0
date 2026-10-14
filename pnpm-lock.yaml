@@ -239,6 +239,9 @@ catalogs:
     mammoth:
       specifier: ^1.13.0
       version: 1.13.0
+    marked:
+      specifier: ^18.1.0
+      version: 18.1.0
     mdsvex:
       specifier: ^0.12.8
       version: 0.12.8
@@ -457,6 +460,9 @@ importers:
       mammoth:
         specifier: 'catalog:'
         version: 1.13.0
+      marked:
+        specifier: 'catalog:'
+        version: 18.1.0
       pdf-parse:
         specifier: 'catalog:'
         version: 2.4.5
@@ -2239,6 +2245,11 @@ packages:
   mammoth@1.13.0:
     resolution: {integrity: sha512-2cawcYFcP7ISfXbBcL9lmVgTNWo88v/52ND1gnywHtVT/pX0//puPnf0iMPV9ZgmuvNOE+zkIhDgZ9M2c2dDDg==}
     engines: {node: '>=12.0.0'}
+    hasBin: true
+
+  marked@18.1.0:
+    resolution: {integrity: sha512-PamYXWWWg2nboG3oX5Ffzpy3EFZROqZJK9hSlMmUnekp7TxPs5DcT95vwd46m73/exfKCRVMtgXoPMI4FEJL6w==}
+    engines: {node: '>= 20'}
     hasBin: true
 
   mdsvex@0.12.8:
@@ -4118,6 +4129,8 @@ snapshots:
       lop: 0.4.2
       underscore: 1.13.8
       xmlbuilder: 10.1.1
+
+  marked@18.1.0: {}
 
   mdsvex@0.12.8(svelte@5.57.1):
     dependencies:

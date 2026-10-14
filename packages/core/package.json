@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"mammoth": "catalog:",
+		"marked": "catalog:",
 		"pdf-parse": "catalog:",
 		"smol-toml": "catalog:",
 		"yaml": "catalog:"

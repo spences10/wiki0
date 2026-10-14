@@ -13,7 +13,7 @@ import {
 import { make_wiki_root } from './test-utils.js';
 
 describe('context and backlinks', () => {
-	it('retrieves context and resolved backlinks from the index', () => {
+	it('retrieves context and resolved backlinks from the index', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'projects/wiki0',
@@ -24,7 +24,7 @@ describe('context and backlinks', () => {
 			root,
 		});
 
-		index_wiki(root);
+		await index_wiki(root);
 
 		const context = get_wiki_context('agent', root, 1);
 		expect(context).toEqual({
@@ -32,7 +32,7 @@ describe('context and backlinks', () => {
 			warnings: [],
 			results: [
 				expect.objectContaining({
-					path: 'topics/memory.md',
+					path: 'wiki/topics/memory.md',
 					start_line: 1,
 				}),
 			],
@@ -42,7 +42,7 @@ describe('context and backlinks', () => {
 		});
 		expect(backlinks_for_page('topics/memory', root)).toEqual([
 			expect.objectContaining({
-				path: 'projects/wiki0.md',
+				path: 'wiki/projects/wiki0.md',
 				raw_text: '[[topics/memory|memory]]',
 				alias: 'memory',
 				embed: false,
@@ -50,19 +50,19 @@ describe('context and backlinks', () => {
 		]);
 	});
 
-	it('retrieves chunk results and known path line chunks', () => {
+	it('retrieves chunk results and known path line chunks', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'projects/wiki0',
-			'# wiki0\n\nIntro.\n\n## Retrieval\n\nAgents need exact cited chunks.\n\n## Other\n\nNoise.',
+			`# wiki0\n\n${'Intro detail. '.repeat(20)}\n\n## Retrieval\n\nAgents need exact cited chunks. ${'Retrieval detail. '.repeat(20)}\n\n## Other\n\n${'Noise detail. '.repeat(20)}`,
 			{ root },
 		);
-		index_wiki(root);
+		await index_wiki(root);
 
 		expect(search_wiki_chunks('exact cited chunks', root, 1)).toEqual(
 			[
 				expect.objectContaining({
-					path: 'projects/wiki0.md',
+					path: 'wiki/projects/wiki0.md',
 					heading: 'Retrieval',
 					start_line: 5,
 				}),
@@ -70,13 +70,13 @@ describe('context and backlinks', () => {
 		);
 		expect(show_wiki_chunk('projects/wiki0.md:6', root)).toEqual(
 			expect.objectContaining({
-				path: 'projects/wiki0.md',
+				path: 'wiki/projects/wiki0.md',
 				heading: 'Retrieval',
 			}),
 		);
 	});
 
-	it('boosts chunk results with frontmatter priority and status', () => {
+	it('boosts chunk results with frontmatter priority and status', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'archive/old',
@@ -88,19 +88,19 @@ describe('context and backlinks', () => {
 			'---\npriority: 20\nstatus: verified\ntags: [canonical]\n---\n# Current\n\nAgent context ranking.',
 			{ root },
 		);
-		index_wiki(root);
+		await index_wiki(root);
 
 		expect(
 			search_wiki_chunks('agent context ranking', root, 2)[0],
 		).toEqual(
-			expect.objectContaining({ path: 'decisions/current.md' }),
+			expect.objectContaining({ path: 'wiki/decisions/current.md' }),
 		);
 	});
 
-	it('warns when context uses a stale index', () => {
+	it('warns when context uses a stale index', async () => {
 		const root = make_wiki_root();
 		create_page('projects/wiki0', 'Stable indexed text.', { root });
-		index_wiki(root);
+		await index_wiki(root);
 		create_page('projects/new', 'Fresh unindexed text.', { root });
 
 		expect(get_wiki_context('indexed', root, 1)).toEqual(
@@ -111,27 +111,27 @@ describe('context and backlinks', () => {
 		);
 	});
 
-	it('treats user search text as plain text', () => {
+	it('treats user search text as plain text', async () => {
 		const root = make_wiki_root();
 		create_page('packages/core', '@wiki0/core powers wiki0.', {
 			root,
 		});
-		index_wiki(root);
+		await index_wiki(root);
 
 		expect(plain_text_fts_query('@wiki0/core')).toBe('"wiki0/core"');
 		expect(search_wiki('@wiki0/core', root, 1)).toEqual([
-			expect.objectContaining({ path: 'packages/core.md' }),
+			expect.objectContaining({ path: 'wiki/packages/core.md' }),
 		]);
 	});
 
-	it('relaxes broad natural-language searches when exact term matching fails', () => {
+	it('relaxes broad natural-language searches when exact term matching fails', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'product/wiki-building-workflow',
 			'The build_wiki prompt and plan_wiki tool describe a wiki building workflow.',
 			{ root },
 		);
-		index_wiki(root);
+		await index_wiki(root);
 
 		expect(
 			relaxed_plain_text_fts_query(
@@ -146,7 +146,7 @@ describe('context and backlinks', () => {
 			),
 		).toEqual([
 			expect.objectContaining({
-				path: 'product/wiki-building-workflow.md',
+				path: 'wiki/product/wiki-building-workflow.md',
 			}),
 		]);
 	});

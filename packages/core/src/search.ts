@@ -1,10 +1,6 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import type { SQLOutputValue } from 'node:sqlite';
 import { index_status } from './indexer.js';
-import { resolve_page_path } from './pages.js';
-import { resolve_wiki_root, wiki_content_dir } from './paths.js';
-import { open_index_or_throw } from './storage.js';
+import { open_index_or_throw, type WikiDatabase } from './storage.js';
 import type {
 	BacklinkResult,
 	ChunkSearchResult,
@@ -118,6 +114,7 @@ export function search_wiki_chunks(
 			fts_page_chunks.path,
 			fts_page_chunks.title,
 			page_chunks.heading,
+			page_chunks.breadcrumb,
 			page_chunks.body,
 			page_chunks.start_line AS start_line,
 			page_chunks.end_line AS end_line,
@@ -178,6 +175,7 @@ function chunk_row_from_sql(
 		path: String(row.path),
 		title: String(row.title),
 		heading: row.heading === null ? null : String(row.heading),
+		breadcrumb: String(row.breadcrumb ?? ''),
 		body: String(row.body),
 		start_line: Number(row.start_line),
 		end_line: Number(row.end_line),
@@ -252,52 +250,70 @@ function parse_page_tags(value: unknown): string[] {
 export function show_wiki_chunk(
 	target: string,
 	root = '.',
-	wiki_dir = 'wiki',
 ): ShowChunkResult | null {
-	const { path, line } = parse_chunk_target(target, root, wiki_dir);
+	const match = target.match(/^(.*?)(?::(\d+))?$/u);
+	const page = match?.[1]?.trim() ?? target;
+	const line = match?.[2] ? Number(match[2]) : null;
 	const db = open_index_or_throw(root);
-	const row = db
-		.prepare(
-			`SELECT id AS chunk_id, path, title, heading, body,
-				start_line AS start_line, end_line AS end_line,
-				body AS snippet, 0 AS rank
-			FROM page_chunks
-			WHERE path = ? AND (? IS NULL OR (start_line <= ? AND end_line >= ?))
-			ORDER BY sequence
-			LIMIT 1`,
-		)
-		.get(path, line, line, line) as ShowChunkResult | undefined;
-	db.close();
-	return row ?? null;
+	try {
+		const path = find_indexed_path(db, page);
+		if (!path) return null;
+		const row = db
+			.prepare(
+				`SELECT id AS chunk_id, path, title, heading, breadcrumb, body,
+					start_line AS start_line, end_line AS end_line,
+					body AS snippet, 0 AS rank
+				FROM page_chunks
+				WHERE path = ? AND (? IS NULL OR (start_line <= ? AND end_line >= ?))
+				ORDER BY sequence
+				LIMIT 1`,
+			)
+			.get(path, line, line, line) as ShowChunkResult | undefined;
+		return row ?? null;
+	} finally {
+		db.close();
+	}
 }
 
-function parse_chunk_target(
+// Finds an indexed document by path, path without extension, unique
+// path suffix, or title/alias.
+export function find_indexed_path(
+	db: WikiDatabase,
 	target: string,
-	root: string,
-	wiki_dir: string,
-): { path: string; line: number | null } {
-	const match = target.match(/^(.*?)(?::(\d+))?$/u);
-	const title = match?.[1]?.trim() ?? target;
-	const line = match?.[2] ? Number(match[2]) : null;
-	const wiki_root = resolve_wiki_root(root);
-	const direct_path = title.endsWith('.md') ? title : `${title}.md`;
-	if (
-		existsSync(
-			join(wiki_content_dir(wiki_root, wiki_dir), direct_path),
-		)
-	) {
-		return { path: direct_path, line };
-	}
-	return { path: resolve_page_path(title, root, wiki_dir), line };
+): string | null {
+	const clean = target.split('#')[0]?.trim() ?? '';
+	if (!clean) return null;
+	const with_extension = /\.[a-z0-9]+$/iu.test(clean)
+		? clean
+		: `${clean}.md`;
+	const rows = db
+		.prepare('SELECT path, title, aliases FROM pages')
+		.all() as { path: string; title: string; aliases: string }[];
+	const exact = rows.find(
+		(row) => row.path === clean || row.path === with_extension,
+	);
+	if (exact) return exact.path;
+	const suffix = rows.filter((row) =>
+		row.path.endsWith(`/${with_extension}`),
+	);
+	if (suffix.length === 1) return suffix[0]?.path ?? null;
+	const name = clean.toLowerCase();
+	const named = rows.find(
+		(row) =>
+			row.title.toLowerCase() === name ||
+			(JSON.parse(row.aliases) as string[]).some(
+				(alias) => alias.toLowerCase() === name,
+			),
+	);
+	return named?.path ?? null;
 }
 
 export function get_wiki_context(
 	query: string,
 	root = '.',
 	limit = 5,
-	wiki_dir = 'wiki',
 ): ContextResult {
-	const status = index_status(root, wiki_dir);
+	const status = index_status(root);
 	const warnings = status.stale
 		? [
 				`Index is stale (${status.reasons.join(', ')}); run index_wiki before relying on these results.`,
@@ -308,12 +324,7 @@ export function get_wiki_context(
 		query,
 		results,
 		warnings,
-		markdown: format_context_markdown(
-			query,
-			results,
-			warnings,
-			wiki_dir,
-		),
+		markdown: format_context_markdown(query, results, warnings),
 	};
 }
 
@@ -321,7 +332,6 @@ export function format_context_markdown(
 	query: string,
 	results: ChunkSearchResult[],
 	warnings: string[] = [],
-	wiki_dir = 'wiki',
 ): string {
 	const lines = [`# wiki0 context: ${query}`, ''];
 
@@ -343,7 +353,7 @@ export function format_context_markdown(
 		const line_range = `${result.start_line}-${result.end_line}`;
 		lines.push(
 			`## ${index + 1}. ${result.title}`,
-			`Source: \`${wiki_dir}/${result.path}:${line_range}\``,
+			`Source: \`${result.path}:${line_range}\``,
 			result.heading ? `Heading: ${result.heading}` : '',
 			'',
 			result.body.trim(),
@@ -357,10 +367,9 @@ export function format_context_markdown(
 export function backlinks_for_page(
 	title: string,
 	root = '.',
-	wiki_dir = 'wiki',
 ): BacklinkResult[] {
 	const db = open_index_or_throw(root);
-	const page_path = resolve_page_path(title, root, wiki_dir);
+	const page_path = find_indexed_path(db, title);
 	const rows = db
 		.prepare(
 			`SELECT pages.path, pages.title, page_links.raw_text AS raw_text,

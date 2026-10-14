@@ -1,15 +1,22 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import {
 	current_index_package_version,
+	current_index_schema_version,
 	index_status,
 	index_wiki,
 } from './indexer.js';
 import { create_page } from './pages.js';
-import { backlinks_for_page, search_wiki } from './search.js';
+import {
+	backlinks_for_page,
+	search_wiki,
+	search_wiki_chunks,
+} from './search.js';
 import { make_wiki_root } from './test-utils.js';
 
 describe('index_wiki', () => {
-	it('indexes Markdown pages into SQLite and searches content', () => {
+	it('indexes Markdown pages into SQLite and searches content', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'projects/wiki0',
@@ -22,11 +29,11 @@ describe('index_wiki', () => {
 			{ root },
 		);
 
-		const result = index_wiki(root);
+		const result = await index_wiki(root);
 		expect(result.page_count).toBe(2);
 		expect(result.link_count).toBe(1);
 		expect(result.indexed_at).toEqual(expect.any(String));
-		expect(result.schema_version).toBe(4);
+		expect(result.schema_version).toBe(current_index_schema_version);
 		expect(result.package_version).toBe(
 			current_index_package_version,
 		);
@@ -34,13 +41,13 @@ describe('index_wiki', () => {
 		const results = search_wiki('inspectable', root);
 		expect(results).toEqual([
 			expect.objectContaining({
-				path: 'topics/memory.md',
+				path: 'wiki/topics/memory.md',
 				title: 'memory',
 			}),
 		]);
 	});
 
-	it('reports index freshness status', () => {
+	it('reports index freshness status', async () => {
 		const root = make_wiki_root();
 		create_page('projects/wiki0', 'SQLite search.', { root });
 
@@ -52,7 +59,7 @@ describe('index_wiki', () => {
 			}),
 		);
 
-		index_wiki(root);
+		await index_wiki(root);
 		expect(index_status(root)).toEqual(
 			expect.objectContaining({
 				exists: true,
@@ -69,15 +76,12 @@ describe('index_wiki', () => {
 		expect(index_status(root)).toEqual(
 			expect.objectContaining({
 				stale: true,
-				reasons: expect.arrayContaining([
-					'page-count-changed',
-					'new-pages',
-				]),
+				reasons: expect.arrayContaining(['new-pages']),
 			}),
 		);
 	});
 
-	it('resolves wikilinks by page title and alias while indexing', () => {
+	it('resolves wikilinks by page title and alias while indexing', async () => {
 		const root = make_wiki_root();
 		create_page(
 			'projects/wiki0',
@@ -95,20 +99,76 @@ describe('index_wiki', () => {
 			{ root },
 		);
 
-		const result = index_wiki(root);
+		const result = await index_wiki(root);
 
 		expect(result.link_count).toBe(2);
 		expect(backlinks_for_page('Core package', root)).toEqual([
 			expect.objectContaining({
-				path: 'projects/wiki0.md',
+				path: 'wiki/projects/wiki0.md',
 				raw_text: '[[Core package]]',
 			}),
 		]);
 		expect(backlinks_for_page('wiki0 CLI', root)).toEqual([
 			expect.objectContaining({
-				path: 'projects/wiki0.md',
+				path: 'wiki/projects/wiki0.md',
 				raw_text: '[[wiki0 CLI]]',
 			}),
 		]);
+	});
+});
+
+describe('index_wiki on project docs', () => {
+	it('indexes Markdown outside wiki/ with frontmatter metadata', async () => {
+		const root = make_wiki_root();
+		mkdirSync(join(root, 'docs/adr'), { recursive: true });
+		writeFileSync(
+			join(root, 'docs/adr/0002-storage.md'),
+			[
+				'---',
+				'status: Superseded',
+				'type: decision',
+				'aliases: [storage decision]',
+				'superseded_by: docs/adr/0003-cache.md',
+				'---',
+				'# Store the index in the repo',
+				'',
+				'We keep the index next to the docs.',
+			].join('\n'),
+		);
+		writeFileSync(join(root, 'README.md'), '# Project\n\nOverview.');
+
+		const result = await index_wiki(root);
+
+		expect(result).toMatchObject({ page_count: 2, warnings: [] });
+		expect(
+			search_wiki_chunks('index next to the docs', root, 1),
+		).toEqual([
+			expect.objectContaining({
+				path: 'docs/adr/0002-storage.md',
+				title: 'Store the index in the repo',
+				breadcrumb: 'Store the index in the repo',
+				page_status: 'superseded',
+				start_line: 7,
+				end_line: 9,
+			}),
+		]);
+	});
+
+	it('warns about invalid frontmatter instead of failing', async () => {
+		const root = make_wiki_root();
+		writeFileSync(
+			join(root, 'broken.md'),
+			'---\ntitle: [unclosed\n---\n# Broken\n\nStill searchable.',
+		);
+
+		const result = await index_wiki(root);
+
+		expect(result.page_count).toBe(1);
+		expect(result.warnings).toEqual([
+			expect.stringContaining('broken.md: Invalid YAML frontmatter'),
+		]);
+		expect(
+			search_wiki_chunks('still searchable', root, 1),
+		).toHaveLength(1);
 	});
 });

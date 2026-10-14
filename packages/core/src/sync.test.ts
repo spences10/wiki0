@@ -22,7 +22,8 @@ describe('sync_documents', () => {
 		});
 
 		expect(result.created).toHaveLength(2);
-		expect(result.indexed?.page_count).toBe(2);
+		// The two synced pages plus docs/guide.md, which is project Markdown.
+		expect(result.indexed?.page_count).toBe(3);
 		expect(
 			result.synced_sources.map((source) => source.kind),
 		).toEqual(['markdown', 'text']);

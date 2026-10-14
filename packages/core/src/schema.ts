@@ -6,4 +6,4 @@ export const schema_sql = readFileSync(
 );
 
 // Bump when schema.sql changes; older indexes are rebuilt.
-export const index_schema_version = 4;
+export const index_schema_version = 5;

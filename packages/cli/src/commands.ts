@@ -567,10 +567,8 @@ export const main = defineCommand({
 					default: 'wiki',
 				},
 			},
-			run({ args }) {
-				print_json(
-					index_wiki(String(args.root ?? '.'), wiki_dir_arg(args)),
-				);
+			async run({ args }) {
+				print_json(await index_wiki(String(args.root ?? '.')));
 			},
 		}),
 		status: defineCommand({
@@ -589,9 +587,7 @@ export const main = defineCommand({
 				},
 			},
 			run({ args }) {
-				print_json(
-					index_status(String(args.root ?? '.'), wiki_dir_arg(args)),
-				);
+				print_json(index_status(String(args.root ?? '.')));
 			},
 		}),
 		search: defineCommand({
@@ -656,7 +652,6 @@ export const main = defineCommand({
 				const result = show_wiki_chunk(
 					String(args.target),
 					String(args.root ?? '.'),
-					wiki_dir_arg(args),
 				);
 				if (args.json) print_json(result);
 				else console.log(result?.body ?? 'No indexed chunk found.');
@@ -694,7 +689,6 @@ export const main = defineCommand({
 					String(args.query),
 					String(args.root ?? '.'),
 					Number(args.limit ?? 5),
-					wiki_dir_arg(args),
 				);
 				console.log(
 					args.json
@@ -767,7 +761,6 @@ export const main = defineCommand({
 					backlinks_for_page(
 						String(args.title),
 						String(args.root ?? '.'),
-						wiki_dir_arg(args),
 					),
 				);
 			},

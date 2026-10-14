@@ -52,7 +52,9 @@ export type IndexResult = {
 	root: string;
 	db_path: string;
 	page_count: number;
+	chunk_count: number;
 	link_count: number;
+	warnings: string[];
 	indexed_at: string;
 	schema_version: number;
 	package_version: string;
@@ -83,6 +85,7 @@ export type SearchResult = {
 export type ChunkSearchResult = SearchResult & {
 	chunk_id: number;
 	heading: string | null;
+	breadcrumb: string;
 	body: string;
 	start_line: number;
 	end_line: number;

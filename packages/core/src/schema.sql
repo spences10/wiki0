@@ -8,6 +8,15 @@ CREATE TABLE IF NOT EXISTS pages (
 	body TEXT NOT NULL,
 	content_hash TEXT NOT NULL,
 	modified_at TEXT NOT NULL,
+	kind TEXT NOT NULL DEFAULT 'markdown',
+	status TEXT,
+	doc_type TEXT,
+	doc_date TEXT,
+	priority INTEGER NOT NULL DEFAULT 0,
+	aliases TEXT NOT NULL DEFAULT '[]',
+	tags TEXT NOT NULL DEFAULT '[]',
+	supersedes TEXT NOT NULL DEFAULT '[]',
+	superseded_by TEXT,
 	created_at TEXT DEFAULT (datetime('now')),
 	updated_at TEXT DEFAULT (datetime('now'))
 );
@@ -30,6 +39,8 @@ CREATE TABLE IF NOT EXISTS page_chunks (
 	path TEXT NOT NULL,
 	title TEXT NOT NULL,
 	heading TEXT,
+	depth INTEGER NOT NULL DEFAULT 0,
+	breadcrumb TEXT NOT NULL DEFAULT '',
 	body TEXT NOT NULL,
 	start_line INTEGER NOT NULL,
 	end_line INTEGER NOT NULL,
@@ -72,4 +83,4 @@ CREATE TABLE IF NOT EXISTS wiki_events (
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_pages USING fts5(path, title, body);
-CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_chunks USING fts5(chunk_id UNINDEXED, path, title, heading, body);
+CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_chunks USING fts5(chunk_id UNINDEXED, path, title, heading, body, breadcrumb, aliases);
