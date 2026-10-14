@@ -25,6 +25,7 @@ the files it indexes.
 
 - [[interfaces/cli]]
 - [[interfaces/mcp]]
+- [[interfaces/ui]]
 
 ## Decisions
 
@@ -39,7 +40,7 @@ the files it indexes.
 | 0007 | [Read-only, no LLM calls](decisions/0007-read-only-no-llm.md)                  | accepted   |
 | 0008 | [Lexical search, no embeddings](decisions/0008-lexical-search.md)              | accepted   |
 | 0009 | [Resolve both link styles](decisions/0009-resolve-both-link-styles.md)         | accepted   |
-| 0010 | [Landing page and local UI](decisions/0010-landing-page-and-local-ui.md)       | proposed   |
+| 0010 | [Landing page and local UI](decisions/0010-landing-page-and-local-ui.md)       | accepted   |
 
 ## Working on wiki0
 

@@ -19,6 +19,7 @@ npx @wiki0/cli index
 npx @wiki0/cli search "how do deploys work"
 npx @wiki0/cli show docs/deploys.md:12-40
 npx @wiki0/cli lint
+npx @wiki0/cli ui      # browse the docs in a local web app
 ```
 
 Agents use the same operations through the MCP server (`@wiki0/mcp`,
@@ -61,6 +62,7 @@ The index lives in `~/.cache/wiki0/<project>/index.db` unless
 - `packages/core`: indexing, link resolution, search and lint
 - `packages/cli`: the `wiki0` command
 - `packages/mcp`: the `wiki0-mcp` server
+- `packages/ui`: the local docs browser behind `wiki0 ui`
 
 ## Development
 

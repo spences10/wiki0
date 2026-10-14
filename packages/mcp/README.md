@@ -29,6 +29,9 @@ The package exposes the `wiki0-mcp` binary.
 Tools return JSON as both text and structured content; failures return
 `isError: true`.
 
+To show the user this project's docs, run `npx @wiki0/cli ui`; it
+prints the URL and returns, and a second run reuses the open server.
+
 ## Roots and safety
 
 Each tool takes an optional `root`. The server only allows roots under
