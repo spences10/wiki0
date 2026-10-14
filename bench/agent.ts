@@ -49,7 +49,7 @@ type Run = {
 	rep: number;
 	correct: boolean;
 	cited_authoritative: boolean;
-	cited_stale: boolean;
+	misled_by_stale: boolean;
 	tokens: number;
 	cache_read: number;
 	cost_usd: number;
@@ -161,7 +161,10 @@ async function run_once(
 		cited_authoritative:
 			task.authoritative.length === 0 ||
 			task.authoritative.some((path) => sources.includes(path)),
-		cited_stale: task.stale.some((path) => sources.includes(path)),
+		// Citing a stale file is fine when the answer is still right
+		// (for example, "this replaced the GitHub Actions deploy").
+		misled_by_stale:
+			!correct && task.stale.some((path) => sources.includes(path)),
 		// Cache reads are reported separately so caching does not hide
 		// what the agent actually consumed.
 		tokens:
@@ -202,7 +205,7 @@ writeFileSync(
 
 console.log('');
 console.log(
-	'arm    correct  cited-source  cited-stale  tokens(med)  cache-read(med)  cost(med)  turns(med)',
+	'arm    correct  cited-source  misled-stale tokens(med)  cache-read(med)  cost(med)  turns(med)',
 );
 for (const arm of arms) {
 	const mine = runs.filter((run) => run.arm === arm);
@@ -213,7 +216,7 @@ for (const arm of arms) {
 			arm.padEnd(6),
 			rate((run) => run.correct).padEnd(8),
 			rate((run) => run.cited_authoritative).padEnd(13),
-			rate((run) => run.cited_stale).padEnd(12),
+			rate((run) => run.misled_by_stale).padEnd(12),
 			String(median(mine.map((run) => run.tokens))).padEnd(12),
 			String(median(mine.map((run) => run.cache_read))).padEnd(16),
 			`$${median(mine.map((run) => run.cost_usd)).toFixed(4)}`.padEnd(

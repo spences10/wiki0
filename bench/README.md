@@ -25,9 +25,10 @@ pnpm bench:agent -- --reps 3 --model claude-sonnet-5-5
 
 Runs `claude -p` per task with two tool sets: grep-only (`Read`,
 `Grep`, `Glob`) and wiki0 (`Read` plus the MCP search, show and
-context tools). Reports correctness, whether the authoritative and
-stale files were cited, and median tokens, cache reads, cost and
-turns. Raw runs go to `results/` (ignored by git).
+context tools). Reports correctness, whether the authoritative file
+was cited, how often a stale file led to a wrong answer, and median
+tokens, cache reads, cost and turns. Raw runs go to `results/`
+(ignored by git).
 
 The corpus is small and written for these tasks, so a perfect
 retrieval score means no regressions, not that ranking is solved. Add
