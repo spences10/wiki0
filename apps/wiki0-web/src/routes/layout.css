@@ -1,7 +1,7 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "@fontsource-variable/mona-sans/wdth.css";
-@import "@fontsource-variable/martian-mono";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/mona-sans/wdth.css';
+@import '@fontsource-variable/martian-mono';
 
 /* Tokens copied from packages/ui so the site and the local UI match. */
 :root {
@@ -81,9 +81,10 @@
 }
 
 @theme inline {
-	--font-sans: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-sans:
+		'Mona Sans Variable', ui-sans-serif, system-ui, sans-serif;
 	--font-ui: var(--font-sans);
-	--font-mono: "Martian Mono Variable", ui-monospace, monospace;
+	--font-mono: 'Martian Mono Variable', ui-monospace, monospace;
 	--color-ring: var(--ring);
 	--color-input: var(--input);
 	--color-border: var(--border);
@@ -112,7 +113,9 @@
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);
-	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary-foreground: var(
+		--sidebar-primary-foreground
+	);
 	--color-sidebar-accent: var(--sidebar-accent);
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
@@ -140,7 +143,7 @@
 		font-family: var(--font-sans);
 		font-size: 1rem;
 		line-height: 1.6;
-		font-feature-settings: "ss01";
+		font-feature-settings: 'ss01';
 	}
 	h1,
 	h2,
@@ -158,29 +161,29 @@
 
 /* shadcn custom variants */
 @custom-variant data-open {
-	&:where([data-state="open"]),
-	&:where([data-open]:not([data-open="false"])) {
+	&:where([data-state='open']),
+	&:where([data-open]:not([data-open='false'])) {
 		@slot;
 	}
 }
 
 @custom-variant data-closed {
-	&:where([data-state="closed"]),
-	&:where([data-closed]:not([data-closed="false"])) {
+	&:where([data-state='closed']),
+	&:where([data-closed]:not([data-closed='false'])) {
 		@slot;
 	}
 }
 
 @custom-variant data-checked {
-	&:where([data-state="checked"]),
-	&:where([data-checked]:not([data-checked="false"])) {
+	&:where([data-state='checked']),
+	&:where([data-checked]:not([data-checked='false'])) {
 		@slot;
 	}
 }
 
 @custom-variant data-unchecked {
-	&:where([data-state="unchecked"]),
-	&:where([data-unchecked]:not([data-unchecked="false"])) {
+	&:where([data-state='unchecked']),
+	&:where([data-unchecked]:not([data-unchecked='false'])) {
 		@slot;
 	}
 }
@@ -192,27 +195,27 @@
 }
 
 @custom-variant data-disabled {
-	&:where([data-disabled="true"]),
-	&:where([data-disabled]:not([data-disabled="false"])) {
+	&:where([data-disabled='true']),
+	&:where([data-disabled]:not([data-disabled='false'])) {
 		@slot;
 	}
 }
 
 @custom-variant data-active {
-	&:where([data-state="active"]),
-	&:where([data-active]:not([data-active="false"])) {
+	&:where([data-state='active']),
+	&:where([data-active]:not([data-active='false'])) {
 		@slot;
 	}
 }
 
 @custom-variant data-horizontal {
-	&:where([data-orientation="horizontal"]) {
+	&:where([data-orientation='horizontal']) {
 		@slot;
 	}
 }
 
 @custom-variant data-vertical {
-	&:where([data-orientation="vertical"]) {
+	&:where([data-orientation='vertical']) {
 		@slot;
 	}
 }
