@@ -369,7 +369,7 @@ function status_factor(
 	superseded: boolean,
 ): number {
 	if (superseded) return 0.3;
-	if (trusted_statuses.has(status ?? '')) return 1.15;
+	if (trusted_statuses.has(status ?? '')) return 1.05;
 	if (tentative_statuses.has(status ?? '')) return 0.85;
 	return 1;
 }

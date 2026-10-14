@@ -1,0 +1,98 @@
+[
+	{
+		"id": "deploy",
+		"kind": "stale",
+		"question": "How is the service deployed to production?",
+		"expected": ["coolify"],
+		"authoritative": ["docs/adr/0007-deploy-with-coolify.md"],
+		"stale": ["docs/adr/0003-deploy-with-github-actions.md"]
+	},
+	{
+		"id": "batch-flag",
+		"kind": "stale",
+		"question": "Which flag sets the maximum number of messages per fetch?",
+		"expected": ["--max-batch"],
+		"authoritative": ["docs/reference/config.md"],
+		"stale": ["docs/guides/tuning-v1.md"]
+	},
+	{
+		"id": "storage-db",
+		"kind": "stale",
+		"question": "Which database stores the messages?",
+		"expected": ["sqlite"],
+		"authoritative": ["docs/adr/0005-sqlite-storage.md"],
+		"stale": ["meetings/2026-03-02.md"]
+	},
+	{
+		"id": "admin-port",
+		"kind": "lookup",
+		"question": "What port does the admin API listen on?",
+		"expected": ["7420"],
+		"authoritative": ["docs/reference/ports.md"],
+		"stale": []
+	},
+	{
+		"id": "release-steps",
+		"kind": "synthesis",
+		"question": "What has to happen before a release is tagged?",
+		"expected": ["changeset", "ci", "publish"],
+		"authoritative": ["docs/releasing.md"],
+		"stale": []
+	},
+	{
+		"id": "naming",
+		"kind": "lookup",
+		"question": "What naming convention do functions use?",
+		"expected": ["snake_case"],
+		"authoritative": ["rules/code-style.md"],
+		"stale": []
+	},
+	{
+		"id": "sla",
+		"kind": "unanswerable",
+		"question": "What is the uptime SLA for the enterprise plan?",
+		"expected": [],
+		"authoritative": [],
+		"stale": []
+	},
+	{
+		"id": "retention",
+		"kind": "stale",
+		"question": "How long are messages kept by default?",
+		"expected": ["7 days"],
+		"authoritative": ["docs/reference/retention.md"],
+		"stale": ["docs/guides/faq.md"]
+	},
+	{
+		"id": "paging",
+		"kind": "vocabulary",
+		"question": "When do I get paged because the queue is backing up?",
+		"expected": ["10,000"],
+		"authoritative": ["ops/alerts.md"],
+		"stale": []
+	},
+	{
+		"id": "key-rotation",
+		"kind": "lookup",
+		"question": "How do I rotate the signing keys?",
+		"expected": ["keys rotate", "prune"],
+		"authoritative": ["ops/runbooks/key-rotation.md"],
+		"stale": []
+	},
+	{
+		"id": "wire-format",
+		"kind": "stale",
+		"question": "What wire format do clients use to send messages?",
+		"expected": ["messagepack"],
+		"authoritative": ["docs/adr/0006-msgpack-wire-format.md"],
+		"stale": ["docs/adr/0002-json-wire-format.md"]
+	},
+	{
+		"id": "auth",
+		"kind": "stale",
+		"question": "How do clients authenticate to the broker?",
+		"expected": ["mutual tls|mtls"],
+		"authoritative": ["docs/security/auth.md"],
+		"stale": ["notes/2025-auth-ideas.md"]
+	}
+]

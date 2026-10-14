@@ -38,7 +38,9 @@
 		"verify": "pnpm check && pnpm test && pnpm build && pnpm test:package",
 		"changeset": "changeset",
 		"version": "changeset version",
-		"release": "pnpm run build && changeset publish"
+		"release": "pnpm run build && changeset publish",
+		"bench:retrieval": "pnpm --filter @wiki0/core run build:self && node bench/retrieval.ts",
+		"bench:agent": "pnpm --filter \"./packages/*\" run build:self && node bench/agent.ts"
 	},
 	"devDependencies": {
 		"@changesets/cli": "catalog:",
