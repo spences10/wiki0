@@ -1,6 +1,6 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { open_wiki_database, type WikiDatabase } from './database.js';
 import { resolve_wiki_root } from './paths.js';
+import { open_index, type WikiDatabase } from './storage.js';
 import type { WikiEvent } from './types.js';
 
 export function log_wiki_event(options: {
@@ -11,7 +11,7 @@ export function log_wiki_event(options: {
 	details?: unknown;
 }): WikiEvent {
 	const wiki_root = resolve_wiki_root(options.root);
-	const db = open_wiki_database(wiki_root);
+	const db = open_index(wiki_root);
 	ensure_events_table(db);
 	const result = db
 		.prepare(
@@ -38,7 +38,7 @@ export function list_wiki_events(
 	root = '.',
 	limit = 50,
 ): WikiEvent[] {
-	const db = open_wiki_database(root);
+	const db = open_index(root);
 	ensure_events_table(db);
 	const rows = db
 		.prepare(

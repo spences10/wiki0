@@ -1,10 +1,10 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { SQLOutputValue } from 'node:sqlite';
-import { open_wiki_database } from './database.js';
 import { index_status } from './indexer.js';
 import { resolve_page_path } from './pages.js';
 import { resolve_wiki_root, wiki_content_dir } from './paths.js';
+import { open_index_or_throw } from './storage.js';
 import type {
 	BacklinkResult,
 	ChunkSearchResult,
@@ -18,7 +18,7 @@ export function search_wiki(
 	root = '.',
 	limit = 10,
 ): SearchResult[] {
-	const db = open_wiki_database(root);
+	const db = open_index_or_throw(root);
 	const statement = db.prepare(
 		`SELECT path, title,
 			snippet(fts_pages, 2, '[', ']', '…', 12) AS snippet,
@@ -112,7 +112,7 @@ export function search_wiki_chunks(
 	root = '.',
 	limit = 10,
 ): ChunkSearchResult[] {
-	const db = open_wiki_database(root);
+	const db = open_index_or_throw(root);
 	const statement = db.prepare(
 		`SELECT fts_page_chunks.chunk_id AS chunk_id,
 			fts_page_chunks.path,
@@ -255,7 +255,7 @@ export function show_wiki_chunk(
 	wiki_dir = 'wiki',
 ): ShowChunkResult | null {
 	const { path, line } = parse_chunk_target(target, root, wiki_dir);
-	const db = open_wiki_database(root);
+	const db = open_index_or_throw(root);
 	const row = db
 		.prepare(
 			`SELECT id AS chunk_id, path, title, heading, body,
@@ -279,7 +279,7 @@ function parse_chunk_target(
 	const match = target.match(/^(.*?)(?::(\d+))?$/u);
 	const title = match?.[1]?.trim() ?? target;
 	const line = match?.[2] ? Number(match[2]) : null;
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const wiki_root = resolve_wiki_root(root);
 	const direct_path = title.endsWith('.md') ? title : `${title}.md`;
 	if (
 		existsSync(
@@ -359,7 +359,7 @@ export function backlinks_for_page(
 	root = '.',
 	wiki_dir = 'wiki',
 ): BacklinkResult[] {
-	const db = open_wiki_database(root);
+	const db = open_index_or_throw(root);
 	const page_path = resolve_page_path(title, root, wiki_dir);
 	const rows = db
 		.prepare(

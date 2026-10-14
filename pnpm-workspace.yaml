@@ -34,6 +34,7 @@ catalog:
   pdf-parse: ^2.4.5
   playwright: ^1.63.0
   shadcn-svelte: ^1.7.0
+  smol-toml: ^1.9.1
   svelte: ^5.57.1
   svelte-check: ^4.7.6
   tailwind-merge: ^3.7.0

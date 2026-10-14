@@ -137,7 +137,7 @@ export function resolve_page_path(
 	root = '.',
 	wiki_dir = 'wiki',
 ): string {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const wiki_root = resolve_wiki_root(root);
 	const content_dir = wiki_content_dir(wiki_root, wiki_dir);
 	const direct_path = page_relative_path(title);
 	if (existsSync(join(content_dir, direct_path))) {
@@ -169,7 +169,7 @@ export function list_markdown_page_paths(
 	root = '.',
 	wiki_dir = 'wiki',
 ): string[] {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const wiki_root = resolve_wiki_root(root);
 	const content_dir = wiki_content_dir(wiki_root, wiki_dir);
 	if (!existsSync(content_dir)) return [];
 
@@ -197,7 +197,7 @@ export function read_page_by_path(
 	root = '.',
 	wiki_dir = 'wiki',
 ): WikiPage {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const wiki_root = resolve_wiki_root(root);
 	const file_path = join(
 		wiki_content_dir(wiki_root, wiki_dir),
 		page_path,

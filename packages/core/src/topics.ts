@@ -1,12 +1,12 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { open_wiki_database } from './database.js';
+import { open_index_or_throw } from './storage.js';
 import type { TopicThreadResult } from './types.js';
 
 export function list_topic_threads(
 	root = '.',
 	limit = 50,
 ): TopicThreadResult[] {
-	const db = open_wiki_database(root);
+	const db = open_index_or_throw(root);
 	const rows = db
 		.prepare(
 			`SELECT path, title, heading, page_tags FROM page_chunks

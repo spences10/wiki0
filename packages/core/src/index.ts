@@ -1,4 +1,8 @@
-export { open_wiki_database, wiki_db_path } from './database.js';
+export {
+	config_file_name,
+	read_config,
+	type Wiki0Config,
+} from './config.js';
 export {
 	document_kind,
 	parse_document,
@@ -47,7 +51,7 @@ export {
 	wikilink_target_path,
 } from './paths.js';
 export { review_wiki } from './review.js';
-export { schema_sql } from './schema.js';
+export { index_schema_version, schema_sql } from './schema.js';
 export {
 	backlinks_for_page,
 	format_context_markdown,
@@ -56,6 +60,17 @@ export {
 	search_wiki_chunks,
 	show_wiki_chunk,
 } from './search.js';
+export {
+	open_index,
+	open_index_or_throw,
+	open_index_readonly,
+	resolve_index,
+	resolve_project_root,
+	worktree_key,
+	type IndexLocation,
+	type IndexLocationSource,
+	type WikiDatabase,
+} from './storage.js';
 export { sync_documents } from './sync.js';
 export { list_topic_threads } from './topics.js';
 export type * from './types.js';

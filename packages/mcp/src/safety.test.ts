@@ -33,8 +33,9 @@ describe('MCP safety', () => {
 		});
 	});
 
-	it('resolves wiki roots inside the allowlist', () => {
+	it('resolves the project root inside the allowlist', () => {
 		const root = make_wiki_root();
+		mkdirSync(join(root, '.git'));
 		process.env.WIKI0_ALLOWED_ROOTS = root;
 
 		expect(mcp_root(join(root, 'wiki'))).toBe(root);

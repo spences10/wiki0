@@ -37,8 +37,10 @@ wiki0 review --root ./my-wiki
 
 Page commands write under `wiki/` by default. Use `--wiki-dir docs`
 when you want wiki0-backed project documentation in `docs/` instead.
-The local SQLite index lives under `.wiki0/`; `wiki0 init` adds
-`.wiki0/` to `.gitignore` because it is rebuildable cache data.
+The index is rebuildable cache data stored outside the project, in
+`~/.cache/wiki0/<project>/index.db`. `wiki0 status` prints the path.
+Set `WIKI0_INDEX` to choose the file, or `[index] location = "local"`
+in `wiki0.toml` to keep it in `.wiki0/`.
 
 ## Output
 

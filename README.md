@@ -25,7 +25,6 @@ so future sessions start from durable knowledge instead of vibes.
 ```txt
 wiki0/
   wiki/             # canonical Markdown knowledge
-  .wiki0/           # local SQLite index/cache
   packages/core/    # schema, indexing, wikilinks, search primitives
   packages/cli/     # wiki0 init/index/search/context/lint/graph/facts
   packages/mcp/     # MCP server wrapping core operations

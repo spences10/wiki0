@@ -34,7 +34,7 @@ const supported_extensions = new Set([
 export async function sync_documents(
 	options: WikiDocumentSyncOptions,
 ): Promise<WikiDocumentSyncResult> {
-	const root = resolve_wiki_root(options.root, options.wiki_dir);
+	const root = resolve_wiki_root(options.root);
 	const sources = discover_sources(root, options.sources, {
 		include: options.include,
 		ignore: options.ignore,

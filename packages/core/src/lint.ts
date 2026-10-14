@@ -6,7 +6,7 @@ import { resolve_wiki_root, wikilink_target_path } from './paths.js';
 import type { LintIssue, LintResult } from './types.js';
 
 export function lint_wiki(root = '.', wiki_dir = 'wiki'): LintResult {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
+	const wiki_root = resolve_wiki_root(root);
 	const page_paths = list_markdown_page_paths(wiki_root, wiki_dir);
 	const known_paths = new Set(page_paths);
 	const issues: LintIssue[] = [];

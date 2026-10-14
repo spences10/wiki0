@@ -1,5 +1,5 @@
-import { existsSync } from 'node:fs';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { join, normalize } from 'node:path';
+import { resolve_project_root } from './storage.js';
 
 export function slugify_title(title: string): string {
 	return title
@@ -23,37 +23,16 @@ export function normalize_wiki_dir(wiki_dir = 'wiki'): string {
 	return normalized;
 }
 
-export function resolve_wiki_root(
-	start_path = '.',
-	wiki_dir = 'wiki',
-): string {
-	let current_path = resolve(start_path);
-	const content_dir = normalize_wiki_dir(wiki_dir);
-
-	while (true) {
-		if (
-			existsSync(join(current_path, '.wiki0')) ||
-			existsSync(join(current_path, content_dir))
-		) {
-			return current_path;
-		}
-
-		const parent_path = dirname(current_path);
-		if (parent_path === current_path) {
-			return resolve(start_path);
-		}
-		current_path = parent_path;
-	}
+// Kept as the legacy name for the project root.
+export function resolve_wiki_root(start_path = '.'): string {
+	return resolve_project_root(start_path);
 }
 
 export function wiki_content_dir(
 	root = '.',
 	wiki_dir = 'wiki',
 ): string {
-	return join(
-		resolve_wiki_root(root, wiki_dir),
-		normalize_wiki_dir(wiki_dir),
-	);
+	return join(resolve_wiki_root(root), normalize_wiki_dir(wiki_dir));
 }
 
 export function page_relative_path(title: string): string {

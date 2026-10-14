@@ -1,9 +1,9 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { open_wiki_database, type WikiDatabase } from './database.js';
 import { log_wiki_event } from './events.js';
 import { resolve_page_path } from './pages.js';
 import { resolve_wiki_root } from './paths.js';
 import { show_wiki_chunk } from './search.js';
+import { open_index, type WikiDatabase } from './storage.js';
 import type {
 	Fact,
 	FactWriteOptions,
@@ -18,8 +18,8 @@ export type DerivedFactCandidate = Omit<
 };
 
 export function add_fact(fact: FactWriteOptions): Fact {
-	const wiki_root = resolve_wiki_root(fact.root, fact.wiki_dir);
-	const db = open_wiki_database(wiki_root);
+	const wiki_root = resolve_wiki_root(fact.root);
+	const db = open_index(wiki_root);
 	ensure_fact_provenance_columns(db);
 	const source_chunk = fact.source
 		? show_wiki_chunk(fact.source, wiki_root, fact.wiki_dir)
@@ -72,7 +72,7 @@ export function add_fact(fact: FactWriteOptions): Fact {
 }
 
 export function list_facts(root = '.', category?: string): Fact[] {
-	const db = open_wiki_database(root);
+	const db = open_index(root);
 	ensure_fact_provenance_columns(db);
 	const sql = `${fact_select_sql}
 		${category ? 'WHERE facts.category = ?' : ''}

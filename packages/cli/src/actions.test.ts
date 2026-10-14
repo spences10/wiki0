@@ -29,7 +29,7 @@ afterEach(() => {
 });
 
 describe('init_workspace', () => {
-	it('creates the wiki folders, starter page, and schema snapshot', () => {
+	it('creates the wiki folders and starter page without touching git config', () => {
 		const root = make_temp_root();
 
 		expect(init_workspace(root)).toBe(
@@ -40,12 +40,8 @@ describe('init_workspace', () => {
 		expect(
 			readFileSync(join(root, 'wiki/index.md'), 'utf-8'),
 		).toContain('[[topics/example]]');
-		expect(
-			readFileSync(join(root, '.wiki0/schema.sql'), 'utf-8'),
-		).toContain('CREATE TABLE IF NOT EXISTS pages');
-		expect(readFileSync(join(root, '.gitignore'), 'utf-8')).toContain(
-			'.wiki0/',
-		);
+		expect(existsSync(join(root, '.wiki0'))).toBe(false);
+		expect(existsSync(join(root, '.gitignore'))).toBe(false);
 	});
 
 	it('can use docs as the content folder', () => {

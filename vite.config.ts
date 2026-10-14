@@ -5,6 +5,7 @@ const config = {
 		expect: { requireAssertions: true },
 		environment: 'node',
 		include: ['packages/**/*.test.ts', 'src/**/*.test.ts'],
+		setupFiles: ['tools/test-setup.ts'],
 	},
 	fmt: {
 		useTabs: true,

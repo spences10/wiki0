@@ -41,8 +41,12 @@ with `isError: true`.
 Each tool accepts an optional `root` argument. Page and indexing tools
 also accept `wiki_dir`; Markdown under `wiki/` is the default, and
 `wiki_dir: "docs"` writes/searches project documentation under
-`docs/`. `.wiki0/wiki0.sqlite` is a local rebuildable index and should
-be ignored by git.
+`docs/`.
+
+The index is rebuildable cache data stored outside the project, in
+`~/.cache/wiki0/<project>/index.db`. `wiki0 status` prints the path.
+Set `WIKI0_INDEX` to choose the file, or `[index] location = "local"`
+in `wiki0.toml` to keep it in `.wiki0/`.
 
 By default the MCP server only allows roots under its current working
 directory. Set `WIKI0_ALLOWED_ROOTS` to a comma-separated list of

@@ -56,8 +56,8 @@ console.log(
 
 ## Storage model
 
-Markdown files under `wiki/` are canonical. The `.wiki0/wiki0.sqlite`
-database is a rebuildable cache for search, backlinks, graph data, and
-facts. `index_status` reports indexed-at time, schema/package
-versions, and stale reasons when Markdown or index metadata has
-changed since the last rebuild.
+Markdown files under `wiki/` are canonical. The index database
+(`resolve_index` returns its path) is a rebuildable cache for search,
+backlinks, graph data, and facts. `index_status` reports indexed-at
+time, schema/package versions, and stale reasons when Markdown or
+index metadata has changed since the last rebuild.

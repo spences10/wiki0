@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { open_wiki_database, wiki_db_path } from './database.js';
 import { log_wiki_event } from './events.js';
 import {
 	list_markdown_page_paths,
@@ -12,19 +11,24 @@ import {
 	wiki_content_dir,
 	wikilink_target_path,
 } from './paths.js';
+import { index_schema_version } from './schema.js';
+import {
+	open_index,
+	open_index_readonly,
+	resolve_index,
+} from './storage.js';
 import type { IndexResult, IndexStatus } from './types.js';
 
-export const current_index_schema_version = 4;
+export const current_index_schema_version = index_schema_version;
 export const current_index_package_version = read_package_version();
 
 export function index_wiki(
 	root = '.',
 	wiki_dir = 'wiki',
 ): IndexResult {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
-	const db_path = wiki_db_path(wiki_root);
-	const db = open_wiki_database(wiki_root);
-	ensure_index_schema(db);
+	const wiki_root = resolve_wiki_root(root);
+	const db_path = resolve_index(wiki_root).index_path;
+	const db = open_index(wiki_root);
 	let page_count = 0;
 	let link_count = 0;
 
@@ -210,28 +214,6 @@ export function index_wiki(
 	};
 }
 
-function ensure_index_schema(
-	db: ReturnType<typeof open_wiki_database>,
-): void {
-	const chunk_columns = new Set(
-		(
-			db.prepare('PRAGMA table_info(page_chunks)').all() as {
-				name: string;
-			}[]
-		).map((column) => column.name),
-	);
-	const migrations: Record<string, string> = {
-		page_priority:
-			'ALTER TABLE page_chunks ADD COLUMN page_priority INTEGER NOT NULL DEFAULT 0',
-		page_status:
-			'ALTER TABLE page_chunks ADD COLUMN page_status TEXT',
-		page_tags: 'ALTER TABLE page_chunks ADD COLUMN page_tags TEXT',
-	};
-	for (const [column_name, sql] of Object.entries(migrations)) {
-		if (!chunk_columns.has(column_name)) db.exec(sql);
-	}
-}
-
 type PageChunk = {
 	heading: string | null;
 	body: string;
@@ -299,15 +281,16 @@ export function index_status(
 	root = '.',
 	wiki_dir = 'wiki',
 ): IndexStatus {
-	const wiki_root = resolve_wiki_root(root, wiki_dir);
-	const db_path = wiki_db_path(wiki_root);
+	const wiki_root = resolve_wiki_root(root);
+	const db_path = resolve_index(wiki_root).index_path;
 	const page_paths = list_markdown_page_paths(wiki_root, wiki_dir);
 	const reasons: string[] = [];
-	if (!existsSync(db_path)) {
+	const db = open_index_readonly(wiki_root);
+	if (!db) {
 		return {
 			root: wiki_root,
 			db_path: db_path,
-			exists: false,
+			exists: existsSync(db_path),
 			indexed_at: null,
 			schema_version: null,
 			current_schema_version: current_index_schema_version,
@@ -316,11 +299,14 @@ export function index_status(
 			page_count: page_paths.length,
 			indexed_page_count: 0,
 			stale: true,
-			reasons: ['missing-index'],
+			reasons: [
+				existsSync(db_path)
+					? 'schema-version-mismatch'
+					: 'missing-index',
+			],
 		};
 	}
 
-	const db = open_wiki_database(wiki_root);
 	const meta_rows = db
 		.prepare('SELECT key, value FROM wiki_meta')
 		.all() as { key: string; value: string }[];
