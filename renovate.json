@@ -28,8 +28,7 @@
 				"vite",
 				"vite-plus",
 				"/^@vitest\\//",
-				"vitest",
-				"vitest-browser-svelte"
+				"vitest"
 			],
 			"groupName": "Vite+ test stack",
 			"groupSlug": "vite-plus-test-stack"

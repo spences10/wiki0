@@ -2,15 +2,18 @@
 	"name": "wiki0",
 	"version": "0.0.0",
 	"private": true,
-	"description": "Local-first AI memory as a Markdown wiki backed by SQLite search and MCP tools",
+	"description": "Cited search over your project's docs for coding agents: CLI, MCP server and a local docs browser",
 	"keywords": [
-		"ai-memory",
+		"adr",
+		"ai-agents",
 		"cli",
-		"knowledge-base",
+		"documentation",
+		"fts5",
+		"markdown",
 		"mcp",
-		"second-brain",
+		"search",
 		"sqlite",
-		"wiki"
+		"wikilinks"
 	],
 	"homepage": "https://github.com/spences10/wiki0#readme",
 	"bugs": {
