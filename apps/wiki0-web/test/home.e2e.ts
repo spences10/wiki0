@@ -17,7 +17,7 @@ test('has the headline and every section', async ({ page }) => {
 	await expect(
 		page.getByRole('heading', {
 			level: 1,
-			name: 'The right section of your docs, cited.',
+			name: 'Docs search for your coding agent.',
 		}),
 	).toBeVisible();
 	for (const name of sections) {

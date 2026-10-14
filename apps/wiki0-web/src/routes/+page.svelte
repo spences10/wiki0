@@ -1,5 +1,4 @@
 <script lang="ts">
-	import UseIt from '#lib/sections/use-it.svelte';
 	import Cite from '#lib/sections/cite.svelte';
 	import Hero from '#lib/sections/hero.svelte';
 	import IndexSection from '#lib/sections/index-section.svelte';
@@ -7,17 +6,18 @@
 	import Problem from '#lib/sections/problem.svelte';
 	import Rerank from '#lib/sections/rerank.svelte';
 	import UiSection from '#lib/sections/ui-section.svelte';
+	import UseIt from '#lib/sections/use-it.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const repo = 'https://github.com/spences10/wiki0';
 	const description =
-		'wiki0 searches the docs already in your repo and gives your coding agent the current section with a path:start-end citation, so it reads a section instead of whole files.';
+		'wiki0 indexes the Markdown in your repo so your coding agent gets back the relevant, current section with the file and line it came from, instead of reading every file.';
 </script>
 
 <svelte:head>
-	<title>wiki0: cited search over your project's docs</title>
+	<title>wiki0: docs search for your coding agent</title>
 	<meta name="description" content={description} />
 	<meta property="og:title" content="wiki0" />
 	<meta property="og:description" content={description} />

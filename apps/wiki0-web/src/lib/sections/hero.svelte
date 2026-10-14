@@ -72,18 +72,19 @@
 
 	<section
 		aria-labelledby="hero-title"
-		class="mx-auto grid max-w-7xl gap-12 px-4 pt-10 pb-24 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:pt-16 lg:pb-32"
+		class="mx-auto grid max-w-7xl gap-12 px-4 pt-10 pb-24 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:pt-16 lg:pb-32"
 	>
-		<div class="grid content-start gap-7">
+		<div class="grid min-w-0 content-start gap-7">
 			<h1 id="hero-title" class="headline">
-				The right section of your docs, cited.
+				Docs search for your <span class="marked">coding agent</span>.
 			</h1>
 			<p class="lede">
-				wiki0 searches the docs already in your repo and hands your
-				coding agent the current section with its file and line range,
-				so it reads a section instead of whole files.
+				wiki0 indexes the Markdown in your repo. Your agent asks a
+				question and gets back the relevant section, the current one,
+				with the file and line it came from, instead of reading every
+				file.
 			</p>
-			<div class="grid max-w-[34rem] gap-2">
+			<div class="grid max-w-136 gap-2">
 				<p class="text-sm text-muted-foreground">Ask your agent:</p>
 				<div
 					class="flex items-start gap-2 rounded-xl border bg-card py-2.5 pr-2 pl-4"
@@ -146,12 +147,19 @@
 
 <style>
 	.headline {
-		font-size: clamp(3rem, 6.6vw, 6.4rem);
+		font-size: clamp(2.6rem, 4.6vw, 4.9rem);
 		font-stretch: 125%;
 		font-weight: 800;
-		line-height: 0.92;
-		letter-spacing: -0.045em;
-		max-width: 11ch;
+		line-height: 1;
+		letter-spacing: -0.04em;
+	}
+
+	/* A hand-drawn stroke under the words that matter */
+	.marked {
+		--stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cpath d='M4 16 C 50 6, 96 20, 150 11 S 250 4, 296 14' fill='none' stroke='%23c4b5fd' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+		padding-bottom: 0.12em;
+		white-space: nowrap;
+		background: var(--stroke) left bottom / 100% 0.28em no-repeat;
 	}
 
 	.lede {
@@ -335,6 +343,10 @@
 		.headline {
 			animation: land 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
 		}
+		.marked {
+			animation: underline 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.8s
+				both;
+		}
 		.editor {
 			animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s both;
 		}
@@ -344,6 +356,12 @@
 		}
 		.cite-tag {
 			animation: pop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) 1.5s both;
+		}
+	}
+
+	@keyframes underline {
+		from {
+			background-size: 0% 0.28em;
 		}
 	}
 
