@@ -38,6 +38,8 @@ export type IndexStatus = {
 	indexed_page_count: number;
 	stale: boolean;
 	reasons: string[];
+	changes: { new: string[]; modified: string[]; deleted: string[] };
+	warnings: string[];
 };
 
 export type SearchRelaxation =
@@ -194,4 +196,14 @@ export type DocumentSummary = {
 	headings: DocumentHeading[];
 	in_link_count: number;
 	out_link_count: number;
+};
+
+export type ChunkSummary = {
+	start_line: number;
+	end_line: number;
+	citation: string;
+	heading: string | null;
+	depth: number;
+	breadcrumb: string[];
+	tokens: number;
 };

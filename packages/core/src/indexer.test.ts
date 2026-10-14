@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import {
@@ -7,7 +7,7 @@ import {
 	index_status,
 	index_wiki,
 } from './indexer.js';
-import { list_documents } from './catalog.js';
+import { list_chunks, list_documents } from './catalog.js';
 import { backlinks_for_page, search } from './search.js';
 import { make_wiki_root, write_doc } from './test-utils.js';
 
@@ -197,5 +197,61 @@ describe('list_documents', () => {
 				out_link_count: 0,
 			}),
 		]);
+	});
+});
+
+describe('index_status changes and warnings', () => {
+	it('lists changed files and keeps warnings from the last index', async () => {
+		const root = make_wiki_root();
+		write_doc(root, 'a.md', '# A');
+		write_doc(root, 'b.md', '# B');
+		write_doc(root, 'bad.md', '---\ntitle: [oops\n---\n# Bad');
+		await index_wiki(root);
+		write_doc(root, 'a.md', '# A changed');
+		write_doc(root, 'c.md', '# C');
+		rmSync(join(root, 'b.md'));
+
+		const status = index_status(root);
+
+		expect(status.changes).toEqual({
+			new: ['c.md'],
+			modified: ['a.md'],
+			deleted: ['b.md'],
+		});
+		expect(status.reasons).toEqual([
+			'new-pages',
+			'modified-pages',
+			'deleted-pages',
+		]);
+		expect(status.warnings).toEqual([
+			expect.stringContaining('bad.md: Invalid YAML frontmatter'),
+		]);
+	});
+});
+
+describe('list_chunks', () => {
+	it('returns the stored chunks for a document', async () => {
+		const root = make_wiki_root();
+		const filler = 'Detail. '.repeat(40);
+		write_doc(
+			root,
+			'docs/guide.md',
+			`# Guide\n\n${filler}\n\n## Setup\n\n${filler}`,
+		);
+		await index_wiki(root);
+
+		expect(list_chunks('guide', root)).toEqual([
+			expect.objectContaining({
+				citation: 'docs/guide.md:1-3',
+				heading: 'Guide',
+				breadcrumb: ['Guide'],
+				tokens: expect.any(Number),
+			}),
+			expect.objectContaining({
+				citation: 'docs/guide.md:5-7',
+				breadcrumb: ['Guide', 'Setup'],
+			}),
+		]);
+		expect(list_chunks('missing', root)).toBeNull();
 	});
 });

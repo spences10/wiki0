@@ -2,7 +2,9 @@ import {
 	open_index_or_throw,
 	resolve_project_root,
 } from './storage.js';
-import type { DocumentSummary } from './types.js';
+import { estimate_tokens } from './chunks.js';
+import { find_indexed_path } from './search.js';
+import type { ChunkSummary, DocumentSummary } from './types.js';
 
 // Every indexed document with its outline and link counts, ordered by
 // path.
@@ -79,6 +81,43 @@ export function list_documents(root = '.'): DocumentSummary[] {
 			headings: outline.get(page.path) ?? [],
 			in_link_count: in_links.get(page.path) ?? 0,
 			out_link_count: out_links.get(page.path) ?? 0,
+		}));
+	} finally {
+		db.close();
+	}
+}
+
+// The chunks stored in the index for one document, in order. Returns
+// null when the target is not an indexed document.
+export function list_chunks(
+	target: string,
+	root = '.',
+): ChunkSummary[] | null {
+	const db = open_index_or_throw(resolve_project_root(root));
+	try {
+		const path = find_indexed_path(db, target);
+		if (!path) return null;
+		const rows = db
+			.prepare(
+				`SELECT start_line, end_line, heading, depth, breadcrumb, body
+				FROM page_chunks WHERE path = ? ORDER BY sequence`,
+			)
+			.all(path) as {
+			start_line: number;
+			end_line: number;
+			heading: string | null;
+			depth: number;
+			breadcrumb: string;
+			body: string;
+		}[];
+		return rows.map((row) => ({
+			start_line: row.start_line,
+			end_line: row.end_line,
+			citation: `${path}:${row.start_line}-${row.end_line}`,
+			heading: row.heading,
+			depth: row.depth,
+			breadcrumb: row.breadcrumb.split(' > ').filter(Boolean),
+			tokens: estimate_tokens(row.body),
 		}));
 	} finally {
 		db.close();

@@ -1,4 +1,4 @@
-export { list_documents } from './catalog.js';
+export { list_chunks, list_documents } from './catalog.js';
 export {
 	chunk_markdown,
 	chunk_plain_text,

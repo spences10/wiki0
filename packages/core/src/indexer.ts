@@ -212,6 +212,7 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 		set_meta(db, 'indexed_at', indexed_at);
 		set_meta(db, 'schema_version', String(index_schema_version));
 		set_meta(db, 'package_version', current_index_package_version);
+		set_meta(db, 'warnings', JSON.stringify(warnings));
 		db.exec('COMMIT');
 	} catch (error) {
 		db.exec('ROLLBACK');
@@ -392,6 +393,8 @@ export function index_status(root = '.'): IndexStatus {
 					? 'schema-version-mismatch'
 					: 'missing-index',
 			],
+			changes: { new: file_paths, modified: [], deleted: [] },
+			warnings: [],
 		};
 	}
 
@@ -421,20 +424,28 @@ export function index_status(root = '.'): IndexStatus {
 		reasons.push('package-version-mismatch');
 	}
 	const current_paths = new Set(file_paths);
+	const changes: IndexStatus['changes'] = {
+		new: [],
+		modified: [],
+		deleted: [],
+	};
 	for (const path of indexed_hashes.keys()) {
-		if (!current_paths.has(path)) reasons.push('deleted-pages');
+		if (!current_paths.has(path)) changes.deleted.push(path);
 	}
 	for (const path of file_paths) {
 		const indexed_hash = indexed_hashes.get(path);
 		if (!indexed_hash) {
-			reasons.push('new-pages');
+			changes.new.push(path);
 			continue;
 		}
 		const current_hash = createHash('sha256')
 			.update(readFileSync(join(project_root, path)))
 			.digest('hex');
-		if (current_hash !== indexed_hash) reasons.push('modified-pages');
+		if (current_hash !== indexed_hash) changes.modified.push(path);
 	}
+	if (changes.new.length > 0) reasons.push('new-pages');
+	if (changes.modified.length > 0) reasons.push('modified-pages');
+	if (changes.deleted.length > 0) reasons.push('deleted-pages');
 
 	return {
 		root: project_root,
@@ -448,7 +459,10 @@ export function index_status(root = '.'): IndexStatus {
 		page_count: file_paths.length,
 		indexed_page_count: indexed_hashes.size,
 		stale: reasons.length > 0,
-		reasons: [...new Set(reasons)],
+		reasons,
+		changes,
+		// Warnings from the last index run (bad frontmatter, skipped files).
+		warnings: JSON.parse(meta.get('warnings') ?? '[]') as string[],
 	};
 }
 
