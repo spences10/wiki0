@@ -87,21 +87,21 @@ export const IndexStatusSchema = v.object({
 export const SearchWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	limit: v.optional(v.number(), 10),
+	limit: v.optional(v.number(), 5),
+	include_superseded: v.optional(v.boolean(), true),
 });
 
 export const ContextWikiSchema = v.object({
 	query: v.string(),
 	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	limit: v.optional(v.number(), 5),
+	limit: v.optional(v.number(), 3),
 });
 
 export const ShowWikiChunkSchema = v.object({
 	target: v.string(),
 	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
+	token_budget: v.optional(v.number(), 2000),
+	neighbours: v.optional(v.number(), 0),
 });
 
 export const GraphWikiSchema = v.object({

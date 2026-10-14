@@ -1,13 +1,9 @@
 import type { SQLOutputValue } from 'node:sqlite';
 import { log_wiki_event } from './events.js';
 import { resolve_wiki_root } from './paths.js';
-import { find_indexed_path, show_wiki_chunk } from './search.js';
+import { find_indexed_path, show } from './search.js';
 import { open_index, type WikiDatabase } from './storage.js';
-import type {
-	Fact,
-	FactWriteOptions,
-	ShowChunkResult,
-} from './types.js';
+import type { Fact, FactWriteOptions, ShowResult } from './types.js';
 
 export type DerivedFactCandidate = Omit<
 	FactWriteOptions,
@@ -21,7 +17,7 @@ export function add_fact(fact: FactWriteOptions): Fact {
 	const db = open_index(wiki_root);
 	ensure_fact_provenance_columns(db);
 	const source_chunk = fact.source
-		? show_wiki_chunk(fact.source, wiki_root)
+		? show(fact.source, wiki_root)
 		: null;
 	const page_path = fact.page
 		? find_indexed_path(db, fact.page)
@@ -47,7 +43,7 @@ export function add_fact(fact: FactWriteOptions): Fact {
 			fact.body ?? null,
 			fact.confidence ?? 'unknown',
 			source_chunk?.path ?? null,
-			source_chunk?.heading ?? null,
+			source_chunk?.breadcrumb.at(-1) ?? null,
 			source_chunk?.start_line ?? null,
 			source_chunk?.end_line ?? null,
 			fact.source_quote ?? source_quote(source_chunk),
@@ -161,10 +157,10 @@ function fact_from_row(row: Record<string, SQLOutputValue>): Fact {
 }
 
 function source_quote(
-	source_chunk: ShowChunkResult | null,
+	source_chunk: ShowResult | null,
 ): string | null {
 	if (!source_chunk) return null;
-	return source_chunk.body.slice(0, 1000);
+	return source_chunk.markdown.slice(0, 1000);
 }
 
 function ensure_fact_provenance_columns(db: WikiDatabase): void {

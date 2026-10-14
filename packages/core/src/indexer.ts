@@ -86,7 +86,7 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 	try {
 		// The index is a cache, so each run rebuilds it from the files.
 		db.exec(
-			'DELETE FROM fts_pages; DELETE FROM fts_page_chunks; DELETE FROM page_chunks; DELETE FROM links; DELETE FROM anchors; DELETE FROM pages;',
+			'DELETE FROM fts_chunks; DELETE FROM page_chunks; DELETE FROM links; DELETE FROM anchors; DELETE FROM pages;',
 		);
 		const resolve_link = link_resolver(
 			documents.map((document) => ({
@@ -117,9 +117,6 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 			INSERT INTO anchors (page_id, path, kind, slug, text, depth, line)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 		`);
-		const insert_fts = db.prepare(
-			'INSERT INTO fts_pages (path, title, body) VALUES (?, ?, ?)',
-		);
 		const insert_chunk = db.prepare(`
 			INSERT INTO page_chunks (
 				page_id, path, title, heading, depth, breadcrumb, body,
@@ -129,7 +126,7 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`);
 		const insert_chunk_fts = db.prepare(
-			'INSERT INTO fts_page_chunks (chunk_id, path, title, heading, body, breadcrumb, aliases) VALUES (?, ?, ?, ?, ?, ?, ?)',
+			'INSERT INTO fts_chunks (chunk_id, path, title, heading, breadcrumb, aliases, body) VALUES (?, ?, ?, ?, ?, ?, ?)',
 		);
 
 		for (const document of documents) {
@@ -151,7 +148,6 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 				JSON.stringify(meta.supersedes),
 				meta.superseded_by,
 			).lastInsertRowid;
-			insert_fts.run(document.path, document.title, document.text);
 
 			for (const link of document.links) {
 				const resolved = resolve_link(document.path, link);
@@ -206,9 +202,9 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 					document.path,
 					document.title,
 					chunk.heading,
-					chunk.body,
 					breadcrumb,
 					meta.aliases.join(' '),
+					chunk.body,
 				);
 				chunk_count += 1;
 			}

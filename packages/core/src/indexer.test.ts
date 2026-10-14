@@ -8,11 +8,7 @@ import {
 	index_wiki,
 } from './indexer.js';
 import { create_page } from './pages.js';
-import {
-	backlinks_for_page,
-	search_wiki,
-	search_wiki_chunks,
-} from './search.js';
+import { backlinks_for_page, search } from './search.js';
 import { make_wiki_root } from './test-utils.js';
 
 describe('index_wiki', () => {
@@ -38,7 +34,7 @@ describe('index_wiki', () => {
 			current_index_package_version,
 		);
 
-		const results = search_wiki('inspectable', root);
+		const results = search('inspectable', root).results;
 		expect(results).toEqual([
 			expect.objectContaining({
 				path: 'wiki/topics/memory.md',
@@ -141,13 +137,14 @@ describe('index_wiki on project docs', () => {
 
 		expect(result).toMatchObject({ page_count: 2, warnings: [] });
 		expect(
-			search_wiki_chunks('index next to the docs', root, 1),
+			search('index next to the docs', root, { limit: 1 }).results,
 		).toEqual([
 			expect.objectContaining({
 				path: 'docs/adr/0002-storage.md',
 				title: 'Store the index in the repo',
-				breadcrumb: 'Store the index in the repo',
-				page_status: 'superseded',
+				breadcrumb: ['Store the index in the repo'],
+				status: 'superseded',
+				doc_type: 'decision',
 				start_line: 7,
 				end_line: 9,
 			}),
@@ -167,8 +164,6 @@ describe('index_wiki on project docs', () => {
 		expect(result.warnings).toEqual([
 			expect.stringContaining('broken.md: Invalid YAML frontmatter'),
 		]);
-		expect(
-			search_wiki_chunks('still searchable', root, 1),
-		).toHaveLength(1);
+		expect(search('still searchable', root).results).toHaveLength(1);
 	});
 });

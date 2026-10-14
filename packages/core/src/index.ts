@@ -67,11 +67,11 @@ export { review_wiki } from './review.js';
 export { index_schema_version, schema_sql } from './schema.js';
 export {
 	backlinks_for_page,
-	format_context_markdown,
+	find_indexed_path,
 	get_wiki_context,
-	search_wiki,
-	search_wiki_chunks,
-	show_wiki_chunk,
+	plain_text_terms,
+	search,
+	show,
 } from './search.js';
 export {
 	open_index,

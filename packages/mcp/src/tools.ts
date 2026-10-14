@@ -17,9 +17,9 @@ import {
 	plan_wiki,
 	read_page,
 	review_wiki,
-	search_wiki,
+	search,
 	set_page_frontmatter,
-	show_wiki_chunk,
+	show,
 	slugify_title,
 	sync_documents,
 	type WikiFrontmatter,
@@ -308,11 +308,19 @@ export function register_wiki_tools(server: {
 	tool(
 		{
 			name: 'search_wiki',
-			description: 'Search indexed wiki0 pages with SQLite FTS',
+			description:
+				'Search the project docs. Returns one cited section per document (path:start-end), ranked so current, authoritative docs come first. Use show_wiki_chunk with a citation to read it.',
 			schema: SearchWikiSchema,
 		},
-		async ({ query, root, limit }: SearchWikiInput) =>
-			json_response(search_wiki(query, mcp_root(root), limit)),
+		async ({
+			query,
+			root,
+			limit,
+			include_superseded,
+		}: SearchWikiInput) =>
+			json_response(
+				search(query, mcp_root(root), { limit, include_superseded }),
+			),
 	);
 
 	tool(
@@ -329,11 +337,18 @@ export function register_wiki_tools(server: {
 		{
 			name: 'show_wiki_chunk',
 			description:
-				'Return the indexed wiki chunk for a page path/title, optionally with :line',
+				'Return a cited section from the current file: path:line, path:start-end, path#heading, path or title. Follows `next` when truncated.',
 			schema: ShowWikiChunkSchema,
 		},
-		async ({ target, root }: ShowWikiChunkInput) =>
-			json_response(show_wiki_chunk(target, mcp_root(root))),
+		async ({
+			target,
+			root,
+			token_budget,
+			neighbours,
+		}: ShowWikiChunkInput) =>
+			json_response(
+				show(target, mcp_root(root), { token_budget, neighbours }),
+			),
 	);
 
 	tool(

@@ -92,8 +92,8 @@ describe('MCP schemas', () => {
 		expect(parse(SearchWikiSchema, { query: 'agent' })).toEqual({
 			query: 'agent',
 			root: '.',
-			wiki_dir: 'wiki',
-			limit: 10,
+			limit: 5,
+			include_superseded: true,
 		});
 	});
 });

@@ -16,9 +16,9 @@ import {
 	plan_wiki,
 	read_page,
 	review_wiki,
-	search_wiki,
+	search,
 	set_page_frontmatter,
-	show_wiki_chunk,
+	show,
 	sync_documents,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
@@ -607,17 +607,21 @@ export const main = defineCommand({
 				},
 				limit: {
 					type: 'string',
-					description: 'Maximum number of results',
-					default: '10',
+					description: 'Maximum number of documents',
+					default: '5',
+				},
+				includeSuperseded: {
+					type: 'boolean',
+					description: 'Keep superseded documents in results',
+					default: true,
 				},
 			},
 			run({ args }) {
 				print_json(
-					search_wiki(
-						String(args.query),
-						String(args.root ?? '.'),
-						Number(args.limit ?? 10),
-					),
+					search(String(args.query), String(args.root ?? '.'), {
+						limit: Number(args.limit ?? 5),
+						include_superseded: args.includeSuperseded !== false,
+					}),
 				);
 			},
 		}),
@@ -630,7 +634,8 @@ export const main = defineCommand({
 				target: {
 					type: 'positional',
 					required: true,
-					description: 'Page path/title, optionally with :line',
+					description:
+						'path:line, path:start-end, path#heading, path or title',
 				},
 				root: {
 					type: 'string',
@@ -643,18 +648,49 @@ export const main = defineCommand({
 						'Content folder to store pages (for example docs)',
 					default: 'wiki',
 				},
+				tokens: {
+					type: 'string',
+					description: 'Token budget for the returned text',
+					default: '2000',
+				},
+				neighbours: {
+					type: 'string',
+					description: 'Also include this many sections either side',
+					default: '0',
+				},
 				json: {
 					type: 'boolean',
 					description: 'Output structured JSON instead of Markdown',
 				},
 			},
 			run({ args }) {
-				const result = show_wiki_chunk(
+				const result = show(
 					String(args.target),
 					String(args.root ?? '.'),
+					{
+						token_budget: Number(args.tokens ?? 2000),
+						neighbours: Number(args.neighbours ?? 0),
+					},
 				);
-				if (args.json) print_json(result);
-				else console.log(result?.body ?? 'No indexed chunk found.');
+				if (args.json) {
+					print_json(result);
+					return;
+				}
+				if (!result) {
+					console.log('No indexed section found.');
+					process.exitCode = 1;
+					return;
+				}
+				console.log(`Source: ${result.citation}`);
+				for (const warning of result.warnings)
+					console.log(`Warning: ${warning}`);
+				if (result.superseded_by) {
+					console.log(`Superseded by: ${result.superseded_by}`);
+				}
+				console.log('');
+				console.log(result.markdown);
+				if (result.next)
+					console.log(`\nMore: wiki0 show ${result.next}`);
 			},
 		}),
 		context: defineCommand({
@@ -676,8 +712,8 @@ export const main = defineCommand({
 				},
 				limit: {
 					type: 'string',
-					description: 'Maximum number of context results',
-					default: '5',
+					description: 'Maximum number of sections',
+					default: '3',
 				},
 				json: {
 					type: 'boolean',
@@ -688,7 +724,7 @@ export const main = defineCommand({
 				const result = get_wiki_context(
 					String(args.query),
 					String(args.root ?? '.'),
-					Number(args.limit ?? 5),
+					Number(args.limit ?? 3),
 				);
 				console.log(
 					args.json

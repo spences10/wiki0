@@ -75,30 +75,77 @@ export type IndexStatus = {
 	reasons: string[];
 };
 
-export type SearchResult = {
-	path: string;
-	title: string;
-	snippet: string;
-	rank: number;
+export type SearchRelaxation =
+	| 'all-terms'
+	| 'without-stopwords'
+	| 'dropped-terms'
+	| 'any-term';
+
+export type ScoreParts = {
+	text: number;
+	status: number;
+	type: number;
+	inlinks: number;
+	recency: number;
+	priority: number;
 };
 
-export type ChunkSearchResult = SearchResult & {
-	chunk_id: number;
-	heading: string | null;
-	breadcrumb: string;
-	body: string;
+export type SearchHit = {
+	path: string;
 	start_line: number;
 	end_line: number;
-	page_priority?: number;
-	page_status?: string | null;
-	page_tags?: string[];
+	citation: string;
+	anchor: string | null;
+	breadcrumb: string[];
+	title: string;
+	heading: string | null;
+	status: string | null;
+	doc_type: string | null;
+	date: string | null;
+	snippet: string;
+	match_ranges: [number, number][];
+	score: number;
+	score_parts: ScoreParts;
+	superseded_by: string | null;
+	more_in_doc: number;
 };
 
-export type ShowChunkResult = ChunkSearchResult;
+export type SearchOptions = {
+	limit?: number;
+	include_superseded?: boolean;
+};
+
+export type SearchResponse = {
+	query: string;
+	relaxation: SearchRelaxation | null;
+	results: SearchHit[];
+	warnings: string[];
+};
+
+export type ShowOptions = {
+	token_budget?: number;
+	neighbours?: number;
+};
+
+export type ShowResult = {
+	path: string;
+	start_line: number;
+	end_line: number;
+	citation: string;
+	title: string;
+	breadcrumb: string[];
+	markdown: string;
+	tokens: number;
+	truncated: boolean;
+	next: string | null;
+	superseded_by: string | null;
+	warnings: string[];
+};
 
 export type ContextResult = {
 	query: string;
-	results: ChunkSearchResult[];
+	relaxation: SearchRelaxation | null;
+	results: SearchHit[];
 	warnings: string[];
 	markdown: string;
 };

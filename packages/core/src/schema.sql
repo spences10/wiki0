@@ -100,5 +100,21 @@ CREATE TABLE IF NOT EXISTS wiki_events (
 	created_at TEXT DEFAULT (datetime('now'))
 );
 
-CREATE VIRTUAL TABLE IF NOT EXISTS fts_pages USING fts5(path, title, body);
-CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_chunks USING fts5(chunk_id UNINDEXED, path, title, heading, body, breadcrumb, aliases);
+-- porter stems English words. Hyphens and underscores split tokens so
+-- `remote-functions-testing` matches "remote functions"; a quoted
+-- query still matches `x-api-key` as a phrase.
+CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks USING fts5(
+	chunk_id UNINDEXED,
+	path,
+	title,
+	heading,
+	breadcrumb,
+	aliases,
+	body,
+	tokenize = "porter unicode61 remove_diacritics 2"
+);
+
+-- Column weights: path 2, title 4, heading 4, breadcrumb 2, aliases 5,
+-- body 1. Stored so ORDER BY rank uses them.
+INSERT INTO fts_chunks (fts_chunks, rank)
+VALUES ('rank', 'bm25(0.0, 2.0, 4.0, 4.0, 2.0, 5.0, 1.0)');

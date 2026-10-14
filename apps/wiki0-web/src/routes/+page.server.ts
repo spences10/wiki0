@@ -5,7 +5,7 @@ import {
 	index_wiki,
 	read_page,
 	review_wiki,
-	search_wiki,
+	search,
 	type BacklinkResult,
 	type WikiPage,
 } from '@wiki0/core';
@@ -33,7 +33,9 @@ export const load: PageServerLoad = async ({ url }) => {
 	const graph = graph_wiki(root);
 	const review = review_wiki(root);
 	const query = url.searchParams.get('q')?.trim() ?? '';
-	const search = query ? search_wiki(query, root, 8) : [];
+	const search_results = query
+		? search(query, root, { limit: 8 }).results
+		: [];
 	const selected_path =
 		url.searchParams.get('page') ?? graph.nodes[0]?.path ?? null;
 	let selected_page: WikiPage | null = null;
@@ -55,7 +57,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		graph,
 		review,
 		query,
-		search,
+		search: search_results,
 		selected_path,
 		selected_page,
 		backlinks,
