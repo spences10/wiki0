@@ -10,8 +10,8 @@ catalog:
   '@internationalized/date': ^3.12.2
   '@layerstack/svelte-actions': ^1.0.1
   '@layerstack/utils': ^1.0.1
-  '@lucide/svelte': ^1.48.0
-  '@playwright/test': ^1.63.0
+  '@lucide/svelte': ^1.55.0
+  '@playwright/test': ^1.64.0
   '@sveltejs/adapter-auto': ^7.0.1
   '@sveltejs/kit': ^2.70.3
   '@sveltejs/vite-plugin-svelte': ^7.3.1
@@ -23,21 +23,21 @@ catalog:
   '@types/node': ^24.0.0
   '@typescript/native': npm:typescript@^7.0.2
   '@vitest/browser-playwright': 5.0.3
-  bits-ui: ^2.19.3
+  bits-ui: ^2.19.5
   citty: ^0.2.2
   clsx: ^2.1.1
   d3-force: ^3.0.0
   d3-shape: ^3.2.0
   github-slugger: ^2.0.0
-  layerchart: '2.5.0'
+  layerchart: ^2.7.0
   mammoth: ^1.13.0
-  marked: ^18.1.0
+  marked: ^18.1.1
   mdsvex: ^0.12.8
   pdf-parse: ^2.4.5
-  playwright: ^1.63.0
+  playwright: ^1.64.0
   shadcn-svelte: ^1.7.0
   smol-toml: ^1.9.1
-  svelte: ^5.57.1
+  svelte: ^5.57.2
   svelte-check: ^4.7.6
   tailwind-merge: ^3.7.0
   tailwind-variants: ^3.2.2
