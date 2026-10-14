@@ -1,26 +1,20 @@
 ---
-title: MCP
-aliases:
-  - MCP server
-  - packages/mcp
-tags:
-  - interface
-  - package
+title: MCP server
+aliases: [MCP, '@wiki0/mcp']
+type: reference
 ---
 
-# MCP
+# MCP server
 
-The wiki0 MCP server is the agent-facing interface for reading,
-writing, searching, and reviewing wiki memory.
+`@wiki0/mcp`, binary `wiki0-mcp`. Tool list:
+[the package README](../../packages/mcp/README.md).
 
-## Responsibilities
-
-- Let agents search and retrieve relevant wiki context.
-- Let agents create and update pages using explicit Markdown files.
-- Preserve citations and backlinks so memory remains inspectable.
-- Scope every session to a selected wiki root.
-
-## Packaging
-
-The MCP server should be published to npm and depend on
-[[packages/core]].
+- Intended agent flow: `search_docs`, then `show_section` with a
+  result's citation, then `show_section` again with `next` if the text
+  was cut short.
+- Roots outside the server's working directory need
+  `WIKI0_ALLOWED_ROOTS`. `WIKI0_READ_ONLY=true` blocks `index_docs`,
+  the only tool that writes (to the index only).
+- If the server and the CLI see different environments they can
+  resolve different index files; set `WIKI0_INDEX` for both
+  ([Storage](../reference/storage.md#index-location)).

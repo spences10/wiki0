@@ -13,15 +13,16 @@ tags:
 
 # Publishing workflow
 
-wiki0 uses [[Changesets]] to version and publish packages.
+wiki0 uses Changesets to version and publish packages. The maintainer
+writes changesets; agents propose the description.
 
 ## Package shape
 
-- `@wiki0/core` is the reusable library of Markdown wiki primitives.
-- `@wiki0/mcp` is the agent-facing MCP server and primary LLM tool
-  surface.
-- `@wiki0/cli` is the shell, CI, and human fallback interface. It
-  still exposes the `wiki0` binary.
+- `@wiki0/core`: indexing, links, search and lint.
+- `@wiki0/mcp`: the agent-facing MCP server ([[interfaces/mcp]]).
+- `@wiki0/cli`: the `wiki0` binary for shells and CI
+  ([[interfaces/cli]]).
+- `apps/wiki0-web` is private and ignored by Changesets.
 
 ## Lessons from first npm publish
 
@@ -38,6 +39,5 @@ wiki0 uses [[Changesets]] to version and publish packages.
 
 ## Validation expectations
 
-Before publishing package changes, load [[wiki0 package workflow]] and
-run the relevant focused checks from
-`.agents/skills/wiki0-package-workflow/SKILL.md`.
+Run `pnpm verify` before publishing; it includes a smoke test that
+packs each package and runs both binaries.
