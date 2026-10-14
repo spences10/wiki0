@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import {
+	create_wikilink_pattern,
 	extract_anchors,
 	extract_links,
 	link_resolver,
@@ -64,6 +65,22 @@ describe('extract_links', () => {
 				target: 'Other',
 			}),
 		]);
+	});
+});
+
+describe('create_wikilink_pattern', () => {
+	it('matches the wikilinks core indexes, with a fresh lastIndex', () => {
+		const text =
+			'See [[Page|alias]] and ![[pic.png]] and [not](x.md).';
+		const matches = [...text.matchAll(create_wikilink_pattern())];
+
+		expect(
+			matches.map((match) => [match[1], match[2], match[3]]),
+		).toEqual([
+			['', 'Page', 'alias'],
+			['!', 'pic.png', undefined],
+		]);
+		expect(create_wikilink_pattern().lastIndex).toBe(0);
 	});
 });
 

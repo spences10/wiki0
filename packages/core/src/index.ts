@@ -1,4 +1,9 @@
-export { list_chunks, list_documents } from './catalog.js';
+export {
+	list_chunks,
+	list_documents,
+	list_links,
+	read_document,
+} from './catalog.js';
 export {
 	chunk_markdown,
 	chunk_plain_text,
@@ -29,6 +34,7 @@ export {
 	index_wiki,
 } from './indexer.js';
 export {
+	create_wikilink_pattern,
 	extract_anchors,
 	extract_links,
 	link_resolver,
@@ -40,6 +46,7 @@ export {
 	type LinkTargetDocument,
 	type MatchQuality,
 	type ResolvedLink,
+	wikilink_pattern_source,
 } from './links.js';
 export { lint_wiki } from './lint.js';
 export { parse_frontmatter, parse_markdown } from './markdown.js';

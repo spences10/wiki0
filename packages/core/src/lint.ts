@@ -5,7 +5,7 @@ import {
 } from './storage.js';
 import type { LintIssue, LintResult, LintSeverity } from './types.js';
 
-type LinkRow = {
+export type LinkRow = {
 	from_path: string;
 	line: number;
 	kind: string;
@@ -84,7 +84,7 @@ export function lint_wiki(root = '.'): LintResult {
 	};
 }
 
-function link_issues(link: LinkRow): LintIssue[] {
+export function link_issues(link: LinkRow): LintIssue[] {
 	const base = {
 		path: link.from_path,
 		line: link.line,

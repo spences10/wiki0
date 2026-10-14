@@ -207,3 +207,35 @@ export type ChunkSummary = {
 	breadcrumb: string[];
 	tokens: number;
 };
+
+export type DocumentContent = {
+	path: string;
+	title: string;
+	kind: string;
+	// Full current file text, frontmatter included.
+	source: string;
+	// Text after the frontmatter, and its first line number in the file.
+	markdown: string;
+	body_start_line: number;
+	frontmatter: WikiFrontmatter;
+	status: string | null;
+	doc_type: string | null;
+	date: string | null;
+	superseded_by: string | null;
+	warnings: string[];
+};
+
+export type DocumentLink = {
+	line: number;
+	kind: string;
+	raw_text: string;
+	target: string;
+	alias: string | null;
+	embed: boolean;
+	to: string | null;
+	to_anchor: string | null;
+	link_status: string;
+	rule: string | null;
+	message: string | null;
+	suggestions: string[];
+};

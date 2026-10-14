@@ -51,7 +51,17 @@ export type ResolvedLink = ExtractedLink & {
 	candidates: string[];
 };
 
-const wikilink_pattern = /(!?)\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gu;
+// The wikilink syntax wiki0 indexes: `[[target]]`, `[[target|alias]]`
+// and `![[embed]]`. Groups: 1 embed marker, 2 target, 3 alias.
+export const wikilink_pattern_source =
+	'(!?)\\[\\[([^\\]|]+)(?:\\|([^\\]]+))?\\]\\]';
+
+// A fresh global RegExp each call, so callers never share lastIndex.
+export function create_wikilink_pattern(): RegExp {
+	return new RegExp(wikilink_pattern_source, 'gu');
+}
+
+const wikilink_pattern = create_wikilink_pattern();
 const undefined_reference_pattern = /\[([^\]\n]+)\]\[([^\]\n]+)\]/gu;
 const external_pattern = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu;
 const line_fragment_pattern =

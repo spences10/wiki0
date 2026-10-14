@@ -7,7 +7,12 @@ import {
 	index_status,
 	index_wiki,
 } from './indexer.js';
-import { list_chunks, list_documents } from './catalog.js';
+import {
+	list_chunks,
+	list_documents,
+	list_links,
+	read_document,
+} from './catalog.js';
 import { backlinks_for_page, search } from './search.js';
 import { make_wiki_root, write_doc } from './test-utils.js';
 
@@ -253,5 +258,68 @@ describe('list_chunks', () => {
 			}),
 		]);
 		expect(list_chunks('missing', root)).toBeNull();
+	});
+});
+
+describe('read_document', () => {
+	it('returns the whole file with frontmatter split off', async () => {
+		const root = make_wiki_root();
+		write_doc(
+			root,
+			'docs/a.md',
+			'---\nstatus: accepted\n---\n# A\n\nBody text.',
+		);
+		await index_wiki(root);
+
+		expect(read_document('docs/a', root)).toMatchObject({
+			path: 'docs/a.md',
+			title: 'A',
+			markdown: '# A\n\nBody text.',
+			body_start_line: 4,
+			frontmatter: { status: 'accepted' },
+			status: 'accepted',
+			warnings: [],
+		});
+		write_doc(root, 'docs/a.md', '# A\n\nEdited.');
+		expect(read_document('docs/a.md', root)?.warnings).toEqual([
+			expect.stringContaining('changed since it was indexed'),
+		]);
+		expect(read_document('nope', root)).toBeNull();
+	});
+});
+
+describe('list_links', () => {
+	it('lists a document’s links in order with lint rules', async () => {
+		const root = make_wiki_root();
+		write_doc(
+			root,
+			'docs/a.md',
+			'# A\n\n[b](./b.md#setup) then [gone](./gone.md)\n\nSee [[B]].',
+		);
+		write_doc(root, 'docs/b.md', '# B\n\n## Setup');
+		await index_wiki(root);
+
+		expect(list_links('docs/a.md', root)).toEqual([
+			expect.objectContaining({
+				line: 3,
+				raw_text: '[b](./b.md#setup)',
+				to: 'docs/b.md',
+				to_anchor: 'setup',
+				link_status: 'resolved',
+				rule: null,
+			}),
+			expect.objectContaining({
+				line: 3,
+				raw_text: '[gone](./gone.md)',
+				link_status: 'missing-file',
+				rule: 'missing-file',
+			}),
+			expect.objectContaining({
+				line: 5,
+				kind: 'wikilink',
+				to: 'docs/b.md',
+			}),
+		]);
+		expect(list_links('nope', root)).toBeNull();
 	});
 });
