@@ -244,7 +244,7 @@ catalogs:
       version: 1.13.0
     marked:
       specifier: ^18.1.0
-      version: 18.1.0
+      version: 18.1.1
     mdsvex:
       specifier: ^0.12.8
       version: 0.12.8
@@ -468,7 +468,7 @@ importers:
         version: 1.13.0
       marked:
         specifier: 'catalog:'
-        version: 18.1.0
+        version: 18.1.1
       pdf-parse:
         specifier: 'catalog:'
         version: 2.4.5
@@ -2256,8 +2256,8 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
-  marked@18.1.0:
-    resolution: {integrity: sha512-PamYXWWWg2nboG3oX5Ffzpy3EFZROqZJK9hSlMmUnekp7TxPs5DcT95vwd46m73/exfKCRVMtgXoPMI4FEJL6w==}
+  marked@18.1.1:
+    resolution: {integrity: sha512-zEGgrtUG8crk+TrMacJSVABU4DYDDkS8uqgU3ohrn/2fW9C2AEfUrO3m6IhpIpQpl7YcVpiXXC9cSMWDANT3dg==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -4141,7 +4141,7 @@ snapshots:
       underscore: 1.13.8
       xmlbuilder: 10.1.1
 
-  marked@18.1.0: {}
+  marked@18.1.1: {}
 
   mdsvex@0.12.8(svelte@5.57.1):
     dependencies:
