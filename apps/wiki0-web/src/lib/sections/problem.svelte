@@ -1,5 +1,8 @@
 <script lang="ts">
 	import Section from '#lib/components/section.svelte';
+	import { Reveal } from '#lib/motion/reveal.svelte.js';
+	import { cubicOut } from 'svelte/easing';
+	import { Tween } from 'svelte/motion';
 	import { lines_of, type StoryDocument } from '#lib/story.js';
 
 	let {
@@ -19,6 +22,15 @@
 		files.reduce((sum, file) => sum + file.lines, 0),
 	);
 	const most = $derived(Math.max(...files.map((file) => file.lines)));
+	const wall = new Reveal();
+	const answer = new Reveal();
+	// The count climbs as the files land; it drops to 0 at once while
+	// the wall waits below the fold
+	const count = Tween.of(() => (wall.seen ? total : 0), {
+		duration: (from, to) => (to < from ? 0 : 1600),
+		easing: cubicOut,
+	});
+
 	// The decision the agent quotes: the lines under "## Decision"
 	const quoted = $derived(
 		lines_of(superseded.source)
@@ -38,9 +50,9 @@
 		</p>
 	{/snippet}
 
-	<div class="wall-scene">
-		<p class="counter" style:--total={total}>
-			<span class="number">{total}</span>
+	<div class="wall-scene" data-seen={wall.seen} {@attach wall.attach}>
+		<p class="counter">
+			<span class="number">{Math.round(count.current)}</span>
 			<span class="unit">lines read to answer one question</span>
 		</p>
 		<ol class="wall" aria-label="Files an agent reads in full">
@@ -67,7 +79,11 @@
 		</ol>
 	</div>
 
-	<blockquote class="answer scrub-in">
+	<blockquote
+		class="answer"
+		data-seen={answer.seen}
+		{@attach answer.attach}
+	>
 		<span class="stamp">{superseded.status}</span>
 		<p class="label">
 			The agent's answer, quoted from a decision you replaced:
@@ -81,7 +97,6 @@
 	.wall-scene {
 		display: grid;
 		gap: 1.5rem;
-		view-timeline: --wall block;
 	}
 
 	.counter {
@@ -256,70 +271,46 @@
 		}
 	}
 
-	/* Scrolled through: files land one after another and fill with
-	   their text while the count climbs. */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.tile {
-				animation: tile-in linear both;
-				animation-timeline: --wall;
-				animation-range: entry calc(20% + var(--i) * 45%) entry
-					calc(45% + var(--i) * 45%);
-			}
-			.lines {
-				animation: read linear both;
-				animation-timeline: --wall;
-				animation-range: entry calc(30% + var(--i) * 45%) cover
-					calc(30% + var(--i) * 25%);
-			}
-			.flag {
-				animation: flag-in linear both;
-				animation-timeline: --wall;
-				animation-range: cover 40% cover 50%;
-			}
-			.number {
-				counter-reset: lines var(--lines-read);
-				animation: count linear both;
-				animation-timeline: --wall;
-				animation-range: entry 20% cover 45%;
-				color: transparent;
-				position: relative;
-			}
-			.number::after {
-				content: counter(lines);
-				position: absolute;
-				inset: 0;
-				color: var(--signal);
-			}
-		}
+	/* When the wall arrives, files land one after another and fill
+	   with their text */
+	.tile,
+	.lines,
+	.flag,
+	.answer {
+		transition:
+			opacity 0.5s ease-out,
+			transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 
-	@keyframes tile-in {
-		from {
-			opacity: 0;
-			transform: translateY(5rem) rotate(-4deg) scale(0.9);
-		}
+	.tile {
+		transition-delay: calc(var(--i) * 1.1s);
 	}
 
-	@keyframes read {
-		from {
-			transform: scaleY(0);
-		}
+	.lines {
+		transition-duration: 0.5s, 0.9s;
+		transition-delay: calc(0.2s + var(--i) * 1.1s);
 	}
 
-	@keyframes flag-in {
-		from {
-			opacity: 0;
-			transform: scale(0.6);
-		}
+	.flag {
+		transition-delay: 1.5s;
 	}
 
-	@keyframes count {
-		from {
-			--lines-read: 0;
-		}
-		to {
-			--lines-read: var(--total);
-		}
+	[data-seen='false'] .tile {
+		opacity: 0;
+		transform: translateY(3rem) rotate(-3deg) scale(0.92);
+	}
+
+	[data-seen='false'] .lines {
+		transform: scaleY(0);
+	}
+
+	[data-seen='false'] .flag {
+		opacity: 0;
+		transform: scale(0.6);
+	}
+
+	.answer[data-seen='false'] {
+		opacity: 0;
+		transform: translateY(2rem);
 	}
 </style>

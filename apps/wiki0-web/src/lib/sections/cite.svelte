@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Section from '#lib/components/section.svelte';
 	import Terminal from '#lib/components/terminal.svelte';
+	import { Reveal } from '#lib/motion/reveal.svelte.js';
 	import { lines_of, type StoryDocument } from '#lib/story.js';
 
 	let {
@@ -8,8 +9,15 @@
 		show,
 	}: {
 		current: StoryDocument;
-		show: { citation: string; markdown: string; tokens: number };
+		show: {
+			citation: string;
+			markdown: string;
+			tokens: number;
+			html: string;
+		};
 	} = $props();
+
+	const camera = new Reveal();
 
 	const range = $derived(show.citation.split(':').at(-1) ?? '');
 	const [start, end] = $derived(
@@ -35,6 +43,8 @@
 	<div class="cite-scene">
 		<figure
 			class="viewport"
+			data-seen={camera.seen}
+			{@attach camera.attach}
 			aria-label="{current.path}, lines {range}"
 		>
 			<ol class="file font-mono" style:--focus="{focus}%">
@@ -50,10 +60,13 @@
 			</ol>
 		</figure>
 
-		<div class="result scrub-in">
+		<div class="result" data-seen={camera.seen}>
 			<Terminal title="wiki0 show {show.citation}">
 				<p class="text-muted-foreground">Source: {show.citation}</p>
-				<pre class="mt-2 whitespace-pre-wrap">{show.markdown}</pre>
+				<div class="show mt-2">
+					<!-- Highlighted at build time from wiki0's own output -->
+					{@html show.html}
+				</div>
 			</Terminal>
 			<p class="tokens">
 				{show.tokens}
@@ -84,7 +97,6 @@
 		border: 1px solid var(--border);
 		border-radius: var(--radius-xl);
 		background: var(--card);
-		view-timeline: --camera block;
 	}
 
 	.file {
@@ -148,33 +160,72 @@
 		color: var(--muted-foreground);
 	}
 
-	/* Scrolled through: the whole file, then the camera pushes in on
-	   the cited lines while the rest fades back. */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.file {
-				animation: push linear both;
-				animation-timeline: --camera;
-				animation-range: entry 60% cover 60%;
-			}
-			.file li:not(.is-cited) {
-				animation: dim linear both;
-				animation-timeline: --camera;
-				animation-range: entry 60% cover 55%;
-			}
-		}
+	.show :global(.twinkleplop) {
+		margin: 0;
+		background: transparent;
+		white-space: pre-wrap;
+		font-size: 1em;
+		line-height: 1.6;
 	}
 
-	@keyframes push {
-		from {
-			transform: translateY(-50%) scale(0.6);
-			transform-origin: 2rem 50%;
-		}
+	.show :global(.l) {
+		padding: 0;
 	}
 
-	@keyframes dim {
-		from {
-			opacity: 1;
+	.show :global(.heading_marker) {
+		color: var(--accent);
+	}
+
+	.show :global(.heading) {
+		font-weight: 700;
+	}
+
+	.show :global(.code) {
+		color: var(--chart-5);
+	}
+
+	.show :global(:is(.link_text, .link_destination)) {
+		color: var(--chart-2);
+	}
+
+	/* When the file arrives the camera starts on the whole file, then
+	   pushes in on the cited lines while the rest fades back; the
+	   result lands after */
+	.file {
+		transition:
+			transform 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s,
+			transform-origin 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s;
+	}
+
+	.file li {
+		transition: opacity 1s ease 0.6s;
+	}
+
+	[data-seen='false'] .file {
+		transform: translateY(-50%) scale(0.6);
+		transform-origin: 2rem 50%;
+	}
+
+	[data-seen='false'] .file li {
+		opacity: 1;
+	}
+
+	.result {
+		transition:
+			opacity 0.6s ease-out 1.4s,
+			transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s;
+	}
+
+	.result[data-seen='false'] {
+		opacity: 0;
+		transform: translateY(2rem);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.file,
+		.file li,
+		.result {
+			transition: none;
 		}
 	}
 </style>

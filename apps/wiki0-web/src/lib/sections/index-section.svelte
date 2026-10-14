@@ -2,6 +2,7 @@
 	import ChartBox from '#lib/components/chart-box.svelte';
 	import Section from '#lib/components/section.svelte';
 	import IndexSkyline from '#lib/scenes/index-skyline.svelte';
+	import { Reveal } from '#lib/motion/reveal.svelte.js';
 	import {
 		lines_of,
 		type Skyline,
@@ -21,6 +22,8 @@
 		counts: { documents: number; chunks: number; links: number };
 	} = $props();
 
+	const split = new Reveal();
+	const rise = new Reveal();
 	const lines = $derived(lines_of(current.source));
 	const frontmatter_end = $derived(lines.indexOf('---', 1) + 1);
 	const numbered = (from: number, to: number) =>
@@ -50,7 +53,11 @@
 		</p>
 	{/snippet}
 
-	<div class="split-scene">
+	<div
+		class="split-scene"
+		data-seen={split.seen}
+		{@attach split.attach}
+	>
 		<div
 			class="file font-mono"
 			aria-label="{current.path}, split into sections"
@@ -113,7 +120,7 @@
 			repo, as tall as its tokens. Search returns one of these, not the
 			whole row.
 		</figcaption>
-		<div class="skyline">
+		<div class="skyline" data-seen={rise.seen} {@attach rise.attach}>
 			<ChartBox
 				ratio="16 / 8"
 				label="Index skyline: each section of the {skyline.paths
@@ -131,7 +138,6 @@
 		grid-template-columns: minmax(0, 1fr);
 		gap: 2.5rem;
 		align-items: center;
-		view-timeline: --split block;
 	}
 
 	@media (min-width: 64rem) {
@@ -258,69 +264,61 @@
 		transform-origin: bottom;
 	}
 
-	/* Scrolled through: the file starts whole and splits into its
-	   sections; the skyline rises from the floor. */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.raw {
-				animation: fade-out linear both;
-				animation-timeline: --split;
-				animation-range: cover 30% cover 45%;
-			}
-			.badges {
-				animation: fade-in linear both;
-				animation-timeline: --split;
-				animation-range: cover 38% cover 50%;
-			}
-			.chunk {
-				animation: join linear both;
-				animation-timeline: --split;
-				animation-range: cover 25% cover 50%;
-			}
-			.label {
-				animation: fade-in linear both;
-				animation-timeline: --split;
-				animation-range: cover 40% cover 52%;
-			}
-			.skyline {
-				animation: rise linear both;
-				animation-timeline: view();
-				animation-range: entry 10% cover 50%;
-			}
-		}
+	/* When the file arrives it starts whole, then splits into its
+	   sections while its frontmatter becomes badges */
+	.raw,
+	.badges,
+	.chunk,
+	.label {
+		transition:
+			opacity 0.5s ease-out,
+			transform 0.8s cubic-bezier(0.65, 0, 0.35, 1),
+			border-color 0.6s,
+			background-color 0.6s,
+			box-shadow 0.6s;
 	}
 
-	@keyframes fade-out {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0.18;
-		}
+	.raw {
+		transition-delay: 0.5s;
 	}
 
-	@keyframes fade-in {
-		from {
-			opacity: 0;
-		}
+	.badges {
+		transition-delay: 0.7s;
+	}
+
+	.chunk {
+		transition-delay: calc(0.3s + var(--k) * 0.12s);
+	}
+
+	.label {
+		transition-delay: calc(0.8s + var(--k) * 0.12s);
+	}
+
+	[data-seen='false'] .raw {
+		opacity: 1;
+	}
+
+	[data-seen='false'] .badges,
+	[data-seen='false'] .label {
+		opacity: 0;
 	}
 
 	/* Each section starts closed up against the one above it */
-	@keyframes join {
-		from {
-			transform: translateY(
-				calc(var(--k) * -1.1rem - var(--k) * 2.1rem)
-			);
-			border-color: transparent;
-			background: var(--card);
-			box-shadow: none;
-		}
+	[data-seen='false'] .chunk {
+		transform: translateY(calc(var(--k) * -3.2rem));
+		border-color: transparent;
+		background-color: var(--card);
+		box-shadow: none;
 	}
 
-	@keyframes rise {
-		from {
-			opacity: 0;
-			transform: scaleY(0.05);
-		}
+	.skyline {
+		transition:
+			opacity 0.6s ease-out,
+			transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.skyline[data-seen='false'] {
+		opacity: 0;
+		transform: scaleY(0.1);
 	}
 </style>

@@ -2,6 +2,7 @@
 	import ChartBox from '#lib/components/chart-box.svelte';
 	import Section from '#lib/components/section.svelte';
 	import Terminal from '#lib/components/terminal.svelte';
+	import { Reveal } from '#lib/motion/reveal.svelte.js';
 	import LinkGraph from '#lib/scenes/link-graph.svelte';
 	import type {
 		GraphEdge,
@@ -23,6 +24,8 @@
 		superseded: string;
 	} = $props();
 
+	const graph_reveal = new Reveal();
+	const lint_reveal = new Reveal();
 	const runbook = $derived(lint.files['runbook.md'] ?? '');
 	const broken = $derived(
 		new Set(lint.issues.map((issue) => issue.line)),
@@ -50,7 +53,7 @@
 		</p>
 	{/snippet}
 
-	<figure class="graph-scene">
+	<figure class="graph-scene" {@attach graph_reveal.attach}>
 		<div class="graph">
 			<ChartBox
 				ratio="16 / 8"
@@ -62,6 +65,7 @@
 					edges={graph.edges}
 					{current}
 					{superseded}
+					seen={graph_reveal.seen}
 				/>
 			</ChartBox>
 		</div>
@@ -77,7 +81,11 @@
 		</figcaption>
 	</figure>
 
-	<div class="lint scrub-in">
+	<div
+		class="lint"
+		data-seen={lint_reveal.seen}
+		{@attach lint_reveal.attach}
+	>
 		<p class="lint-copy">
 			<code class="font-mono text-[0.9em]">wiki0 lint</code> reports
 			every link that points nowhere with its file and line, and
@@ -109,7 +117,6 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		gap: 2rem;
-		view-timeline: --graph block;
 	}
 
 	@media (min-width: 64rem) {
@@ -157,6 +164,17 @@
 	.lint-copy {
 		font-size: clamp(1.05rem, 1.4vw, 1.25rem);
 		color: var(--muted-foreground);
+	}
+
+	.lint {
+		transition:
+			opacity 0.6s ease-out,
+			transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.lint[data-seen='false'] {
+		opacity: 0;
+		transform: translateY(2rem);
 	}
 
 	.broken {

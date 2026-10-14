@@ -1,5 +1,12 @@
 <script lang="ts">
 	import Section from '#lib/components/section.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import { Reveal } from '#lib/motion/reveal.svelte.js';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { cubicOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 
 	const prompt = 'Use pnpx @wiki0/cli and show me the docs.';
 	const command = 'pnpx @wiki0/cli ui';
@@ -20,7 +27,43 @@
 			caption: 'Index health: status, lint and the link graph.',
 		},
 	];
+
+	const fan = new Reveal();
+	let open = $state(false);
+	// The thumbnail that opened the large view, to return focus to
+	let opener: HTMLElement | null = null;
+	let viewing = $state(0);
+	// Which way the large view slides when you step through it
+	let step = $state(1);
+	const shot = $derived(shots[viewing] ?? shots[0]!);
+
+	function show(index: number) {
+		step = index >= viewing ? 1 : -1;
+		viewing = (index + shots.length) % shots.length;
+	}
+
+	function on_key(event: KeyboardEvent) {
+		if (event.key === 'ArrowRight') show(viewing + 1);
+		if (event.key === 'ArrowLeft') show(viewing - 1);
+	}
 </script>
+
+{#snippet picture(name: string, alt: string, eager = false)}
+	<picture>
+		<source
+			srcset="/shots/{name}-dark.webp"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<img
+			src="/shots/{name}-light.webp"
+			{alt}
+			width="1440"
+			height="900"
+			loading={eager ? 'eager' : 'lazy'}
+			decoding="async"
+		/>
+	</picture>
+{/snippet}
 
 <Section id="ui" title="“Show me the docs”">
 	{#snippet copy()}
@@ -34,7 +77,7 @@
 		</p>
 	{/snippet}
 
-	<div class="chat scrub-in" aria-label="Asking an agent">
+	<div class="chat" aria-label="Asking an agent">
 		<p class="bubble">{prompt}</p>
 		<p class="run">
 			<span class="text-muted-foreground">$</span>
@@ -45,39 +88,84 @@
 		</p>
 	</div>
 
-	<ul class="fan">
-		{#each shots as shot, index (shot.name)}
+	<ul class="fan" data-seen={fan.seen} {@attach fan.attach}>
+		{#each shots as item, index (item.name)}
 			<li class="window" style:--i={index - 1}>
-				<div class="chrome" aria-hidden="true">
-					<span class="flex gap-1.5">
-						<span class="size-2.5 rounded-full bg-foreground/15"
-						></span>
-						<span class="size-2.5 rounded-full bg-foreground/15"
-						></span>
-						<span class="size-2.5 rounded-full bg-foreground/15"
-						></span>
+				<button
+					type="button"
+					class="open"
+					aria-label="View larger: {item.caption}"
+					onclick={(event) => {
+						opener = event.currentTarget;
+						show(index);
+						open = true;
+					}}
+				>
+					<span class="chrome" aria-hidden="true">
+						<span class="flex gap-1.5">
+							<span class="size-2.5 rounded-full bg-foreground/15"
+							></span>
+							<span class="size-2.5 rounded-full bg-foreground/15"
+							></span>
+							<span class="size-2.5 rounded-full bg-foreground/15"
+							></span>
+						</span>
+						<span class="address">127.0.0.1:4100</span>
 					</span>
-					<span class="address">127.0.0.1:4100</span>
-				</div>
-				<picture>
-					<source
-						srcset="/shots/{shot.name}-dark.webp"
-						media="(prefers-color-scheme: dark)"
-					/>
-					<img
-						src="/shots/{shot.name}-light.webp"
-						alt={shot.alt}
-						width="1440"
-						height="900"
-						loading="lazy"
-						decoding="async"
-					/>
-				</picture>
-				<p class="caption">{shot.caption}</p>
+					{@render picture(item.name, item.alt)}
+					<span class="caption">{item.caption}</span>
+				</button>
 			</li>
 		{/each}
 	</ul>
 </Section>
+
+<Dialog.Root bind:open>
+	<Dialog.Content
+		class="w-[min(94vw,88rem)] max-w-none gap-3 p-3 sm:max-w-none"
+		onkeydown={on_key}
+		onCloseAutoFocus={(event) => {
+			// Back to the thumbnail without scrolling the page
+			event.preventDefault();
+			opener?.focus({ preventScroll: true });
+		}}
+	>
+		<Dialog.Title class="pr-10 text-base">{shot.caption}</Dialog.Title
+		>
+		<div class="viewer">
+			{#key viewing}
+				<div
+					class="slide"
+					in:fly={{ x: step * 60, duration: 350, easing: cubicOut }}
+					out:fly={{ x: step * -60, duration: 250 }}
+				>
+					{@render picture(shot.name, shot.alt, true)}
+				</div>
+			{/key}
+		</div>
+		<div class="flex items-center justify-between gap-2">
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => show(viewing - 1)}
+				aria-label="Previous screenshot"
+			>
+				<ChevronLeft aria-hidden="true" /> Previous
+			</Button>
+			<p class="text-xs text-muted-foreground">
+				{viewing + 1} of {shots.length}
+			</p>
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => show(viewing + 1)}
+				aria-label="Next screenshot"
+			>
+				Next <ChevronRight aria-hidden="true" />
+			</Button>
+		</div>
+	</Dialog.Content>
+</Dialog.Root>
 
 <style>
 	.chat {
@@ -108,7 +196,6 @@
 	.fan {
 		display: grid;
 		gap: 1.5rem;
-		view-timeline: --fan block;
 	}
 
 	@media (min-width: 56rem) {
@@ -119,12 +206,34 @@
 	}
 
 	.window {
+		transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.open {
+		display: block;
+		width: 100%;
 		overflow: hidden;
 		border: 1px solid var(--border);
 		border-radius: var(--radius-xl);
 		background: var(--card);
+		text-align: left;
 		box-shadow: 0 30px 60px -30px
 			color-mix(in oklab, var(--foreground) 45%, transparent);
+		cursor: zoom-in;
+		transition:
+			transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+			box-shadow 0.3s;
+	}
+
+	.open:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 40px 70px -30px
+			color-mix(in oklab, var(--signal) 55%, transparent);
+	}
+
+	.open:focus-visible {
+		outline: 2px solid var(--ring);
+		outline-offset: 3px;
 	}
 
 	.chrome {
@@ -145,39 +254,59 @@
 		color: var(--muted-foreground);
 	}
 
-	.window img {
+	.open :global(img),
+	.slide :global(img) {
 		display: block;
 		width: 100%;
 		height: auto;
 	}
 
 	.caption {
+		display: block;
 		padding: 0.7rem 0.9rem;
 		border-top: 1px solid var(--border);
 		font-size: 0.95rem;
 	}
 
-	/* Scrolled through on a wide screen: the windows arrive stacked in
-	   the middle and fan out into a row. */
-	@media (prefers-reduced-motion: no-preference) and (min-width: 56rem) {
-		@supports (animation-timeline: view()) {
-			.window {
-				animation: fan linear both;
-				animation-timeline: --fan;
-				animation-range: entry 20% cover 50%;
-			}
-			.window:nth-child(2) {
-				z-index: 1;
-			}
-		}
+	.viewer {
+		display: grid;
+		overflow: hidden;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border);
 	}
 
-	@keyframes fan {
-		from {
+	.slide {
+		grid-area: 1 / 1;
+		display: grid;
+		place-items: center;
+	}
+
+	/* The whole screenshot fits the window */
+	.slide :global(img) {
+		width: auto;
+		max-width: 100%;
+		max-height: calc(100dvh - 10rem);
+	}
+
+	/* On a wide screen the windows arrive stacked in the middle and
+	   fan out into a row */
+	@media (min-width: 56rem) {
+		.fan[data-seen='false'] .window {
 			transform: translateX(
 					calc(var(--i) * -100% - var(--i) * 1.25rem)
 				)
 				rotate(calc(var(--i) * -5deg)) scale(0.92);
+		}
+		.window:nth-child(2) {
+			position: relative;
+			z-index: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.window,
+		.open {
+			transition: none;
 		}
 	}
 </style>

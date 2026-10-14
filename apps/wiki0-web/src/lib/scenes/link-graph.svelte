@@ -1,20 +1,23 @@
 <script lang="ts">
 	import type { GraphEdge, GraphNode } from '#lib/story.js';
-	import { Chart, Svg } from 'layerchart';
+	import { Chart, Html, Svg } from 'layerchart';
+	import { fade } from 'svelte/transition';
 
-	// This repo's link graph, laid out when the page was built. Each
-	// node and edge carries its link distance from `current` as --wave,
-	// so the page can draw the graph outward from it.
+	// This repo's link graph, laid out when the page was built. It draws
+	// itself outward from `current` once `seen`; hover or tap a document
+	// to light up its links.
 	let {
 		nodes,
 		edges,
 		current,
 		superseded,
+		seen = true,
 	}: {
 		nodes: GraphNode[];
 		edges: GraphEdge[];
 		current: string;
 		superseded: string;
+		seen?: boolean;
 	} = $props();
 
 	// White is kept for the current decision, red for the replaced one
@@ -39,24 +42,24 @@
 		palette[folders.indexOf(folder) % palette.length] ??
 		'var(--muted-foreground)';
 	const radius = (node: GraphNode) =>
-		5 + Math.min(11, Math.sqrt(node.degree) * 2.4);
+		(node.id === current ? 1.5 : 1) *
+		(5 + Math.min(11, Math.sqrt(node.degree) * 2.4));
 	const by_id = $derived(
 		new Map(nodes.map((node) => [node.id, node])),
 	);
+	const neighbours = $derived.by(() => {
+		const result = new Map<string, Set<string>>();
+		for (const edge of edges) {
+			if (!result.has(edge.from)) result.set(edge.from, new Set());
+			if (!result.has(edge.to)) result.set(edge.to, new Set());
+			result.get(edge.from)?.add(edge.to);
+			result.get(edge.to)?.add(edge.from);
+		}
+		return result;
+	});
 
 	// Link distance from the current decision; unreachable docs last
 	const distance = $derived.by(() => {
-		const neighbours = new Map<string, string[]>();
-		for (const edge of edges) {
-			neighbours.set(edge.from, [
-				...(neighbours.get(edge.from) ?? []),
-				edge.to,
-			]);
-			neighbours.set(edge.to, [
-				...(neighbours.get(edge.to) ?? []),
-				edge.from,
-			]);
-		}
 		const result = new Map<string, number>([[current, 0]]);
 		let frontier = [current];
 		while (frontier.length) {
@@ -87,9 +90,21 @@
 	};
 	const label = (id: string) =>
 		id.split('/').at(-1)?.replace(/\.md$/u, '') ?? id;
+
+	let active = $state<string | null>(null);
+	const lit = $derived(
+		active
+			? new Set([active, ...(neighbours.get(active) ?? [])])
+			: null,
+	);
+	const active_node = $derived(
+		active ? by_id.get(active) : undefined,
+	);
+	const touches = (edge: GraphEdge) =>
+		edge.from === active || edge.to === active;
 </script>
 
-<div class="flex h-full flex-col">
+<div class="flex h-full flex-col" data-seen={seen}>
 	<div class="min-h-0 flex-1">
 		<Chart
 			data={nodes}
@@ -107,7 +122,12 @@
 							{@const to = by_id.get(edge.to)}
 							{#if from && to}
 								<line
-									class={['edge', is_story_edge(edge) && 'is-story']}
+									class={[
+										'edge',
+										is_story_edge(edge) && 'is-story',
+										active && !touches(edge) && 'is-dim',
+										active && touches(edge) && 'is-lit',
+									]}
 									style:--wave={Math.max(
 										wave(edge.from),
 										wave(edge.to),
@@ -126,15 +146,21 @@
 							{@const is_current = node.id === current}
 							{@const is_old = node.id === superseded}
 							<g
-								class="node"
+								class={['node', lit && !lit.has(node.id) && 'is-dim']}
 								style:--wave={wave(node.id)}
 								transform="translate({context.xScale(
 									node.x,
 								)} {context.yScale(node.y)})"
+								role="presentation"
+								onpointerenter={() => (active = node.id)}
+								onpointerleave={() => (active = null)}
+								onclick={() =>
+									(active = active === node.id ? null : node.id)}
 							>
 								<g class="pop">
+									<circle class="hit" r={radius(node) + 6} />
 									<circle
-										r={radius(node) * (is_current ? 1.5 : 1)}
+										r={radius(node)}
 										fill={is_current
 											? '#ffffff'
 											: is_old
@@ -146,12 +172,10 @@
 											? color(node.folder)
 											: 'var(--background)'}
 										stroke-width="1.5"
-									>
-										<title>{node.title}</title>
-									</circle>
+									/>
 									{#if is_current || is_old}
 										<text
-											x={radius(node) * 1.5 + 6}
+											x={radius(node) + 6}
 											y="4"
 											class={['label', is_old && 'is-old']}
 										>
@@ -163,6 +187,26 @@
 						{/each}
 					</g>
 				</Svg>
+				<Html pointerEvents={false}>
+					{#if active_node}
+						<div
+							class="tip"
+							style:left="{context.xScale(active_node.x)}px"
+							style:top="{context.yScale(active_node.y)}px"
+							transition:fade={{ duration: 150 }}
+						>
+							<p class="font-medium">{active_node.title}</p>
+							<p class="font-mono text-xs break-all opacity-75">
+								{active_node.id}
+							</p>
+							<p class="mt-1 text-xs opacity-75">
+								{neighbours.get(active_node.id)?.size ?? 0} linked documents{active_node.orphan
+									? ', nothing links here'
+									: ''}
+							</p>
+						</div>
+					{/if}
+				</Html>
 			{/snippet}
 		</Chart>
 	</div>
@@ -190,7 +234,7 @@
 			<span
 				class="size-2.5 rounded-full border border-muted-foreground"
 			></span>
-			no links in
+			nothing links here
 		</li>
 	</ul>
 </div>
@@ -200,6 +244,13 @@
 		stroke: currentColor;
 		stroke-opacity: 0.3;
 		stroke-width: 1;
+		stroke-dasharray: 1;
+		stroke-dashoffset: 0;
+		transition:
+			stroke-dashoffset 0.9s cubic-bezier(0.65, 0, 0.35, 1)
+				calc(0.2s + var(--wave) * 1.2s),
+			stroke-opacity 0.25s,
+			stroke-width 0.25s;
 	}
 
 	.edge.is-story {
@@ -208,50 +259,76 @@
 		stroke-width: 3.5;
 	}
 
+	.edge.is-dim {
+		stroke-opacity: 0.08;
+	}
+
+	.edge.is-lit {
+		stroke: #ffffff;
+		stroke-opacity: 0.9;
+		stroke-width: 2;
+	}
+
+	.node {
+		cursor: pointer;
+		transition: opacity 0.25s;
+	}
+
+	.node.is-dim {
+		opacity: 0.25;
+	}
+
+	.hit {
+		fill: transparent;
+	}
+
+	.pop {
+		transition:
+			opacity 0.5s ease-out calc(var(--wave) * 1.2s),
+			scale 0.6s cubic-bezier(0.2, 1.4, 0.4, 1)
+				calc(var(--wave) * 1.2s);
+	}
+
+	[data-seen='false'] .edge {
+		stroke-dashoffset: 1;
+	}
+
+	[data-seen='false'] .pop {
+		opacity: 0;
+		scale: 0.2;
+	}
+
 	.label {
 		font-family: var(--font-mono);
 		font-size: 12px;
 		font-weight: 650;
 		fill: #ffffff;
+		paint-order: stroke;
+		stroke: var(--background);
+		stroke-width: 4px;
 	}
 
 	.label.is-old {
 		fill: var(--destructive);
 	}
 
-	/* Drawn outward from the current decision as the graph scrolls
-	   through; the --graph timeline comes from the page. */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.edge {
-				stroke-dasharray: 1;
-				animation: draw linear both;
-				animation-timeline: --graph;
-				animation-range: entry calc(40% + var(--wave) * 50%) cover
-					calc(25% + var(--wave) * 30%);
-			}
-			.pop {
-				animation: pop linear both;
-				animation-timeline: --graph;
-				animation-range: entry calc(30% + var(--wave) * 50%) entry
-					calc(50% + var(--wave) * 50%);
-			}
-		}
+	.tip {
+		position: absolute;
+		transform: translate(-50%, calc(-100% - 18px));
+		width: max-content;
+		max-width: 16rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: var(--radius-md);
+		background: #ffffff;
+		color: #2e1065;
+		font-size: 0.85rem;
+		box-shadow: 0 12px 30px -10px rgb(10 2 30 / 0.6);
 	}
 
-	@keyframes draw {
-		from {
-			stroke-dashoffset: 1;
-		}
-		to {
-			stroke-dashoffset: 0;
-		}
-	}
-
-	@keyframes pop {
-		from {
-			opacity: 0;
-			scale: 0.2;
+	@media (prefers-reduced-motion: reduce) {
+		.edge,
+		.pop {
+			transition: none;
 		}
 	}
 </style>

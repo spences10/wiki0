@@ -1,5 +1,9 @@
 <script lang="ts">
-	import type { Skyline } from '#lib/story.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { create_isometric_view } from '#lib/isometric-view.svelte.js';
+	import type { Skyline, Tower } from '#lib/story.js';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import RotateCw from '@lucide/svelte/icons/rotate-cw';
 	import { scaleBand, scaleOrdinal, scaleThreshold } from 'd3-scale';
 	import {
 		Axis,
@@ -10,10 +14,12 @@
 		isometric,
 		LinearGradient,
 		Svg,
+		Tooltip,
 	} from 'layerchart';
 
-	// The local UI's index skyline, filling its parent. It is drawn
-	// once; the page animates its container, not the bars.
+	// The local UI's index skyline: every section of the largest
+	// documents, as tall as its tokens. Hover a tower for its section;
+	// drag or use the buttons to turn it.
 	let { skyline }: { skyline: Skyline } = $props();
 
 	const colors = [
@@ -26,7 +32,6 @@
 	const fill_scale = scaleThreshold<number, string>()
 		.domain(thresholds)
 		.range(colors);
-
 	const towers = $derived(
 		skyline.towers.map((tower) => ({
 			...tower,
@@ -36,14 +41,51 @@
 
 	const uid = $props.id();
 	const gradient_id = (index: number) => `${uid}-fill-${index}`;
+	const view = create_isometric_view(() => ({
+		rotate: -34,
+		tilt: 58,
+	}));
+	// Folder and file, since READMEs and changelogs repeat by name
 	const short_name = (path: string) =>
 		path.split('/').slice(-2).join('/');
 	const tick_label =
 		'!stroke-transparent fill-muted-foreground text-[10px]';
 </script>
 
-<div class="flex h-full flex-col">
-	<div class="min-h-0 flex-1 select-none">
+<div class="flex h-full flex-col gap-3">
+	<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+		<p class="text-sm text-muted-foreground max-sm:hidden">
+			Hover a tower for its section. Drag to turn.
+		</p>
+		<div
+			class="ml-auto flex items-center gap-1"
+			role="group"
+			aria-label="Skyline view"
+		>
+			<Button
+				variant="outline"
+				size="icon-sm"
+				aria-label="Turn the skyline left"
+				onclick={() => view.turn(-45)}
+			>
+				<RotateCcw aria-hidden="true" />
+			</Button>
+			<Button
+				variant="outline"
+				size="icon-sm"
+				aria-label="Turn the skyline right"
+				onclick={() => view.turn(45)}
+			>
+				<RotateCw aria-hidden="true" />
+			</Button>
+			<Button variant="outline" size="sm" onclick={view.reset}
+				>Reset</Button
+			>
+		</div>
+	</div>
+	<div
+		class="min-h-0 flex-1 cursor-grab touch-pan-y select-none active:cursor-grabbing"
+	>
 		<Chart
 			data={towers}
 			x="position"
@@ -55,13 +97,20 @@
 			z="tokens"
 			valueAxis="z"
 			zDomain={[0, skyline.max]}
+			zNice
 			zRange={({ height }: { height: number }) => [0, height * 0.5]}
 			c="fill"
 			cScale={scaleOrdinal()}
 			cDomain={colors}
 			cRange={colors.map((_, index) => `url(#${gradient_id(index)})`)}
-			view={isometric({ rotate: -34, tilt: 58, aspect: 1.4 })}
+			view={isometric({ ...view.options, aspect: 1.4 })}
+			transform={{ mode: 'canvas', drag: 'rotate' }}
+			onTransform={view.on_transform}
+			ondragstart={view.drag_start}
+			ondragend={view.drag_end}
+			tooltipContext={{ mode: 'manual' }}
 			padding={{ top: 16, bottom: 28, left: 150, right: 16 }}
+			clip
 		>
 			<Svg>
 				{#each colors as color, index (index)}
@@ -79,6 +128,7 @@
 				<Axis
 					placement="left"
 					format={short_name}
+					tickLabelProps={{ viewport: true }}
 					classes={{ tickLabel: tick_label }}
 				/>
 				<Axis
@@ -87,12 +137,28 @@
 					format="integer"
 					classes={{ tickLabel: tick_label }}
 				/>
-				<Bars strokeWidth={1} stroke="var(--card)" />
+				<Bars
+					tooltip
+					strokeWidth={1}
+					stroke="var(--card)"
+					class="tower"
+				/>
 			</Svg>
+			<Tooltip.Root>
+				{#snippet children({ data: tower }: { data: Tower })}
+					<Tooltip.Header
+						>{tower.heading ?? short_name(tower.path)}</Tooltip.Header
+					>
+					<Tooltip.List>
+						<Tooltip.Item label="Tokens" value={tower.tokens} />
+						<Tooltip.Item label="Section" value={tower.citation} />
+					</Tooltip.List>
+				{/snippet}
+			</Tooltip.Root>
 		</Chart>
 	</div>
 	<ul
-		class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
+		class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
 	>
 		{#each colors as color, index (color)}
 			<li class="flex items-center gap-1.5">
@@ -107,3 +173,9 @@
 		{/each}
 	</ul>
 </div>
+
+<style>
+	:global(.lc-rect-box:has(.tower):hover .lc-rect) {
+		filter: brightness(1.15);
+	}
+</style>

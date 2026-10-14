@@ -29,7 +29,13 @@
 			},
 		]}
 		bandPadding={0.3}
-		props={{ bars: { radius: 2, strokeWidth: 0 } }}
+		props={{
+			bars: {
+				radius: 2,
+				strokeWidth: 0,
+				motion: { type: 'tween', duration: 600 },
+			},
+		}}
 		padding={defaultChartPadding({ left: 76, bottom: 20 })}
 	/>
 </div>
