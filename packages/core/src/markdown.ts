@@ -1,38 +1,9 @@
-import { isMap, parseDocument, stringify } from 'yaml';
+import { isMap, parseDocument } from 'yaml';
 import type {
 	FrontmatterValue,
 	ParsedMarkdown,
 	WikiFrontmatter,
-	WikiLink,
 } from './types.js';
-
-export function parse_wikilinks(markdown: string): WikiLink[] {
-	const links: WikiLink[] = [];
-	const pattern = /(!?)\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gu;
-	const searchable_markdown = strip_inline_code(
-		strip_fenced_code_blocks(parse_markdown(markdown).content),
-	);
-
-	for (const match of searchable_markdown.matchAll(pattern)) {
-		const [, embed_marker, target, alias] = match;
-		links.push({
-			raw: match[0],
-			target: target.trim(),
-			alias: alias?.trim(),
-			embed: embed_marker === '!',
-		});
-	}
-
-	return links;
-}
-
-export function strip_fenced_code_blocks(markdown: string): string {
-	return markdown.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1\s*$/gmu, '');
-}
-
-export function strip_inline_code(markdown: string): string {
-	return markdown.replace(/`[^`\n]*`/gu, '');
-}
 
 export function parse_markdown(markdown: string): ParsedMarkdown {
 	if (
@@ -67,15 +38,6 @@ export function parse_frontmatter(source: string): WikiFrontmatter {
 	return normalize_frontmatter_value(
 		document.toJSON(),
 	) as WikiFrontmatter;
-}
-
-export function serialize_frontmatter(
-	frontmatter: WikiFrontmatter,
-): string {
-	const yaml = stringify(frontmatter, {
-		lineWidth: 0,
-	}).trimEnd();
-	return `---\n${yaml}\n---\n\n`;
 }
 
 function normalize_frontmatter_value(

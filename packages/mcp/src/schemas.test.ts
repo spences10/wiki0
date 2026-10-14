@@ -1,99 +1,31 @@
 import { parse } from 'valibot';
 import { describe, expect, it } from 'vite-plus/test';
 import {
-	AddFactSchema,
-	CreatePageSchema,
-	GraphWikiSchema,
-	IndexWikiSchema,
-	LintWikiSchema,
-	ListFactsSchema,
-	ListTopicThreadsSchema,
-	ListWikiEventsSchema,
-	ParseDocumentSchema,
-	SearchWikiSchema,
-	SyncDocumentsSchema,
+	GetContextSchema,
+	RootSchema,
+	SearchDocsSchema,
+	ShowSectionSchema,
 } from './schemas.js';
 
 describe('MCP schemas', () => {
-	it('applies defaults for page creation', () => {
-		expect(
-			parse(CreatePageSchema, { title: 'Test', body: 'Body' }),
-		).toEqual({
-			title: 'Test',
-			body: 'Body',
-			root: '.',
-			wiki_dir: 'wiki',
-			overwrite: false,
-		});
-	});
-
-	it('applies defaults for facts', () => {
-		expect(
-			parse(AddFactSchema, {
-				category: 'decision',
-				summary: 'Local first',
-			}),
-		).toEqual({
-			category: 'decision',
-			summary: 'Local first',
-			confidence: 'unknown',
-			root: '.',
-			wiki_dir: 'wiki',
-		});
-		expect(parse(ListFactsSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-		});
-		expect(parse(ListWikiEventsSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-			limit: 50,
-		});
-		expect(parse(ListTopicThreadsSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-			limit: 50,
-		});
-	});
-
-	it('applies defaults for document parsing', () => {
-		expect(
-			parse(ParseDocumentSchema, { source_path: 'docs/a.pdf' }),
-		).toEqual({
-			source_path: 'docs/a.pdf',
-			root: '.',
-		});
-	});
-
-	it('applies defaults for indexing and search', () => {
-		expect(parse(SyncDocumentsSchema, { sources: ['docs'] })).toEqual(
-			{
-				root: '.',
-				wiki_dir: 'wiki',
-				sources: ['docs'],
-				overwrite: false,
-				index: true,
-				derive_facts: true,
-				propose_pages: false,
-			},
-		);
-		expect(parse(IndexWikiSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-		});
-		expect(parse(GraphWikiSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-		});
-		expect(parse(LintWikiSchema, {})).toEqual({
-			root: '.',
-			wiki_dir: 'wiki',
-		});
-		expect(parse(SearchWikiSchema, { query: 'agent' })).toEqual({
-			query: 'agent',
+	it('applies defaults', () => {
+		expect(parse(RootSchema, {})).toEqual({ root: '.' });
+		expect(parse(SearchDocsSchema, { query: 'deploys' })).toEqual({
+			query: 'deploys',
 			root: '.',
 			limit: 5,
 			include_superseded: true,
+		});
+		expect(parse(ShowSectionSchema, { target: 'a.md:3' })).toEqual({
+			target: 'a.md:3',
+			root: '.',
+			token_budget: 2000,
+			neighbours: 0,
+		});
+		expect(parse(GetContextSchema, { query: 'x' })).toEqual({
+			query: 'x',
+			root: '.',
+			limit: 3,
 		});
 	});
 });

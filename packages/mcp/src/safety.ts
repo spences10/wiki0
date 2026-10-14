@@ -1,4 +1,4 @@
-import { resolve_wiki_root } from '@wiki0/core';
+import { resolve_project_root } from '@wiki0/core';
 import { resolve } from 'node:path';
 
 export type McpSafetyConfig = {
@@ -15,7 +15,7 @@ export function mcp_safety_config(): McpSafetyConfig {
 
 export function mcp_root(root = '.'): string {
 	const requested_root = resolve(root);
-	const wiki_root = resolve_wiki_root(requested_root);
+	const wiki_root = resolve_project_root(requested_root);
 	const allowed_roots = parse_allowed_roots();
 	if (!is_allowed(wiki_root, allowed_roots)) {
 		throw new Error(

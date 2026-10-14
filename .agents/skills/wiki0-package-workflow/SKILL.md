@@ -10,8 +10,8 @@ Use this workflow for code changes in the core, CLI, or MCP packages.
 
 ## Package boundaries
 
-- Put shared Markdown, frontmatter, page IO, indexing, and search
-  behavior in `packages/core`.
+- Put Markdown parsing, indexing, link resolution, search and lint in
+  `packages/core`.
 - Expose agent-facing operations in `packages/mcp` after core support
   exists.
 - Expose user command workflows in `packages/cli` after core support
@@ -36,5 +36,6 @@ files.
 
 ## Dogfood check
 
-When adding a CLI or MCP feature intended for wiki operations, use
-that feature against this repository before finishing when safe.
+When changing indexing, search or lint, run the CLI against this repo
+and at least one other real repo before finishing, and check the
+results are correct, not just present.

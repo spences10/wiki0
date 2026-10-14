@@ -1,6 +1,7 @@
 # @wiki0/cli
 
-Command line interface for wiki0 local-first Markdown wiki memory.
+Command line interface for wiki0: search a project's docs and get the
+right section with a `path:start-end` citation.
 
 ## Install
 
@@ -8,42 +9,29 @@ Command line interface for wiki0 local-first Markdown wiki memory.
 pnpm add -g @wiki0/cli
 ```
 
-The package exposes the `wiki0` binary.
-
 ## Commands
 
 ```sh
-wiki0 init ./my-wiki
-wiki0 init ./my-project --wiki-dir docs
-wiki0 page create "projects/wiki0" --body "Local-first [[topics/memory]]." --root ./my-wiki
-wiki0 plan --source_type codebase --scope "current repository" --sources README.md,package.json
-wiki0 extract docs/guide.md --root ./my-wiki
-wiki0 sync docs --root ./my-wiki
-wiki0 index --root ./my-wiki
-wiki0 status --root ./my-wiki
-wiki0 search "memory" --root ./my-wiki
-wiki0 context "what is wiki0?" --root ./my-wiki
-wiki0 show topics/memory.md:12 --root ./my-wiki
-wiki0 lint --root ./my-wiki
-wiki0 graph --root ./my-wiki
-wiki0 facts add "Markdown is source of truth" --category decision --confidence high --source decisions/storage.md:12 --root ./my-wiki
-wiki0 facts list --root ./my-wiki
-wiki0 topics --root ./my-wiki
-wiki0 events --root ./my-wiki
-wiki0 review --root ./my-wiki
+wiki0 index                      # index the project docs
+wiki0 status                     # index path and staleness
+wiki0 search "query" [--limit 5] # one cited section per document
+wiki0 show <target> [--tokens 2000] [--neighbours 1]
+wiki0 context "query"            # top sections as cited Markdown
+wiki0 lint                       # broken links and anchors
+wiki0 graph                      # documents and links
+wiki0 documents                  # outline and link counts per document
+wiki0 backlinks <path-or-title>
 ```
 
-## Content folder and index
+`show` targets: `path:12`, `path:12-40`, `path#heading`, `path` or a
+document title. When the text is longer than the token budget, the
+output ends with the range to read next.
 
-Page commands write under `wiki/` by default. Use `--wiki-dir docs`
-when you want wiki0-backed project documentation in `docs/` instead.
-The index is rebuildable cache data stored outside the project, in
-`~/.cache/wiki0/<project>/index.db`. `wiki0 status` prints the path.
-Set `WIKI0_INDEX` to choose the file, or `[index] location = "local"`
-in `wiki0.toml` to keep it in `.wiki0/`.
+Every command takes `--root`; by default the project root is the
+nearest folder with `.git` or `wiki0.toml`. `lint` exits with code 1
+when it finds errors.
 
 ## Output
 
-Most commands return JSON so agents and shell scripts can consume the
-results. `wiki0 context` returns Markdown by default and supports
-`--json` for structured output.
+`show` and `context` print Markdown (`--json` for structured output).
+The other commands print JSON.

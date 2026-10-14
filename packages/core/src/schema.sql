@@ -70,34 +70,10 @@ CREATE TABLE IF NOT EXISTS page_chunks (
 	UNIQUE(page_id, sequence)
 );
 
-CREATE TABLE IF NOT EXISTS facts (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	page_id INTEGER REFERENCES pages(id) ON DELETE SET NULL,
-	category TEXT NOT NULL,
-	summary TEXT NOT NULL,
-	body TEXT,
-	confidence TEXT NOT NULL DEFAULT 'unknown',
-	source_path TEXT,
-	source_heading TEXT,
-	source_start_line INTEGER,
-	source_end_line INTEGER,
-	source_quote TEXT,
-	created_at TEXT DEFAULT (datetime('now'))
-);
-
 CREATE TABLE IF NOT EXISTS wiki_meta (
 	key TEXT PRIMARY KEY,
 	value TEXT NOT NULL,
 	updated_at TEXT DEFAULT (datetime('now'))
-);
-
-CREATE TABLE IF NOT EXISTS wiki_events (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	operation TEXT NOT NULL,
-	summary TEXT NOT NULL,
-	target TEXT,
-	details TEXT,
-	created_at TEXT DEFAULT (datetime('now'))
 );
 
 -- porter stems English words. Hyphens and underscores split tokens so

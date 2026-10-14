@@ -9,10 +9,10 @@ describe('wiki0_info', () => {
 		expect(info.version).toMatch(/^\d+\.\d+\.\d+/u);
 		expect(info.capabilities).toEqual({
 			tools: true,
-			prompts: true,
-			resources: true,
+			prompts: false,
+			resources: false,
 		});
-		expect(info.features).toContain('wiki-planning');
+		expect(info.features).toContain('cited-sections');
 		expect(info.features).toContain('structured-json-responses');
 	});
 });

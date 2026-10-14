@@ -4,8 +4,11 @@ import { join } from 'node:path';
 import type { SQLOutputValue } from 'node:sqlite';
 import { estimate_tokens } from './chunks.js';
 import { index_status } from './indexer.js';
-import { resolve_wiki_root } from './paths.js';
-import { open_index_or_throw, type WikiDatabase } from './storage.js';
+import {
+	open_index_or_throw,
+	resolve_project_root,
+	type WikiDatabase,
+} from './storage.js';
 import type {
 	BacklinkResult,
 	ContextResult,
@@ -120,7 +123,7 @@ export function search(
 	options: SearchOptions = {},
 ): SearchResponse {
 	const limit = options.limit ?? default_limit;
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const db = open_index_or_throw(project_root);
 	try {
 		const { candidates, relaxation } = collect_candidates(
@@ -502,7 +505,7 @@ export function show(
 	options: ShowOptions = {},
 ): ShowResult | null {
 	const budget = options.token_budget ?? default_token_budget;
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const db = open_index_or_throw(project_root);
 	try {
 		const parsed = parse_show_target(target);

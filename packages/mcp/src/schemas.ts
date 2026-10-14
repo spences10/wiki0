@@ -1,154 +1,74 @@
 import * as v from 'valibot';
 
+const root = v.optional(
+	v.pipe(
+		v.string(),
+		v.description(
+			'Project root; defaults to the nearest folder with .git or wiki0.toml',
+		),
+	),
+	'.',
+);
+
 export const Wiki0InfoSchema = v.object({});
 
-export const ParseWikilinksSchema = v.object({
-	markdown: v.string(),
-});
+export const RootSchema = v.object({ root });
 
-export const ParseMarkdownSchema = v.object({
-	markdown: v.string(),
-});
-
-export const ParseDocumentSchema = v.object({
-	source_path: v.string(),
-	root: v.optional(v.string(), '.'),
-});
-
-export const SlugifyTitleSchema = v.object({
-	title: v.string(),
-});
-
-export const CreatePageSchema = v.object({
-	title: v.string(),
-	body: v.string(),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	overwrite: v.optional(v.boolean(), false),
-});
-
-export const ReadPageSchema = v.object({
-	title: v.string(),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const SetPageFrontmatterSchema = v.object({
-	title: v.string(),
-	frontmatter: v.record(v.string(), v.unknown()),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	merge: v.optional(v.boolean(), false),
-});
-
-export const AddFactSchema = v.object({
-	category: v.string(),
-	summary: v.string(),
-	body: v.optional(v.string()),
-	confidence: v.optional(
-		v.picklist(['unknown', 'low', 'medium', 'high', 'verified']),
-		'unknown',
+export const SearchDocsSchema = v.object({
+	query: v.pipe(
+		v.string(),
+		v.description('Plain words; punctuation is treated as text'),
 	),
-	page: v.optional(v.string()),
-	source: v.optional(v.string()),
-	source_quote: v.optional(v.string()),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const ListFactsSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	category: v.optional(v.string()),
-});
-
-export const ListWikiEventsSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	limit: v.optional(v.number(), 50),
-});
-
-export const ListTopicThreadsSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	limit: v.optional(v.number(), 50),
-});
-
-export const IndexWikiSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const IndexStatusSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const SearchWikiSchema = v.object({
-	query: v.string(),
-	root: v.optional(v.string(), '.'),
-	limit: v.optional(v.number(), 5),
-	include_superseded: v.optional(v.boolean(), true),
-});
-
-export const ContextWikiSchema = v.object({
-	query: v.string(),
-	root: v.optional(v.string(), '.'),
-	limit: v.optional(v.number(), 3),
-});
-
-export const ShowWikiChunkSchema = v.object({
-	target: v.string(),
-	root: v.optional(v.string(), '.'),
-	token_budget: v.optional(v.number(), 2000),
-	neighbours: v.optional(v.number(), 0),
-});
-
-export const GraphWikiSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const LintWikiSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const BacklinksForPageSchema = v.object({
-	title: v.string(),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const ReviewWikiSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const AppendPageSchema = v.object({
-	title: v.string(),
-	body: v.string(),
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-});
-
-export const PlanWikiSchema = v.object({
-	source_type: v.optional(
-		v.picklist(['general', 'codebase', 'docs', 'research', 'notes']),
-		'general',
+	root,
+	limit: v.optional(
+		v.pipe(v.number(), v.description('Maximum number of documents')),
+		5,
 	),
-	scope: v.optional(v.string()),
-	sources: v.optional(v.array(v.string())),
+	include_superseded: v.optional(
+		v.pipe(
+			v.boolean(),
+			v.description(
+				'Keep superseded documents (ranked low, with superseded_by)',
+			),
+		),
+		true,
+	),
 });
 
-export const SyncDocumentsSchema = v.object({
-	root: v.optional(v.string(), '.'),
-	wiki_dir: v.optional(v.string(), 'wiki'),
-	sources: v.array(v.string()),
-	overwrite: v.optional(v.boolean(), false),
-	index: v.optional(v.boolean(), true),
-	include: v.optional(v.array(v.string())),
-	ignore: v.optional(v.array(v.string())),
-	derive_facts: v.optional(v.boolean(), true),
-	propose_pages: v.optional(v.boolean(), false),
+export const ShowSectionSchema = v.object({
+	target: v.pipe(
+		v.string(),
+		v.description(
+			'A citation from search (path:start-end), path:line, path#heading, path or title',
+		),
+	),
+	root,
+	token_budget: v.optional(
+		v.pipe(
+			v.number(),
+			v.description('Approximate token limit for the returned text'),
+		),
+		2000,
+	),
+	neighbours: v.optional(
+		v.pipe(
+			v.number(),
+			v.description('Also include this many sections either side'),
+		),
+		0,
+	),
+});
+
+export const GetContextSchema = v.object({
+	query: v.string(),
+	root,
+	limit: v.optional(
+		v.pipe(v.number(), v.description('Maximum number of sections')),
+		3,
+	),
+});
+
+export const BacklinksSchema = v.object({
+	target: v.pipe(v.string(), v.description('Document path or title')),
+	root,
 });

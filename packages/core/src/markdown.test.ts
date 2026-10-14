@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
 	page_title_from_markdown,
 	parse_markdown,
-	parse_wikilinks,
 } from './markdown.js';
 
 describe('parse_markdown', () => {
@@ -65,50 +64,5 @@ describe('page_title_from_markdown', () => {
 		expect(page_title_from_markdown('Body only', 'Fallback')).toBe(
 			'Fallback',
 		);
-	});
-});
-
-describe('parse_wikilinks', () => {
-	it('parses wikilinks and aliases', () => {
-		expect(
-			parse_wikilinks(
-				'See [[projects/wiki0|wiki zero]] and ![[assets/logo]].',
-			),
-		).toEqual([
-			{
-				raw: '[[projects/wiki0|wiki zero]]',
-				target: 'projects/wiki0',
-				alias: 'wiki zero',
-				embed: false,
-			},
-			{
-				raw: '![[assets/logo]]',
-				target: 'assets/logo',
-				embed: true,
-			},
-		]);
-	});
-
-	it('ignores links in frontmatter, fenced code blocks, and inline code', () => {
-		const markdown = `---
-title: Link Test
-related: [[frontmatter-ignored]]
----
-See [[real]].
-
-\`[[inline-ignored]]\`
-
-\`\`\`md
-[[fenced-ignored]]
-\`\`\`
-`;
-
-		expect(parse_wikilinks(markdown)).toEqual([
-			{
-				raw: '[[real]]',
-				target: 'real',
-				embed: false,
-			},
-		]);
 	});
 });

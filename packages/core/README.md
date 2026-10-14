@@ -1,63 +1,51 @@
 # @wiki0/core
 
-Core wiki0 primitives for local-first Markdown wiki memory.
+Indexing, link resolution, search and lint for wiki0. The CLI and MCP
+server are thin wrappers over these functions.
 
-## What it provides
-
-- Markdown and frontmatter parsing.
-- Obsidian-style `[[WikiLinks]]` parsing.
-- Page create/read/append/frontmatter operations.
-- SQLite indexing and FTS search.
-- Chunk-level context snippets with `wiki/path.md:line-line`
-  citations.
-- Direct indexed chunk lookup for known `path:line` targets.
-- Backlinks, graph data, lint results, review queues, and structured
-  facts with optional source-line provenance.
-- Stale-index warnings in context responses.
-- Lightweight topic threads and operation logs for agent workflows.
-- Frontmatter-aware chunk ranking using priority, status, and tags.
-- Wiki-building workflow planning for agents that need a deterministic
-  source-to-wiki recipe.
-
-## Basic usage
+## Usage
 
 ```ts
 import {
-	create_page,
-	index_status,
 	index_wiki,
-	search_wiki,
-	get_wiki_context,
-	sync_documents,
+	index_status,
 	lint_wiki,
-	parse_document,
-	plan_wiki,
+	search,
+	show,
 } from '@wiki0/core';
 
-create_page('projects/wiki0', 'Local-first [[topics/memory]].', {
-	root: '.',
+await index_wiki('.');
+
+const { results } = search('how do deploys work', '.');
+// results[0].citation === 'docs/deploys.md:12-40'
+
+const section = show(results[0].citation, '.', {
+	token_budget: 1500,
 });
-index_wiki('.');
-console.log(index_status('.'));
-console.log(search_wiki('memory', '.', 10));
-console.log(get_wiki_context('what is wiki0?', '.', 5).markdown);
-console.log(lint_wiki('.'));
-console.log(
-	plan_wiki({ source_type: 'codebase', scope: 'current repo' }),
-);
-console.log(await parse_document('docs/guide.md'));
-console.log(
-	await sync_documents({
-		root: '.',
-		sources: ['docs'],
-	}),
-);
 ```
 
-## Storage model
+## Functions
 
-Markdown files under `wiki/` are canonical. The index database
-(`resolve_index` returns its path) is a rebuildable cache for search,
-backlinks, graph data, and facts. `index_status` reports indexed-at
-time, schema/package versions, and stale reasons when Markdown or
-index metadata has changed since the last rebuild.
+| Function                   | Returns                                                        |
+| -------------------------- | -------------------------------------------------------------- |
+| `index_wiki(root)`         | Rebuilds the index from the project files (async)              |
+| `index_status(root)`       | Index path, staleness and reasons                              |
+| `search(query, root, o)`   | One ranked, cited section per document                         |
+| `show(target, root, o)`    | Current file text for a citation, line, heading, path or title |
+| `get_wiki_context(q, r)`   | Search plus section text as Markdown                           |
+| `lint_wiki(root)`          | Link problems with rule ids, severity and `path:line`          |
+| `graph_wiki(root)`         | Documents and resolved/unresolved links                        |
+| `list_documents(root)`     | Outline, metadata and link counts per document                 |
+| `backlinks_for_page(t, r)` | Documents linking to a document                                |
+| `resolve_index(root)`      | Where the index file lives                                     |
+
+Reading functions open the index read-only and throw if it is missing;
+run `index_wiki` first.
+
+## Storage
+
+The index is a rebuildable cache; a schema change rebuilds it.
+`resolve_index` returns its path: `WIKI0_INDEX` if set,
+`.wiki0/index.db` when `wiki0.toml` sets `[index] location = "local"`,
+otherwise `~/.cache/wiki0/<project>-<hash>/index.db`
+(`WIKI0_CACHE_DIR` overrides the base folder).

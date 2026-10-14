@@ -7,22 +7,22 @@ import {
 	index_status,
 	index_wiki,
 } from './indexer.js';
-import { create_page } from './pages.js';
+import { list_documents } from './catalog.js';
 import { backlinks_for_page, search } from './search.js';
-import { make_wiki_root } from './test-utils.js';
+import { make_wiki_root, write_doc } from './test-utils.js';
 
 describe('index_wiki', () => {
 	it('indexes Markdown pages into SQLite and searches content', async () => {
 		const root = make_wiki_root();
-		create_page(
-			'projects/wiki0',
+		write_doc(
+			root,
+			'wiki/projects/wiki0.md',
 			'SQLite search with [[topics/memory]].',
-			{ root },
 		);
-		create_page(
-			'topics/memory',
+		write_doc(
+			root,
+			'wiki/topics/memory.md',
 			'Agent memory should be inspectable.',
-			{ root },
 		);
 
 		const result = await index_wiki(root);
@@ -45,13 +45,13 @@ describe('index_wiki', () => {
 
 	it('reports index freshness status', async () => {
 		const root = make_wiki_root();
-		create_page('projects/wiki0', 'SQLite search.', { root });
+		write_doc(root, 'wiki/projects/wiki0.md', 'SQLite search.');
 
 		expect(index_status(root)).toEqual(
 			expect.objectContaining({
-				exists: true,
+				exists: false,
 				stale: true,
-				reasons: expect.arrayContaining(['never-indexed']),
+				reasons: ['missing-index'],
 			}),
 		);
 
@@ -68,7 +68,7 @@ describe('index_wiki', () => {
 			}),
 		);
 
-		create_page('topics/memory', 'New page.', { root });
+		write_doc(root, 'wiki/topics/memory.md', 'New page.');
 		expect(index_status(root)).toEqual(
 			expect.objectContaining({
 				stale: true,
@@ -79,20 +79,20 @@ describe('index_wiki', () => {
 
 	it('resolves wikilinks by page title and alias while indexing', async () => {
 		const root = make_wiki_root();
-		create_page(
-			'projects/wiki0',
+		write_doc(
+			root,
+			'wiki/projects/wiki0.md',
 			'Links to [[Core package]] and [[wiki0 CLI]].',
-			{ root },
 		);
-		create_page(
-			'packages/core',
+		write_doc(
+			root,
+			'wiki/packages/core.md',
 			'---\ntitle: Core package\n---\n# Core\n',
-			{ root },
 		);
-		create_page(
-			'interfaces/cli',
+		write_doc(
+			root,
+			'wiki/interfaces/cli.md',
 			'---\ntitle: CLI\naliases: [wiki0 CLI]\n---\n# CLI\n',
-			{ root },
 		);
 
 		const result = await index_wiki(root);
@@ -165,5 +165,37 @@ describe('index_wiki on project docs', () => {
 			expect.stringContaining('broken.md: Invalid YAML frontmatter'),
 		]);
 		expect(search('still searchable', root).results).toHaveLength(1);
+	});
+});
+
+describe('list_documents', () => {
+	it('lists documents with outlines and link counts', async () => {
+		const root = make_wiki_root();
+		write_doc(
+			root,
+			'docs/a.md',
+			'---\nstatus: accepted\ntype: decision\n---\n# A\n\n## Why\n\nSee [b](./b.md).',
+		);
+		write_doc(root, 'docs/b.md', '# B');
+		await index_wiki(root);
+
+		expect(list_documents(root)).toEqual([
+			expect.objectContaining({
+				path: 'docs/a.md',
+				status: 'accepted',
+				doc_type: 'decision',
+				out_link_count: 1,
+				in_link_count: 0,
+				headings: [
+					{ slug: 'a', text: 'A', depth: 1, line: 5 },
+					{ slug: 'why', text: 'Why', depth: 2, line: 7 },
+				],
+			}),
+			expect.objectContaining({
+				path: 'docs/b.md',
+				in_link_count: 1,
+				out_link_count: 0,
+			}),
+		]);
 	});
 });

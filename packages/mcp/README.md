@@ -1,6 +1,7 @@
 # @wiki0/mcp
 
-MCP server exposing wiki0 Markdown memory operations to agents.
+MCP server for wiki0: search a project's docs and get the right
+section with a `path:start-end` citation.
 
 ## Install
 
@@ -10,46 +11,31 @@ pnpm add -g @wiki0/mcp
 
 The package exposes the `wiki0-mcp` binary.
 
-## Tool surface
+## Tools
 
-- `wiki0_info` for server version, capabilities, and feature flags
-- `parse_wikilinks`, `parse_markdown`, `parse_document`,
-  `slugify_title`
-- `plan_wiki` for a deterministic source-to-wiki workflow and starter
-  page plan
-- `sync_documents` to sync source documents into Markdown source pages
-  and index the wiki
-- `create_page`, `read_page`, `append_page`, `set_page_frontmatter`
-- `index_wiki`, `index_status`, `search_wiki`, `get_wiki_context`
-- `show_wiki_chunk` for known page or `page:line` retrieval
-- `backlinks_for_page`, `graph_wiki`, `lint_wiki`, `review_wiki`
-- `list_topic_threads`, `list_wiki_events`
-- `add_fact`, `list_facts` with optional `source` / `source_quote`
-  provenance
+| Tool             | Purpose                                                        |
+| ---------------- | -------------------------------------------------------------- |
+| `search_docs`    | One cited section per document, authoritative docs first       |
+| `show_section`   | Text of a citation, `path:line`, `path#heading`, path or title |
+| `get_context`    | Search plus the top sections as cited Markdown                 |
+| `index_docs`     | Index the project docs                                         |
+| `index_status`   | Index path and staleness                                       |
+| `lint_docs`      | Broken links and anchors with `path:line`                      |
+| `link_graph`     | Documents and links                                            |
+| `list_documents` | Outline, status, type and link counts per document             |
+| `backlinks`      | Documents linking to a document                                |
+| `wiki0_info`     | Version and safety settings                                    |
 
-## Prompt and resource
+Tools return JSON as both text and structured content; failures return
+`isError: true`.
 
-The server also exposes a `build_wiki` prompt and a
-`wiki0://workflows/wiki-building` resource so MCP clients can discover
-how to turn source material into a linked wiki instead of guessing the
-workflow from individual tools. JSON tools return both text content
-and structured content, and recoverable tool failures are returned
-with `isError: true`.
+## Roots and safety
 
-## Root handling
+Each tool takes an optional `root`. The server only allows roots under
+its working directory unless `WIKI0_ALLOWED_ROOTS` lists others
+(comma-separated). `WIKI0_READ_ONLY=true` blocks `index_docs`, the
+only tool that writes (to the index, never to your files).
 
-Each tool accepts an optional `root` argument. Page and indexing tools
-also accept `wiki_dir`; Markdown under `wiki/` is the default, and
-`wiki_dir: "docs"` writes/searches project documentation under
-`docs/`.
-
-The index is rebuildable cache data stored outside the project, in
-`~/.cache/wiki0/<project>/index.db`. `wiki0 status` prints the path.
-Set `WIKI0_INDEX` to choose the file, or `[index] location = "local"`
-in `wiki0.toml` to keep it in `.wiki0/`.
-
-By default the MCP server only allows roots under its current working
-directory. Set `WIKI0_ALLOWED_ROOTS` to a comma-separated list of
-allowed root directories. Set `WIKI0_READ_ONLY=true` to block write
-operations such as page creation, frontmatter updates, fact writes,
-index rebuilds, and document sync.
+The index lives in `~/.cache/wiki0/<project>/index.db`. Set
+`WIKI0_INDEX` so the CLI and the server use the same file if their
+environments differ.

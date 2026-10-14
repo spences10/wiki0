@@ -6,10 +6,12 @@
   validation so the change can be reviewed.
 - Run `pnpm verify` before reporting work as done. Report failures; do
   not weaken checks to get a green result.
-- Change pages in `wiki/` through wiki0's own CLI or MCP tools, not
-  direct file edits. If the needed tool is missing, say so.
+- After changing Markdown docs, run wiki0's own `index` and `lint` on
+  this repo and fix the errors it reports.
 - Changesets cover changes to the published packages' behaviour or
   runtime dependencies only.
+- wiki0 must never write to the files it indexes; only the index is
+  written.
 - Keep Vite, Vitest and the browser provider on the exact versions the
   current `vite-plus` bundles, and import test APIs from
   `vite-plus/test`.

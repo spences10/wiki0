@@ -1,16 +1,3 @@
-export type WikiConfig = {
-	root: string;
-	wiki_dir?: string;
-	db_path?: string;
-};
-
-export type WikiLink = {
-	raw: string;
-	target: string;
-	alias?: string;
-	embed: boolean;
-};
-
 export type FrontmatterValue =
 	| string
 	| number
@@ -24,28 +11,6 @@ export type WikiFrontmatter = Record<string, FrontmatterValue>;
 export type ParsedMarkdown = {
 	frontmatter: WikiFrontmatter;
 	content: string;
-};
-
-export type WikiPage = {
-	path: string;
-	title: string;
-	body: string;
-	content: string;
-	frontmatter: WikiFrontmatter;
-	links: WikiLink[];
-};
-
-export type WikiDirOptions = {
-	root?: string;
-	wiki_dir?: string;
-};
-
-export type PageWriteOptions = WikiDirOptions & {
-	overwrite?: boolean;
-};
-
-export type PageFrontmatterOptions = WikiDirOptions & {
-	merge?: boolean;
 };
 
 export type IndexResult = {
@@ -188,46 +153,6 @@ export type GraphResult = {
 	edges: GraphEdge[];
 };
 
-export type FactConfidence =
-	| 'unknown'
-	| 'low'
-	| 'medium'
-	| 'high'
-	| 'verified';
-
-export type Fact = {
-	id: number;
-	page_path: string | null;
-	category: string;
-	summary: string;
-	body: string | null;
-	confidence: FactConfidence;
-	source_path: string | null;
-	source_heading: string | null;
-	source_start_line: number | null;
-	source_end_line: number | null;
-	source_quote: string | null;
-	created_at: string;
-};
-
-export type FactWriteOptions = WikiDirOptions & {
-	page?: string;
-	category: string;
-	summary: string;
-	body?: string;
-	confidence?: FactConfidence;
-	source?: string;
-	source_quote?: string;
-};
-
-export type ReviewResult = {
-	path: string;
-	title: string;
-	status: string | null;
-	tags: string[];
-	reason: string;
-};
-
 export type LintSeverity = 'error' | 'warning' | 'info';
 
 export type LintIssue = {
@@ -248,76 +173,25 @@ export type LintResult = {
 	issues: LintIssue[];
 };
 
-export type WikiSourceType =
-	| 'general'
-	| 'codebase'
-	| 'docs'
-	| 'research'
-	| 'notes';
-
-export type WikiPlanOptions = {
-	source_type?: WikiSourceType;
-	scope?: string;
-	sources?: string[];
+export type DocumentHeading = {
+	slug: string;
+	text: string;
+	depth: number;
+	line: number;
 };
 
-export type WikiPlanPage = {
-	title: string;
+export type DocumentSummary = {
 	path: string;
-	purpose: string;
-	tags: string[];
-};
-
-export type WikiPlanResult = {
-	source_type: WikiSourceType;
-	scope: string;
-	workflow: string;
-	pages: WikiPlanPage[];
-	next_steps: string[];
-};
-
-export type WikiDocumentSyncOptions = WikiDirOptions & {
-	sources: string[];
-	overwrite?: boolean;
-	index?: boolean;
-	include?: string[];
-	ignore?: string[];
-	derive_facts?: boolean;
-	propose_pages?: boolean;
-};
-
-export type WikiDocumentSync = {
-	source: string;
-	page: string;
-	kind: 'markdown' | 'text' | 'pdf' | 'docx' | 'unsupported';
-	status: 'created' | 'updated' | 'unchanged' | 'changed' | 'warning';
-	warnings: string[];
-};
-
-export type WikiDocumentSyncResult = {
-	root: string;
-	sources: string[];
-	created: string[];
-	skipped: string[];
-	proposed_pages: string[];
-	derived_facts: Fact[];
-	synced_sources: WikiDocumentSync[];
-	indexed: IndexResult | null;
-};
-
-export type WikiEvent = {
-	id: number;
-	operation: string;
-	summary: string;
-	target: string | null;
-	details: string | null;
-	created_at: string;
-};
-
-export type TopicThreadResult = {
-	topic: string;
-	reference_count: number;
-	page_count: number;
-	paths: string[];
-	summary: string;
+	title: string;
+	kind: string;
+	status: string | null;
+	doc_type: string | null;
+	date: string | null;
+	aliases: string[];
+	supersedes: string[];
+	superseded_by: string | null;
+	line_count: number;
+	headings: DocumentHeading[];
+	in_link_count: number;
+	out_link_count: number;
 };

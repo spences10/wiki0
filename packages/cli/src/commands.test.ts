@@ -2,39 +2,17 @@ import { describe, expect, it } from 'vite-plus/test';
 import { main } from './commands.js';
 
 describe('main command', () => {
-	it('exposes the expected top-level commands', () => {
+	it('exposes only read and index commands', () => {
 		expect(Object.keys(main.subCommands ?? {})).toEqual([
-			'init',
-			'page',
-			'extract',
-			'sync',
-			'plan',
-			'facts',
-			'events',
-			'topics',
 			'index',
 			'status',
 			'search',
 			'show',
 			'context',
-			'graph',
 			'lint',
+			'graph',
+			'documents',
 			'backlinks',
-			'review',
-		]);
-	});
-
-	it('groups page subcommands', () => {
-		const sub_commands = main.subCommands as Record<
-			string,
-			typeof main
-		>;
-		const page_command = sub_commands.page;
-		expect(Object.keys(page_command?.subCommands ?? {})).toEqual([
-			'create',
-			'read',
-			'frontmatter',
-			'append',
 		]);
 	});
 });

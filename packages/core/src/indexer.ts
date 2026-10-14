@@ -8,7 +8,6 @@ import {
 } from './chunks.js';
 import { read_config } from './config.js';
 import { document_kind, parse_document } from './documents.js';
-import { log_wiki_event } from './events.js';
 import {
 	list_all_project_files,
 	list_project_files,
@@ -21,12 +20,12 @@ import {
 	type ExtractedLink,
 } from './links.js';
 import { parse_markdown } from './markdown.js';
-import { resolve_wiki_root } from './paths.js';
 import { index_schema_version } from './schema.js';
 import {
 	open_index,
 	open_index_readonly,
 	resolve_index,
+	resolve_project_root,
 	type WikiDatabase,
 } from './storage.js';
 import type {
@@ -64,7 +63,7 @@ type IndexedDocument = {
 };
 
 export async function index_wiki(root = '.'): Promise<IndexResult> {
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const config = read_config(project_root);
 	const warnings: string[] = [];
 	const documents: IndexedDocument[] = [];
@@ -221,18 +220,6 @@ export async function index_wiki(root = '.'): Promise<IndexResult> {
 		db.close();
 	}
 
-	log_wiki_event({
-		root: project_root,
-		operation: 'index_wiki',
-		summary: `Indexed ${documents.length} documents and ${link_count} links`,
-		target: project_root,
-		details: {
-			page_count: documents.length,
-			chunk_count,
-			link_count,
-			schema_version: index_schema_version,
-		},
-	});
 	return {
 		root: project_root,
 		db_path,
@@ -380,7 +367,7 @@ function set_meta(
 }
 
 export function index_status(root = '.'): IndexStatus {
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const db_path = resolve_index(project_root).index_path;
 	const file_paths = list_project_files(
 		project_root,

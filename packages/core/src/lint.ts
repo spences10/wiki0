@@ -1,6 +1,8 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { resolve_wiki_root } from './paths.js';
-import { open_index_or_throw } from './storage.js';
+import {
+	open_index_or_throw,
+	resolve_project_root,
+} from './storage.js';
 import type { LintIssue, LintResult, LintSeverity } from './types.js';
 
 type LinkRow = {
@@ -18,7 +20,7 @@ type LinkRow = {
 // Lints the indexed docs. Run `index_wiki` first; the index is the
 // source for links, anchors and names.
 export function lint_wiki(root = '.'): LintResult {
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const db = open_index_or_throw(project_root);
 	let links: LinkRow[];
 	let pages: { path: string; title: string; aliases: string[] }[];

@@ -1,610 +1,64 @@
-import type { FactConfidence, WikiSourceType } from '@wiki0/core';
 import {
-	add_fact,
-	append_page,
 	backlinks_for_page,
-	create_page,
 	get_wiki_context,
 	graph_wiki,
 	index_status,
 	index_wiki,
 	lint_wiki,
-	list_facts,
-	list_topic_threads,
-	list_wiki_events,
-	parse_document,
-	plan_wiki,
-	read_page,
-	review_wiki,
+	list_documents,
 	search,
-	set_page_frontmatter,
 	show,
-	sync_documents,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
-import { isAbsolute, resolve } from 'node:path';
-import {
-	init_workspace,
-	parse_frontmatter_json,
-	print_json,
-	read_markdown_input,
-} from './actions.js';
+import { print_json } from './actions.js';
 
-function parse_wiki_source_type(value: unknown): WikiSourceType {
-	const source_type = typeof value === 'string' ? value : 'general';
-	if (
-		source_type === 'general' ||
-		source_type === 'codebase' ||
-		source_type === 'docs' ||
-		source_type === 'research' ||
-		source_type === 'notes'
-	) {
-		return source_type;
-	}
-	throw new Error(`Invalid wiki source type: ${source_type}`);
-}
+const root_arg = {
+	root: {
+		type: 'string',
+		description: 'Project root (default: nearest folder with .git)',
+		default: '.',
+	},
+} as const;
 
-function parse_sources(value: unknown): string[] | undefined {
-	if (typeof value !== 'string' || value.trim().length === 0) {
-		return undefined;
-	}
-	return value
-		.split(',')
-		.map((source) => source.trim())
-		.filter(Boolean);
-}
-
-function parse_optional_sources(
-	value: unknown,
-): string[] | undefined {
-	return parse_sources(value);
-}
-
-function wiki_dir_arg(args: { wikiDir?: unknown }): string {
-	return typeof args.wikiDir === 'string' && args.wikiDir.length > 0
-		? args.wikiDir
-		: 'wiki';
-}
-
-function resolve_cli_source(root: string, source: string): string {
-	return isAbsolute(source) ? source : resolve(root, source);
-}
-
-function parse_fact_confidence(value: unknown): FactConfidence {
-	const confidence = typeof value === 'string' ? value : 'unknown';
-	if (
-		confidence === 'unknown' ||
-		confidence === 'low' ||
-		confidence === 'medium' ||
-		confidence === 'high' ||
-		confidence === 'verified'
-	) {
-		return confidence;
-	}
-	throw new Error(`Invalid fact confidence: ${confidence}`);
-}
+const json_arg = {
+	json: {
+		type: 'boolean',
+		description: 'Output JSON instead of Markdown',
+	},
+} as const;
 
 export const main = defineCommand({
 	meta: {
 		name: 'wiki0',
 		description:
-			'Local-first Markdown wiki memory for humans and agents',
+			'Search a project’s docs and get the right section with a path:line citation',
 	},
 	subCommands: {
-		init: defineCommand({
-			meta: { description: 'Create a wiki0 folder structure' },
-			args: {
-				path: {
-					type: 'positional',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-			},
-			run({ args }) {
-				console.log(
-					init_workspace(
-						String(args.path ?? '.'),
-						wiki_dir_arg(args),
-					),
-				);
-			},
-		}),
-		page: defineCommand({
-			meta: {
-				description: 'Create, read, append, and tag wiki pages',
-			},
-			subCommands: {
-				create: defineCommand({
-					meta: { description: 'Create a wiki page' },
-					args: {
-						title: {
-							type: 'positional',
-							required: true,
-							description: 'Page title or path',
-						},
-						body: { type: 'string', description: 'Markdown body' },
-						file: {
-							type: 'string',
-							description: 'Read Markdown body from a file',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-						overwrite: {
-							type: 'boolean',
-							description: 'Overwrite an existing page',
-						},
-					},
-					run({ args }) {
-						const page = create_page(
-							String(args.title),
-							read_markdown_input(args),
-							{
-								root: String(args.root ?? '.'),
-								wiki_dir: wiki_dir_arg(args),
-								overwrite: Boolean(args.overwrite),
-							},
-						);
-						print_json(page);
-					},
-				}),
-				read: defineCommand({
-					meta: { description: 'Read a wiki page' },
-					args: {
-						title: {
-							type: 'positional',
-							required: true,
-							description: 'Page title or path',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-					},
-					run({ args }) {
-						print_json(
-							read_page(
-								String(args.title),
-								String(args.root ?? '.'),
-								wiki_dir_arg(args),
-							),
-						);
-					},
-				}),
-				frontmatter: defineCommand({
-					meta: {
-						description: 'Set YAML frontmatter on a wiki page',
-					},
-					args: {
-						title: {
-							type: 'positional',
-							required: true,
-							description: 'Page title or path',
-						},
-						data: {
-							type: 'string',
-							required: true,
-							description: 'Frontmatter as a JSON object',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-						merge: {
-							type: 'boolean',
-							description: 'Merge with existing frontmatter',
-						},
-					},
-					run({ args }) {
-						const page = set_page_frontmatter(
-							String(args.title),
-							parse_frontmatter_json(args.data),
-							{
-								root: String(args.root ?? '.'),
-								wiki_dir: wiki_dir_arg(args),
-								merge: Boolean(args.merge),
-							},
-						);
-						print_json(page);
-					},
-				}),
-				append: defineCommand({
-					meta: { description: 'Append Markdown to a wiki page' },
-					args: {
-						title: {
-							type: 'positional',
-							required: true,
-							description: 'Page title or path',
-						},
-						body: {
-							type: 'string',
-							description: 'Markdown body to append',
-						},
-						file: {
-							type: 'string',
-							description: 'Read Markdown body from a file',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-					},
-					run({ args }) {
-						const page = append_page(
-							String(args.title),
-							read_markdown_input(args),
-							String(args.root ?? '.'),
-							wiki_dir_arg(args),
-						);
-						print_json(page);
-					},
-				}),
-			},
-		}),
-		extract: defineCommand({
-			meta: {
-				description:
-					'Extract normalized text and metadata from a source document',
-			},
-			args: {
-				source: {
-					type: 'positional',
-					required: true,
-					description: 'Source document path',
-				},
-				root: {
-					type: 'string',
-					description: 'Wiki root path for relative sources',
-					default: '.',
-				},
-			},
-			async run({ args }) {
-				print_json(
-					await parse_document(
-						resolve_cli_source(
-							String(args.root ?? '.'),
-							String(args.source),
-						),
-					),
-				);
-			},
-		}),
-		sync: defineCommand({
-			meta: {
-				description:
-					'Sync source documents into wiki source pages, then index the wiki',
-			},
-			args: {
-				sources: {
-					type: 'positional',
-					required: true,
-					description: 'Comma-separated source paths or directories',
-				},
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-				overwrite: {
-					type: 'boolean',
-					description: 'Overwrite existing synced source pages',
-				},
-				include: {
-					type: 'string',
-					description:
-						'Comma-separated glob patterns to include during recursive sync',
-				},
-				ignore: {
-					type: 'string',
-					description:
-						'Comma-separated glob patterns to ignore during recursive sync',
-				},
-				noFacts: {
-					type: 'boolean',
-					description: 'Skip deriving SQLite facts from source text',
-				},
-				proposePages: {
-					type: 'boolean',
-					description:
-						'Generate proposed concept/workflow pages from source text',
-				},
-				noIndex: {
-					type: 'boolean',
-					description: 'Skip rebuilding the SQLite index after sync',
-				},
-			},
-			async run({ args }) {
-				print_json(
-					await sync_documents({
-						root: String(args.root ?? '.'),
-						wiki_dir: wiki_dir_arg(args),
-						sources: parse_sources(args.sources) ?? [],
-						overwrite: Boolean(args.overwrite),
-						index: !args.noIndex,
-						include: parse_optional_sources(args.include),
-						ignore: parse_optional_sources(args.ignore),
-						derive_facts: !args.noFacts,
-						propose_pages: Boolean(args.proposePages),
-					}),
-				);
-			},
-		}),
-		plan: defineCommand({
-			meta: {
-				description:
-					'Print a deterministic workflow and starter page plan for building a wiki',
-			},
-			args: {
-				source_type: {
-					type: 'string',
-					description: 'general, codebase, docs, research, or notes',
-					default: 'general',
-				},
-				scope: {
-					type: 'string',
-					description: 'Source scope description',
-				},
-				sources: {
-					type: 'string',
-					description: 'Comma-separated source paths or URLs',
-				},
-			},
-			run({ args }) {
-				print_json(
-					plan_wiki({
-						source_type: parse_wiki_source_type(args.source_type),
-						scope: args.scope ? String(args.scope) : undefined,
-						sources: parse_sources(args.sources),
-					}),
-				);
-			},
-		}),
-		facts: defineCommand({
-			meta: { description: 'Add and list structured wiki facts' },
-			subCommands: {
-				add: defineCommand({
-					meta: { description: 'Add a structured wiki fact' },
-					args: {
-						summary: { type: 'positional', required: true },
-						category: {
-							type: 'string',
-							description: 'Fact category',
-							default: 'note',
-						},
-						body: { type: 'string', description: 'Fact details' },
-						confidence: {
-							type: 'string',
-							description: 'unknown, low, medium, high, or verified',
-							default: 'unknown',
-						},
-						page: {
-							type: 'string',
-							description: 'Related page title or path',
-						},
-						source: {
-							type: 'string',
-							description:
-								'Source page or page:line target for provenance',
-						},
-						sourceQuote: {
-							type: 'string',
-							description: 'Exact source quote for provenance',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-					},
-					run({ args }) {
-						print_json(
-							add_fact({
-								root: String(args.root ?? '.'),
-								wiki_dir: wiki_dir_arg(args),
-								page: args.page ? String(args.page) : undefined,
-								category: String(args.category ?? 'note'),
-								summary: String(args.summary),
-								body: args.body ? String(args.body) : undefined,
-								confidence: parse_fact_confidence(args.confidence),
-								source: args.source ? String(args.source) : undefined,
-								source_quote: args.sourceQuote
-									? String(args.sourceQuote)
-									: undefined,
-							}),
-						);
-					},
-				}),
-				list: defineCommand({
-					meta: { description: 'List structured wiki facts' },
-					args: {
-						category: {
-							type: 'string',
-							description: 'Filter by category',
-						},
-						root: {
-							type: 'string',
-							description: 'Wiki root path',
-							default: '.',
-						},
-						wikiDir: {
-							type: 'string',
-							description:
-								'Content folder to store pages (for example docs)',
-							default: 'wiki',
-						},
-					},
-					run({ args }) {
-						print_json(
-							list_facts(
-								String(args.root ?? '.'),
-								args.category ? String(args.category) : undefined,
-							),
-						);
-					},
-				}),
-			},
-		}),
-		events: defineCommand({
-			meta: { description: 'List recent wiki operation log events' },
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-				limit: {
-					type: 'string',
-					description: 'Maximum number of events',
-					default: '50',
-				},
-			},
-			run({ args }) {
-				print_json(
-					list_wiki_events(
-						String(args.root ?? '.'),
-						Number(args.limit ?? 50),
-					),
-				);
-			},
-		}),
-		topics: defineCommand({
-			meta: {
-				description:
-					'List lightweight topic threads from indexed chunks',
-			},
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-				limit: {
-					type: 'string',
-					description: 'Maximum number of topics',
-					default: '50',
-				},
-			},
-			run({ args }) {
-				print_json(
-					list_topic_threads(
-						String(args.root ?? '.'),
-						Number(args.limit ?? 50),
-					),
-				);
-			},
-		}),
 		index: defineCommand({
-			meta: { description: 'Index Markdown pages into SQLite' },
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-			},
+			meta: { description: 'Index the project docs' },
+			args: { ...root_arg },
 			async run({ args }) {
-				print_json(await index_wiki(String(args.root ?? '.')));
+				print_json(await index_wiki(String(args.root)));
 			},
 		}),
 		status: defineCommand({
-			meta: { description: 'Show index freshness and schema status' },
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+			meta: {
+				description:
+					'Show where the index is and whether it is stale',
 			},
+			args: { ...root_arg },
 			run({ args }) {
-				print_json(index_status(String(args.root ?? '.')));
+				print_json(index_status(String(args.root)));
 			},
 		}),
 		search: defineCommand({
-			meta: { description: 'Search indexed wiki pages' },
+			meta: {
+				description:
+					'Search the docs; one cited section per document, most authoritative first',
+			},
 			args: {
 				query: { type: 'positional', required: true },
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+				...root_arg,
 				limit: {
 					type: 'string',
 					description: 'Maximum number of documents',
@@ -618,8 +72,8 @@ export const main = defineCommand({
 			},
 			run({ args }) {
 				print_json(
-					search(String(args.query), String(args.root ?? '.'), {
-						limit: Number(args.limit ?? 5),
+					search(String(args.query), String(args.root), {
+						limit: Number(args.limit),
 						include_superseded: args.includeSuperseded !== false,
 					}),
 				);
@@ -628,26 +82,11 @@ export const main = defineCommand({
 		show: defineCommand({
 			meta: {
 				description:
-					'Show the indexed wiki chunk for a page or page:line target',
+					'Show a cited section: path:line, path:start-end, path#heading, path or title',
 			},
 			args: {
-				target: {
-					type: 'positional',
-					required: true,
-					description:
-						'path:line, path:start-end, path#heading, path or title',
-				},
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+				target: { type: 'positional', required: true },
+				...root_arg,
 				tokens: {
 					type: 'string',
 					description: 'Token budget for the returned text',
@@ -658,20 +97,13 @@ export const main = defineCommand({
 					description: 'Also include this many sections either side',
 					default: '0',
 				},
-				json: {
-					type: 'boolean',
-					description: 'Output structured JSON instead of Markdown',
-				},
+				...json_arg,
 			},
 			run({ args }) {
-				const result = show(
-					String(args.target),
-					String(args.root ?? '.'),
-					{
-						token_budget: Number(args.tokens ?? 2000),
-						neighbours: Number(args.neighbours ?? 0),
-					},
-				);
+				const result = show(String(args.target), String(args.root), {
+					token_budget: Number(args.tokens),
+					neighbours: Number(args.neighbours),
+				});
 				if (args.json) {
 					print_json(result);
 					return;
@@ -682,49 +114,39 @@ export const main = defineCommand({
 					return;
 				}
 				console.log(`Source: ${result.citation}`);
-				for (const warning of result.warnings)
+				for (const warning of result.warnings) {
 					console.log(`Warning: ${warning}`);
+				}
 				if (result.superseded_by) {
 					console.log(`Superseded by: ${result.superseded_by}`);
 				}
 				console.log('');
 				console.log(result.markdown);
-				if (result.next)
+				if (result.next) {
 					console.log(`\nMore: wiki0 show ${result.next}`);
+				}
 			},
 		}),
 		context: defineCommand({
 			meta: {
-				description: 'Retrieve indexed context with citations',
+				description:
+					'Search and return the top sections as cited Markdown',
 			},
 			args: {
 				query: { type: 'positional', required: true },
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+				...root_arg,
 				limit: {
 					type: 'string',
 					description: 'Maximum number of sections',
 					default: '3',
 				},
-				json: {
-					type: 'boolean',
-					description: 'Output structured JSON instead of Markdown',
-				},
+				...json_arg,
 			},
 			run({ args }) {
 				const result = get_wiki_context(
 					String(args.query),
-					String(args.root ?? '.'),
-					Number(args.limit ?? 3),
+					String(args.root),
+					Number(args.limit),
 				);
 				console.log(
 					args.json
@@ -733,91 +155,44 @@ export const main = defineCommand({
 				);
 			},
 		}),
-		graph: defineCommand({
-			meta: { description: 'Output indexed wiki graph data' },
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-			},
-			run({ args }) {
-				print_json(graph_wiki(String(args.root ?? '.')));
-			},
-		}),
 		lint: defineCommand({
-			meta: { description: 'Lint wiki links and duplicate names' },
-			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+			meta: {
+				description:
+					'Report broken links, missing headings and other link problems',
 			},
+			args: { ...root_arg },
 			run({ args }) {
-				const result = lint_wiki(String(args.root ?? '.'));
+				const result = lint_wiki(String(args.root));
 				print_json(result);
 				if (!result.ok) process.exitCode = 1;
 			},
 		}),
-		backlinks: defineCommand({
-			meta: { description: 'List resolved backlinks for a page' },
-			args: {
-				title: { type: 'positional', required: true },
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
-			},
+		graph: defineCommand({
+			meta: { description: 'Output the document link graph' },
+			args: { ...root_arg },
 			run({ args }) {
-				print_json(
-					backlinks_for_page(
-						String(args.title),
-						String(args.root ?? '.'),
-					),
-				);
+				print_json(graph_wiki(String(args.root)));
 			},
 		}),
-		review: defineCommand({
+		documents: defineCommand({
 			meta: {
-				description: 'List pages marked for review',
+				description:
+					'List indexed documents with outlines and link counts',
 			},
+			args: { ...root_arg },
+			run({ args }) {
+				print_json(list_documents(String(args.root)));
+			},
+		}),
+		backlinks: defineCommand({
+			meta: { description: 'List documents that link to a document' },
 			args: {
-				root: {
-					type: 'string',
-					description: 'Wiki root path',
-					default: '.',
-				},
-				wikiDir: {
-					type: 'string',
-					description:
-						'Content folder to store pages (for example docs)',
-					default: 'wiki',
-				},
+				target: { type: 'positional', required: true },
+				...root_arg,
 			},
 			run({ args }) {
 				print_json(
-					review_wiki(String(args.root ?? '.'), wiki_dir_arg(args)),
+					backlinks_for_page(String(args.target), String(args.root)),
 				);
 			},
 		}),

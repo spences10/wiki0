@@ -1,10 +1,12 @@
 import type { SQLOutputValue } from 'node:sqlite';
-import { resolve_wiki_root } from './paths.js';
-import { open_index_or_throw } from './storage.js';
+import {
+	open_index_or_throw,
+	resolve_project_root,
+} from './storage.js';
 import type { GraphEdge, GraphNode, GraphResult } from './types.js';
 
 export function graph_wiki(root = '.'): GraphResult {
-	const project_root = resolve_wiki_root(root);
+	const project_root = resolve_project_root(root);
 	const db = open_index_or_throw(project_root);
 	try {
 		const edges = (
