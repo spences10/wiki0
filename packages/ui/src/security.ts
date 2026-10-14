@@ -12,12 +12,13 @@ const loopback_hosts = new Set(['127.0.0.1', 'localhost', '[::1]']);
 // Raw HTML in docs is rendered as is, so the policy is what keeps it
 // inert: no inline scripts or handlers, no frames, forms or <base>.
 // Styles allow inline attributes because bits-ui and layerchart set
-// them.
+// them. Images may load over https, as docs embed badges and
+// diagrams hosted elsewhere.
 export const content_security_policy = [
 	"default-src 'self'",
 	"script-src 'self'",
 	"style-src 'self' 'unsafe-inline'",
-	"img-src 'self' blob: data:",
+	"img-src 'self' blob: data: https:",
 	"font-src 'self'",
 	"connect-src 'self'",
 	"object-src 'none'",

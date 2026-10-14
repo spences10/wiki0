@@ -41,6 +41,8 @@ See [missing](missing.md), [bad anchor](setup.md#nope) and
 
 External: [example](https://example.com) and a [route](/contact).
 
+![badge](https://img.example.com/badge.svg) ![plain](http://img.example.com/x.png)
+
 \`\`\`ts {2}
 // [not a link](setup.md)
 const value = 42;
@@ -148,7 +150,17 @@ describe('render_document', () => {
 		expect(html).toMatch(
 			/<img data-line="\d+" data-end-line="\d+" data-wiki0-asset="docs\/diagram\.png" alt="inline diagram">/u,
 		);
-		expect(html).not.toMatch(/<img[^>]*\ssrc=/u);
+		expect(html).not.toMatch(/<img[^>]*\ssrc="(?!https:)/u);
+	});
+
+	it('loads remote https images and links the rest', async () => {
+		const { html } = await render_fixture();
+		expect(html).toContain(
+			'<img src="https://img.example.com/badge.svg" alt="badge" loading="lazy" referrerpolicy="no-referrer">',
+		);
+		expect(html).toContain(
+			'<a href="http://img.example.com/x.png" target="_blank" rel="noopener noreferrer" class="wiki0-remote-image">plain</a>',
+		);
 	});
 
 	it('opens external links in a new tab and marks site routes', async () => {

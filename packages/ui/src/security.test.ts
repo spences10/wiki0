@@ -70,9 +70,9 @@ describe('health proof', () => {
 });
 
 describe('content_security_policy', () => {
-	it('allows no inline scripts, frames, forms or base', () => {
+	it('allows no inline scripts, frames, forms or base, and https images', () => {
 		expect(content_security_policy).toBe(
-			"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+			"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
 		);
 	});
 });

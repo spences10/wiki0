@@ -188,7 +188,11 @@ export function render_document(
 		alt: string,
 	): string {
 		if (!link) {
-			// Remote images are blocked by the CSP; link to them instead.
+			// The CSP allows remote images over https only; anything
+			// else becomes a link.
+			if (/^https:\/\//iu.test(href)) {
+				return `<img src="${escape_html(href)}" alt="${escape_html(alt)}" loading="lazy" referrerpolicy="no-referrer">`;
+			}
 			return `<a href="${escape_html(href)}" target="_blank" rel="noopener noreferrer" class="wiki0-remote-image">${escape_html(alt || href)}</a>`;
 		}
 		if (link.link_status !== 'resolved') {
