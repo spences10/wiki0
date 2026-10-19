@@ -1,5 +1,14 @@
 # @wiki0/ui
 
+## 0.1.1
+
+### Patch Changes
+
+- 2c68f16: Link graph nodes can be dragged to move them instead of
+  panning the whole map.
+- 8138728: Docs browser sidebar can be resized by dragging its edge,
+  and long folder names truncate.
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @wiki0/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [2c68f16]
+- Updated dependencies [8138728]
+  - @wiki0/ui@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
