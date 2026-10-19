@@ -58,7 +58,7 @@
 		<Alert.Description>{String(error)}</Alert.Description>
 	</Alert.Root>
 {:else if !graph}
-	<Skeleton class="h-[34rem]" />
+	<Skeleton class="h-136" />
 {:else}
 	<Card.Root>
 		<Card.Header>
@@ -66,7 +66,8 @@
 			<Card.Description>
 				{graph.nodes.length} documents · {graph.edges.length} links ·
 				{unresolved} broken · {orphans} orphans. Click a document to open
-				it; scroll to zoom, drag to pan.
+				it or drag it to move it; drag the background to pan, scroll to
+				zoom.
 			</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
