@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { has_token } from '#lib/api.js';
 	import { app } from '#lib/app-state.svelte.js';
-	import CommandPalette from '#lib/components/command-palette.svelte';
 	import AppSidebar from '#lib/components/app-sidebar.svelte';
+	import CommandPalette from '#lib/components/command-palette.svelte';
 	import ThemeToggle from '#lib/components/theme-toggle.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -11,6 +11,7 @@
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import { router } from '#lib/router.svelte.js';
+	import { sidebar_width } from '#lib/sidebar-width.svelte.js';
 	import { theme } from '#lib/theme.svelte.js';
 	import DocsView from '#lib/views/docs-view.svelte';
 	import KeyRoundIcon from '@lucide/svelte/icons/key-round';
@@ -52,7 +53,11 @@
 			</Empty.Header>
 		</Empty.Root>
 	{:else}
-		<Sidebar.Provider>
+		<Sidebar.Provider
+			style={sidebar_width.style}
+			data-resizing={sidebar_width.resizing || undefined}
+			class="data-resizing:**:data-[slot^=sidebar-]:transition-none"
+		>
 			<AppSidebar />
 			<Sidebar.Inset>
 				<header

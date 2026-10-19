@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { app } from '#lib/app-state.svelte.js';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
+	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import { ancestor_folders, build_tree } from '#lib/doc-tree.js';
 	import { router } from '#lib/router.svelte.js';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import NetworkIcon from '@lucide/svelte/icons/network';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import DocTreeNode from './doc-tree-node.svelte';
+	import SidebarResizeHandle from './sidebar-resize-handle.svelte';
 
 	let filter = $state('');
 
@@ -48,7 +50,7 @@
 	<Sidebar.Header>
 		<a href="/" class="flex items-baseline gap-2 px-2 pt-1">
 			<span
-				class="text-lg font-bold tracking-tight [font-stretch:112%]"
+				class="text-lg font-bold tracking-tight font-stretch-112%"
 			>
 				wiki0
 			</span>
@@ -72,20 +74,23 @@
 				>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
-				<Sidebar.Menu>
-					{#each tree as node (node.path)}
-						<DocTreeNode
-							{node}
-							{active_path}
-							{open_folders}
-							force_open={filter.trim() !== ''}
-						/>
-					{:else}
-						<p class="px-2 py-1 text-sm text-muted-foreground">
-							{filter ? 'No docs match.' : 'No docs indexed.'}
-						</p>
-					{/each}
-				</Sidebar.Menu>
+				<!-- Paths show on hover, after a pause so scanning the tree stays quiet. -->
+				<Tooltip.Provider delayDuration={500}>
+					<Sidebar.Menu>
+						{#each tree as node (node.path)}
+							<DocTreeNode
+								{node}
+								{active_path}
+								{open_folders}
+								force_open={filter.trim() !== ''}
+							/>
+						{:else}
+							<p class="px-2 py-1 text-sm text-muted-foreground">
+								{filter ? 'No docs match.' : 'No docs indexed.'}
+							</p>
+						{/each}
+					</Sidebar.Menu>
+				</Tooltip.Provider>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
@@ -108,5 +113,5 @@
 			{/each}
 		</Sidebar.Menu>
 	</Sidebar.Footer>
-	<Sidebar.Rail />
+	<SidebarResizeHandle />
 </Sidebar.Root>

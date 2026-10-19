@@ -38,6 +38,7 @@
 			isActive={active_path === node.path}
 			class={superseded ? 'text-muted-foreground line-through' : ''}
 			tooltipContent={document.path}
+			tooltipContentProps={{ hidden: false }}
 		>
 			{#snippet child({ props })}
 				<a href="/docs/{encode_doc_path(node.path)}" {...props}>
@@ -56,12 +57,16 @@
 		>
 			<Collapsible.Trigger>
 				{#snippet child({ props })}
-					<Sidebar.MenuButton {...props}>
+					<Sidebar.MenuButton
+						{...props}
+						tooltipContent={node.path}
+						tooltipContentProps={{ hidden: false }}
+					>
 						<ChevronRightIcon class="transition-transform" />
 						<FolderIcon />
-						<span>{node.name}</span>
+						<span class="min-w-0 flex-1 truncate">{node.name}</span>
 						<span
-							class="ml-auto text-xs text-muted-foreground tabular-nums"
+							class="shrink-0 text-xs text-muted-foreground tabular-nums"
 						>
 							{node.count}
 						</span>
@@ -69,7 +74,7 @@
 				{/snippet}
 			</Collapsible.Trigger>
 			<Collapsible.Content>
-				<Sidebar.MenuSub class="mr-0 pr-0">
+				<Sidebar.MenuSub class="mr-0 ml-4 pr-0 pl-1">
 					{#each node.children as child (child.path)}
 						<Self
 							node={child}
