@@ -115,6 +115,9 @@ export const main = defineCommand({
 					return;
 				}
 				console.log(`Source: ${result.citation}`);
+				if (result.status_note) {
+					console.log(`Status: ${result.status_note}`);
+				}
 				for (const warning of result.warnings) {
 					console.log(`Warning: ${warning}`);
 				}

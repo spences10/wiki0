@@ -92,6 +92,37 @@ describe('search', () => {
 		).toHaveLength(1);
 	});
 
+	it('ranks ideas below decisions and labels them not decided', async () => {
+		const root = make_wiki_root();
+		write(
+			root,
+			'docs/postgres.md',
+			'---\nstatus: idea\n---\n# Postgres\n\nMove the database to Postgres if it grows.',
+		);
+		write(
+			root,
+			'docs/sqlite.md',
+			'---\nstatus: accepted\n---\n# SQLite\n\nThe database is SQLite.',
+		);
+		await index_wiki(root);
+
+		const { results } = search('database', root);
+
+		expect(results.map((hit) => [hit.path, hit.status_note])).toEqual(
+			[
+				['docs/sqlite.md', null],
+				['docs/postgres.md', 'idea, not decided'],
+			],
+		);
+		expect(results[1]?.score_parts.status).toBe(0.85);
+		expect(show('docs/postgres.md', root)?.status_note).toBe(
+			'idea, not decided',
+		);
+		expect(get_wiki_context('postgres', root).markdown).toContain(
+			'Status: idea, not decided',
+		);
+	});
+
 	it('drops terms that match nothing before using OR', async () => {
 		const root = make_wiki_root();
 		write(

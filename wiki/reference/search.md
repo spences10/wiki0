@@ -26,13 +26,14 @@ score = text match × status × type × in-links × priority × recency
   aliases count more than body text. Normalised so scores from
   different queries compare.
 - **Status:** `accepted`, `verified`, `active` and similar rank
-  slightly higher; `draft` and `proposed` lower; `superseded`,
-  `deprecated`, `archived` much lower. A document listed in another
-  document's `supersedes`, or with `superseded_by` set, counts as
-  superseded. A document that a newer one says it `Supersedes:` or
-  `Amends:` in its header ranks a little lower and carries
-  `amended_by`, because such headers often replace only part of the
-  older doc.
+  slightly higher; `draft`, `proposed`, `idea`, `research`, `planned`
+  and `backburner` lower, and their results carry `status_note`
+  ("idea, not decided"); `superseded`, `deprecated`, `archived` much
+  lower. A document listed in another document's `supersedes`, or with
+  `superseded_by` set, counts as superseded. A document that a newer
+  one says it `Supersedes:` or `Amends:` in its header ranks a little
+  lower and carries `amended_by`, because such headers often replace
+  only part of the older doc.
 - **Type:** decisions, specs, rules, policies and references rank
   higher; notes, meetings and logs lower; changelogs lower still. With
   no `type`, folders such as `adr/`, `decisions/`, `meetings/` and

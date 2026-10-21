@@ -52,12 +52,18 @@ const trusted_statuses = new Set([
 	'current',
 	'canonical',
 ]);
+// Not decided: ideas and plans rank lower and are labelled, so an agent
+// does not treat them as a decision.
 const tentative_statuses = new Set([
 	'draft',
 	'proposed',
 	'review',
 	'wip',
 	'rfc',
+	'idea',
+	'research',
+	'planned',
+	'backburner',
 ]);
 const authoritative_types = new Set([
 	'decision',
@@ -350,6 +356,7 @@ function rank_candidates(
 					title: candidate.title,
 					heading: candidate.heading,
 					status: candidate.status,
+					status_note: tentative_status_note(candidate.status),
 					doc_type,
 					date: candidate.doc_date,
 					...plain_snippet(candidate.snippet),
@@ -377,6 +384,15 @@ function one_per_document(
 		...hit,
 		more_in_doc: (counts.get(hit.path) ?? 1) - 1,
 	}));
+}
+
+// "idea, not decided" for a tentative status, otherwise null.
+export function tentative_status_note(
+	status: string | null,
+): string | null {
+	return status && tentative_statuses.has(status)
+		? `${status}, not decided`
+		: null;
 }
 
 function status_factor(
@@ -546,12 +562,13 @@ export function show(
 		if (!path) return null;
 		const page = db
 			.prepare(
-				'SELECT title, content_hash, line_count, superseded_by FROM pages WHERE path = ?',
+				'SELECT title, content_hash, line_count, status, superseded_by FROM pages WHERE path = ?',
 			)
 			.get(path) as {
 			title: string;
 			content_hash: string;
 			line_count: number;
+			status: string | null;
 			superseded_by: string | null;
 		};
 		const range = resolve_range(
@@ -608,6 +625,8 @@ export function show(
 			next: truncated
 				? `${path}:${end_line + 1}-${range.end_line}`
 				: null,
+			status: page.status,
+			status_note: tentative_status_note(page.status),
 			superseded_by:
 				page.superseded_by ?? successor_map(db).get(path) ?? null,
 			warnings,
@@ -751,6 +770,9 @@ export function get_wiki_context(
 			`## ${index + 1}. ${hit.breadcrumb.join(' > ')}`,
 			`Source: \`${section.citation}\``,
 		);
+		if (section.status_note) {
+			lines.push(`Status: ${section.status_note}`);
+		}
 		if (hit.superseded_by) {
 			lines.push(`Superseded by: \`${hit.superseded_by}\``);
 		}

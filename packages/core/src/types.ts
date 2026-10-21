@@ -67,6 +67,8 @@ export type SearchHit = {
 	title: string;
 	heading: string | null;
 	status: string | null;
+	// Set for a tentative status, e.g. "idea, not decided".
+	status_note: string | null;
 	doc_type: string | null;
 	date: string | null;
 	snippet: string;
@@ -107,6 +109,9 @@ export type ShowResult = {
 	tokens: number;
 	truncated: boolean;
 	next: string | null;
+	status: string | null;
+	// Set for a tentative status, e.g. "idea, not decided".
+	status_note: string | null;
 	superseded_by: string | null;
 	warnings: string[];
 };
