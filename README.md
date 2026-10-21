@@ -39,6 +39,7 @@ npx @wiki0/cli search "how do deploys work" # one cited section per doc
 npx @wiki0/cli show docs/deploys.md:12-40  # read a cited section
 npx @wiki0/cli lint                        # broken links and anchors
 npx @wiki0/cli check                       # after editing docs
+npx @wiki0/cli skill                       # print the agent skill
 npx @wiki0/cli ui                          # open the local docs browser
 ```
 

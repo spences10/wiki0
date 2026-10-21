@@ -19,6 +19,7 @@ wiki0 show <target> [--tokens 2000] [--neighbours 1]
 wiki0 context "query"            # top sections as cited Markdown
 wiki0 lint                       # broken links and anchors
 wiki0 check [paths] [--all]      # after editing docs: check changed files
+wiki0 skill                      # print the agent skill
 wiki0 graph                      # documents and links
 wiki0 documents                  # outline and link counts per document
 wiki0 backlinks <path-or-title>
@@ -28,6 +29,11 @@ wiki0 ui [--no-open] [--stop]    # browse the docs in a local web app
 `show` targets: `path:12`, `path:12-40`, `path#heading`, `path` or a
 document title. When the text is longer than the token budget, the
 output ends with the range to read next.
+
+`wiki0 skill` prints an agent skill for finding and writing docs.
+wiki0 never writes project files, so save it yourself, e.g.
+`wiki0 skill > .agents/skills/wiki0/SKILL.md` (create the folder
+first).
 
 To show a user this project's docs, an agent runs `npx @wiki0/cli ui`:
 it prints the URL and returns, and a second run reuses the open

@@ -13,4 +13,6 @@ type: reference
   JSON for scripts and agents.
 - `lint` and `check` exit with code 1 when they find errors, so they
   can gate CI.
+- `skill` prints the agent skill from
+  `packages/cli/skills/wiki0/SKILL.md`; the user or agent saves it.
 - Every command is a thin wrapper over a `@wiki0/core` function.

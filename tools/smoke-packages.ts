@@ -14,7 +14,7 @@ const packages = [
 	},
 	{
 		name: '@wiki0/cli',
-		files: ['package/dist/index.js'],
+		files: ['package/dist/index.js', 'package/skills/wiki0/SKILL.md'],
 		executable: 'package/dist/index.js',
 	},
 	{
@@ -147,6 +147,15 @@ try {
 	if (!cli_ui.stdout.includes('--detach')) {
 		throw new Error(
 			'CLI ui help smoke test returned unexpected output',
+		);
+	}
+	const cli_skill = run(process.execPath, [
+		'packages/cli/dist/index.js',
+		'skill',
+	]);
+	if (!cli_skill.stdout.includes('\nname: wiki0\n')) {
+		throw new Error(
+			'CLI skill smoke test returned unexpected output',
 		);
 	}
 	console.log('Verified @wiki0/cli binary');

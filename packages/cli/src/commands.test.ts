@@ -11,6 +11,7 @@ describe('main command', () => {
 			'context',
 			'lint',
 			'check',
+			'skill',
 			'graph',
 			'documents',
 			'backlinks',

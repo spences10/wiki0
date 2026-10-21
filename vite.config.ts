@@ -14,7 +14,10 @@ const config = {
 		trailingComma: 'all',
 		proseWrap: 'always',
 		// Skill loaders need the frontmatter description on one line.
-		ignorePatterns: ['.agents/skills/**/SKILL.md'],
+		ignorePatterns: [
+			'.agents/skills/**/SKILL.md',
+			'packages/cli/skills/**/SKILL.md',
+		],
 		overrides: [
 			{
 				files: [

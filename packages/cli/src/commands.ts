@@ -15,6 +15,7 @@ import {
 import { defineCommand } from 'citty';
 import { relative, resolve } from 'node:path';
 import { print_json } from './actions.js';
+import { skill_text } from './skill.js';
 import { run_ui } from './ui.js';
 
 const root_arg = {
@@ -211,6 +212,15 @@ export const main = defineCommand({
 				if (args.json) print_json(result);
 				else console.log(format_check(result));
 				if (!result.ok) process.exitCode = 1;
+			},
+		}),
+		skill: defineCommand({
+			meta: {
+				description:
+					'Print the agent skill for finding and writing docs; save it to .agents/skills/wiki0/SKILL.md',
+			},
+			run() {
+				process.stdout.write(skill_text());
 			},
 		}),
 		graph: defineCommand({
