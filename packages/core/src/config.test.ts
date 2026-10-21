@@ -10,6 +10,7 @@ describe('read_config', () => {
 			include: ['**/*.md'],
 			exclude: [],
 			index_location: 'cache',
+			check_disable: [],
 			config_path: null,
 		});
 	});
@@ -23,6 +24,8 @@ describe('read_config', () => {
 				'exclude = ["docs/archive/**"]',
 				'[index]',
 				'location = "local"',
+				'[check]',
+				'disable = ["net-growth"]',
 			].join('\n'),
 		);
 
@@ -30,6 +33,7 @@ describe('read_config', () => {
 			include: ['docs/**/*.md', 'adr/*.md'],
 			exclude: ['docs/archive/**'],
 			index_location: 'local',
+			check_disable: ['net-growth'],
 			config_path: join(root, 'wiki0.toml'),
 		});
 	});
@@ -40,6 +44,7 @@ describe('read_config', () => {
 		['include = "docs"', /array of strings/u],
 		['[index]\nlocation = "remote"', /cache" or "local/u],
 		['include = [', /Invalid wiki0.toml/u],
+		['[check]\ndisable = "net-growth"', /array of rule names/u],
 	])('rejects %s', (body, message) => {
 		const root = make_wiki_root();
 		writeFileSync(join(root, 'wiki0.toml'), body);

@@ -10,6 +10,7 @@ describe('main command', () => {
 			'show',
 			'context',
 			'lint',
+			'check',
 			'graph',
 			'documents',
 			'backlinks',

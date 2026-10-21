@@ -1,5 +1,6 @@
 import {
 	backlinks_for_page,
+	check_docs,
 	get_wiki_context,
 	graph_wiki,
 	index_status,
@@ -15,6 +16,7 @@ import { json_response, with_tool_errors } from './responses.js';
 import { assert_mcp_writable, mcp_root } from './safety.js';
 import {
 	BacklinksSchema,
+	CheckDocsSchema,
 	GetContextSchema,
 	RootSchema,
 	SearchDocsSchema,
@@ -27,6 +29,7 @@ type SearchDocsInput = InferInput<typeof SearchDocsSchema>;
 type ShowSectionInput = InferInput<typeof ShowSectionSchema>;
 type GetContextInput = InferInput<typeof GetContextSchema>;
 type BacklinksInput = InferInput<typeof BacklinksSchema>;
+type CheckDocsInput = InferInput<typeof CheckDocsSchema>;
 
 export function register_wiki_tools(server: {
 	tool: (...args: any[]) => void;
@@ -120,11 +123,26 @@ export function register_wiki_tools(server: {
 		{
 			name: 'lint_docs',
 			description:
-				'Report broken links, missing headings, ambiguous wikilinks and other link problems with path:line',
+				'Report broken links, missing headings, ambiguous wikilinks and other link problems with path:line. After editing docs, use check_docs.',
 			schema: RootSchema,
 		},
 		async ({ root }: RootInput) =>
 			json_response(lint_wiki(mcp_root(root))),
+	);
+
+	tool(
+		{
+			name: 'check_docs',
+			description:
+				'Run after editing docs. Re-indexes, then reports problems in changed files with path:line: broken links, IDs that match no document, sections repeated in another file, and changes that only add lines.',
+			schema: CheckDocsSchema,
+		},
+		async ({ root, paths, base, all }: CheckDocsInput) => {
+			assert_mcp_writable('check_docs');
+			return json_response(
+				await check_docs(mcp_root(root), { paths, base, all }),
+			);
+		},
 	);
 
 	tool(

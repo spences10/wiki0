@@ -18,6 +18,7 @@ wiki0 search "query" [--limit 5] # one cited section per document
 wiki0 show <target> [--tokens 2000] [--neighbours 1]
 wiki0 context "query"            # top sections as cited Markdown
 wiki0 lint                       # broken links and anchors
+wiki0 check [paths] [--all]      # after editing docs: check changed files
 wiki0 graph                      # documents and links
 wiki0 documents                  # outline and link counts per document
 wiki0 backlinks <path-or-title>
@@ -33,10 +34,14 @@ it prints the URL and returns, and a second run reuses the open
 server. Flags: [`@wiki0/ui`](../ui/README.md).
 
 Every command takes `--root`; by default the project root is the
-nearest folder with `.git` or `wiki0.toml`. `lint` exits with code 1
-when it finds errors.
+nearest folder with `.git` or `wiki0.toml`. `lint` and `check` exit
+with code 1 when they find errors.
+
+`check` re-indexes, then checks Markdown changed since `HEAD`
+(`--base <rev>` to compare with another revision). Rules:
+[Links and lint](../../wiki/reference/links-and-lint.md#check-rules).
 
 ## Output
 
-`show` and `context` print Markdown (`--json` for structured output).
-`ui` prints the URL. The other commands print JSON.
+`show`, `context` and `check` print Markdown (`--json` for structured
+output). `ui` prints the URL. The other commands print JSON.

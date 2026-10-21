@@ -4,6 +4,7 @@ export {
 	list_links,
 	read_document,
 } from './catalog.js';
+export { check_docs } from './check.js';
 export {
 	chunk_markdown,
 	chunk_plain_text,
@@ -38,6 +39,7 @@ export {
 	extract_anchors,
 	extract_links,
 	link_resolver,
+	wikilink_pattern_source,
 	type Anchor,
 	type AnchorKind,
 	type ExtractedLink,
@@ -46,7 +48,6 @@ export {
 	type LinkTargetDocument,
 	type MatchQuality,
 	type ResolvedLink,
-	wikilink_pattern_source,
 } from './links.js';
 export { lint_wiki } from './lint.js';
 export { parse_frontmatter, parse_markdown } from './markdown.js';

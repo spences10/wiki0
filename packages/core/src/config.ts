@@ -10,6 +10,8 @@ export type Wiki0Config = {
 	include: string[];
 	exclude: string[];
 	index_location: IndexLocationSetting;
+	// `wiki0 check` rules to skip, from `[check] disable`.
+	check_disable: string[];
 	config_path: string | null;
 };
 
@@ -22,6 +24,7 @@ export function read_config(root: string): Wiki0Config {
 			include: default_include,
 			exclude: [],
 			index_location: 'cache',
+			check_disable: [],
 			config_path: null,
 		};
 	}
@@ -46,10 +49,25 @@ export function read_config(root: string): Wiki0Config {
 		);
 	}
 
+	const check = data.check;
+	const disable =
+		check && typeof check === 'object' && 'disable' in check
+			? check.disable
+			: [];
+	if (
+		!Array.isArray(disable) ||
+		!disable.every((rule) => typeof rule === 'string')
+	) {
+		throw new Error(
+			`Invalid ${config_file_name}: check.disable must be an array of rule names.`,
+		);
+	}
+
 	return {
 		include: read_globs(data.include, 'include') ?? default_include,
 		exclude: read_globs(data.exclude, 'exclude') ?? [],
 		index_location: location,
+		check_disable: disable,
 		config_path: config_path,
 	};
 }

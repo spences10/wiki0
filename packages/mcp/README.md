@@ -21,6 +21,7 @@ The package exposes the `wiki0-mcp` binary.
 | `index_docs`     | Index the project docs                                         |
 | `index_status`   | Index path and staleness                                       |
 | `lint_docs`      | Broken links and anchors with `path:line`                      |
+| `check_docs`     | After editing docs: problems in the changed files              |
 | `link_graph`     | Documents and links                                            |
 | `list_documents` | Outline, status, type and link counts per document             |
 | `backlinks`      | Documents linking to a document                                |
@@ -36,8 +37,9 @@ prints the URL and returns, and a second run reuses the open server.
 
 Each tool takes an optional `root`. The server only allows roots under
 its working directory unless `WIKI0_ALLOWED_ROOTS` lists others
-(comma-separated). `WIKI0_READ_ONLY=true` blocks `index_docs`, the
-only tool that writes (to the index, never to your files).
+(comma-separated). `WIKI0_READ_ONLY=true` blocks `index_docs` and
+`check_docs`, the only tools that write (to the index, never to your
+files).
 
 The index lives in `~/.cache/wiki0/<project>/index.db`. Set
 `WIKI0_INDEX` so the CLI and the server use the same file if their

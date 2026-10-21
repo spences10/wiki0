@@ -16,8 +16,8 @@ the files it indexes.
   frontmatter
 - [Search and show](reference/search.md): ranking, relaxation and
   reading sections
-- [Links and lint](reference/links-and-lint.md): link resolution and
-  lint rules
+- [Links and lint](reference/links-and-lint.md): link resolution, lint
+  and check rules
 - [Storage](reference/storage.md): where the index lives and how to
   configure it
 
@@ -41,6 +41,7 @@ the files it indexes.
 | 0008 | [Lexical search, no embeddings](decisions/0008-lexical-search.md)              | accepted   |
 | 0009 | [Resolve both link styles](decisions/0009-resolve-both-link-styles.md)         | accepted   |
 | 0010 | [Landing page and local UI](decisions/0010-landing-page-and-local-ui.md)       | accepted   |
+| 0011 | [Check changed docs](decisions/0011-check-changed-docs.md)                     | accepted   |
 
 ## Working on wiki0
 

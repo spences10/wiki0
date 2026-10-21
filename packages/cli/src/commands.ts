@@ -1,15 +1,19 @@
 import {
 	backlinks_for_page,
+	check_docs,
 	get_wiki_context,
 	graph_wiki,
 	index_status,
 	index_wiki,
 	lint_wiki,
 	list_documents,
+	resolve_project_root,
 	search,
 	show,
+	type CheckResult,
 } from '@wiki0/core';
 import { defineCommand } from 'citty';
+import { relative, resolve } from 'node:path';
 import { print_json } from './actions.js';
 import { run_ui } from './ui.js';
 
@@ -162,12 +166,50 @@ export const main = defineCommand({
 		lint: defineCommand({
 			meta: {
 				description:
-					'Report broken links, missing headings and other link problems',
+					'Report link problems across all docs; after editing docs, run check',
 			},
 			args: { ...root_arg },
 			run({ args }) {
 				const result = lint_wiki(String(args.root));
 				print_json(result);
+				if (!result.ok) process.exitCode = 1;
+			},
+		}),
+		check: defineCommand({
+			meta: {
+				description:
+					'Run after editing docs: checks changed files for broken links, unknown IDs, repeated sections and additions-only changes',
+			},
+			args: {
+				paths: {
+					type: 'positional',
+					required: false,
+					description:
+						'Documents to check (default: Markdown changed since --base)',
+				},
+				...root_arg,
+				base: {
+					type: 'string',
+					description: 'git revision to compare with (default: HEAD)',
+				},
+				all: {
+					type: 'boolean',
+					description: 'Check every document, not just changed ones',
+				},
+				...json_arg,
+			},
+			async run({ args }) {
+				const root = resolve_project_root(String(args.root));
+				const paths = args._.map((path) =>
+					relative(root, resolve(path)),
+				);
+				const result = await check_docs(root, {
+					paths,
+					base: args.base,
+					all: args.all,
+				});
+				if (args.json) print_json(result);
+				else console.log(format_check(result));
 				if (!result.ok) process.exitCode = 1;
 			},
 		}),
@@ -250,3 +292,27 @@ export const main = defineCommand({
 		}),
 	},
 });
+
+function format_check(result: CheckResult): string {
+	const lines = [
+		result.files.length === 0
+			? 'No changed documents to check.'
+			: `Checked ${result.files.length} document${result.files.length === 1 ? '' : 's'}.`,
+	];
+	for (const warning of result.warnings) {
+		lines.push(`Warning: ${warning}`);
+	}
+	for (const issue of result.issues) {
+		const place =
+			issue.line === null
+				? issue.path
+				: `${issue.path}:${issue.line}`;
+		lines.push(
+			`${place} ${issue.severity} ${issue.rule}: ${issue.message}`,
+		);
+	}
+	if (result.files.length > 0 && result.issues.length === 0) {
+		lines.push('No problems found.');
+	}
+	return lines.join('\n');
+}

@@ -1,6 +1,7 @@
 import { parse } from 'valibot';
 import { describe, expect, it } from 'vite-plus/test';
 import {
+	CheckDocsSchema,
 	GetContextSchema,
 	RootSchema,
 	SearchDocsSchema,
@@ -21,6 +22,10 @@ describe('MCP schemas', () => {
 			root: '.',
 			token_budget: 2000,
 			neighbours: 0,
+		});
+		expect(parse(CheckDocsSchema, {})).toEqual({
+			root: '.',
+			all: false,
 		});
 		expect(parse(GetContextSchema, { query: 'x' })).toEqual({
 			query: 'x',

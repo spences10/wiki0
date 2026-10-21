@@ -182,6 +182,25 @@ export type LintResult = {
 	issues: LintIssue[];
 };
 
+export type CheckOptions = {
+	// Documents to check, relative to the project root.
+	paths?: string[];
+	// git revision to compare with (default HEAD).
+	base?: string;
+	// Check every document instead of the changed ones.
+	all?: boolean;
+};
+
+export type CheckResult = {
+	root: string;
+	ok: boolean;
+	files: string[];
+	issue_count: number;
+	counts: Record<LintSeverity, number>;
+	issues: LintIssue[];
+	warnings: string[];
+};
+
 export type DocumentHeading = {
 	slug: string;
 	text: string;

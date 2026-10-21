@@ -68,6 +68,31 @@ export const GetContextSchema = v.object({
 	),
 });
 
+export const CheckDocsSchema = v.object({
+	root,
+	paths: v.optional(
+		v.pipe(
+			v.array(v.string()),
+			v.description(
+				'Documents to check, relative to the root; default is files changed since base',
+			),
+		),
+	),
+	base: v.optional(
+		v.pipe(
+			v.string(),
+			v.description('git revision to compare with (default HEAD)'),
+		),
+	),
+	all: v.optional(
+		v.pipe(
+			v.boolean(),
+			v.description('Check every document, not just changed ones'),
+		),
+		false,
+	),
+});
+
 export const BacklinksSchema = v.object({
 	target: v.pipe(v.string(), v.description('Document path or title')),
 	root,

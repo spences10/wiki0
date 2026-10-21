@@ -6,8 +6,9 @@ aliases: [link resolution, lint rules]
 
 # Links and lint
 
-Code: `packages/core/src/links.ts`, `lint.ts`. Why both link styles:
-[0009](../decisions/0009-resolve-both-link-styles.md).
+Code: `packages/core/src/links.ts`, `lint.ts`, `check.ts`. Why both
+link styles: [0009](../decisions/0009-resolve-both-link-styles.md).
+Why `check`: [0011](../decisions/0011-check-changed-docs.md).
 
 ## What counts as a link
 
@@ -51,3 +52,26 @@ code blocks or code spans is ignored. External URLs are not stored.
 
 Info findings never fail `wiki0 lint`; most repos have many unlinked
 docs, and noisy rules teach agents to ignore lint.
+
+## Check rules
+
+`wiki0 check` re-indexes, then reports the lint rules above plus these
+for Markdown changed since `HEAD` (or the paths given, or `--all`).
+Turn a rule off in `wiki0.toml`: `[check]` `disable = ["net-growth"]`.
+
+| Rule                  | Severity | Meaning                                                                       |
+| --------------------- | -------- | ----------------------------------------------------------------------------- |
+| `unresolved-id`       | error    | an ID such as `Decision 0012` or `ADR-012` matches no document                |
+| `unlinked-id`         | warning  | an ID matches a document but the line does not link to it                     |
+| `overlapping-section` | warning  | 60% or more of a section's 3-word phrases appear in a section of another file |
+| `net-growth`          | info     | the change only adds lines (10 or more), or adds a new document               |
+
+- IDs come from the repo's own numbered file names:
+  `decisions/0004-x.md` makes `Decision 4` and `decisions 0004` IDs;
+  `ADR-012-x.md` makes `ADR-012`. Repos without numbered files get no
+  ID checks.
+- Sections under 200 characters and changelogs are not compared.
+- Not checked: wording, length or style. Those rules were too noisy in
+  every tool reviewed ([research](../research/agent-written-docs.md)).
+  Numbers without a source were tried and dropped: spec values such as
+  "10 MB a file" are their own source.

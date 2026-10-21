@@ -21,6 +21,8 @@ Ask your coding agent. It runs wiki0 for you:
   `wiki0 ui`, and a local docs browser opens with rendered docs,
   working links, search and index health.
 - "Use `pnpx @wiki0/cli lint` and fix the broken links in our docs."
+- "Update the docs, then run `pnpx @wiki0/cli check` and fix what it
+  reports."
 
 The agent indexes the repo, searches, and reads only the cited section
 (`path:start-end`) instead of whole files. Superseded docs rank low
@@ -36,6 +38,7 @@ npx @wiki0/cli index                       # index the project docs
 npx @wiki0/cli search "how do deploys work" # one cited section per doc
 npx @wiki0/cli show docs/deploys.md:12-40  # read a cited section
 npx @wiki0/cli lint                        # broken links and anchors
+npx @wiki0/cli check                       # after editing docs
 npx @wiki0/cli ui                          # open the local docs browser
 ```
 

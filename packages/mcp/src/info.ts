@@ -41,6 +41,7 @@ export function wiki0_info(): Wiki0Info {
 			'cited-sections',
 			'markdown-and-wikilink-resolution',
 			'link-lint',
+			'changed-doc-checks',
 			'link-graph',
 			'stale-index-warnings',
 			'structured-json-responses',
