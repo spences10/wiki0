@@ -1,6 +1,6 @@
 {
 	"name": "@wiki0/ui",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Local docs browser for wiki0, launched with `wiki0 ui`",
 	"homepage": "https://github.com/spences10/wiki0/tree/main/packages/ui#readme",
 	"license": "MIT",

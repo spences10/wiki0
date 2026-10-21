@@ -1,5 +1,25 @@
 # @wiki0/cli
 
+## 0.2.0
+
+### Minor Changes
+
+- f66c546: Add `wiki0 check` and the `check_docs` MCP tool: after
+  editing docs, report broken links, unknown IDs, repeated sections
+  and additions-only changes in the changed files.
+- 2f8cbf0: Add `wiki0 skill`, which prints an agent skill for finding
+  and writing docs.
+
+### Patch Changes
+
+- 8813c2b: Docs with status `idea`, `research`, `planned` or
+  `backburner` rank lower, and search, show and context label them
+  "not decided".
+- Updated dependencies [f66c546]
+- Updated dependencies [8813c2b]
+  - @wiki0/core@0.2.0
+  - @wiki0/ui@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

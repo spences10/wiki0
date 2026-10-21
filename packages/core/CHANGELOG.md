@@ -1,5 +1,16 @@
 # @wiki0/core
 
+## 0.2.0
+
+### Minor Changes
+
+- f66c546: Add `wiki0 check` and the `check_docs` MCP tool: after
+  editing docs, report broken links, unknown IDs, repeated sections
+  and additions-only changes in the changed files.
+- 8813c2b: Docs with status `idea`, `research`, `planned` or
+  `backburner` rank lower, and search, show and context label them
+  "not decided".
+
 ## 0.1.0
 
 ### Minor Changes

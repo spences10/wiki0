@@ -1,5 +1,13 @@
 # @wiki0/ui
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [f66c546]
+- Updated dependencies [8813c2b]
+  - @wiki0/core@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes

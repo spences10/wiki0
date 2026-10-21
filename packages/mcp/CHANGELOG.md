@@ -1,5 +1,19 @@
 # @wiki0/mcp
 
+## 0.2.0
+
+### Minor Changes
+
+- f66c546: Add `wiki0 check` and the `check_docs` MCP tool: after
+  editing docs, report broken links, unknown IDs, repeated sections
+  and additions-only changes in the changed files.
+
+### Patch Changes
+
+- Updated dependencies [f66c546]
+- Updated dependencies [8813c2b]
+  - @wiki0/core@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
