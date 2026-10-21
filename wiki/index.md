@@ -46,3 +46,4 @@ the files it indexes.
 
 - [[packages/publishing-workflow]]
 - [Search quality log](dogfooding/search-quality.md)
+- [Agent-written docs research](research/agent-written-docs.md)
