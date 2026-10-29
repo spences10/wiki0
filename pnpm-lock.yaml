@@ -346,7 +346,7 @@ catalogs:
       version: 4.3.3
     tmcp:
       specifier: ^1.18.1
-      version: 1.20.0
+      version: 1.20.1
     tw-animate-css:
       specifier: ^1.4.0
       version: 1.4.0
@@ -568,16 +568,16 @@ importers:
     dependencies:
       '@tmcp/adapter-valibot':
         specifier: 'catalog:'
-        version: 0.1.6(tmcp@1.20.0(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
+        version: 0.1.6(tmcp@1.20.1(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
       '@tmcp/transport-stdio':
         specifier: 'catalog:'
-        version: 0.5.0(tmcp@1.20.0(typescript@7.0.2))
+        version: 0.5.0(tmcp@1.20.1(typescript@7.0.2))
       '@wiki0/core':
         specifier: workspace:*
         version: link:../core
       tmcp:
         specifier: 'catalog:'
-        version: 1.20.0(typescript@7.0.2)
+        version: 1.20.1(typescript@7.0.2)
       valibot:
         specifier: 'catalog:'
         version: 1.5.0(typescript@7.0.2)
@@ -1625,6 +1625,9 @@ packages:
 
   '@types/geojson@7946.0.16':
     resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
+
+  '@types/json-schema@7.0.15':
+    resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
   '@types/node@24.19.2':
     resolution: {integrity: sha512-93d49wCWJkCyN87MxLpNN6KXPCwFw7bVUg79mGUV1OS40JGWwVCr8n61DXCSqz7CV6/VfPkb7xec7uP2M+QHWQ==}
@@ -2823,8 +2826,8 @@ packages:
     resolution: {integrity: sha512-LgO3D9yZJjApUiuUfl9iFAwrtaX4+lok3wJIqttGoKCHlWUqHqbQpnxCf82L8FjgKsh4iGo78hqJwgL8F6To2A==}
     engines: {node: '>=14.0.0'}
 
-  tmcp@1.20.0:
-    resolution: {integrity: sha512-dcDximKQBGqLP/aEAVA26HcWRHhKipstg1w0fbDDJ0HcFZ6lolLU1YYmStYEn/73f534i7WrDNcjRfRYdV9CoA==}
+  tmcp@1.20.1:
+    resolution: {integrity: sha512-fpUliSYZnYOlFbgpUtUAdyKWoLsjyyt1DZc/zvpY5r0aUUUwcp57od4iJGemLcrEQrRF2V7Niktmt7S5DYIqhw==}
 
   totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
@@ -3559,22 +3562,22 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
-  '@tmcp/adapter-valibot@0.1.6(tmcp@1.20.0(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))':
+  '@tmcp/adapter-valibot@0.1.6(tmcp@1.20.1(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@valibot/to-json-schema': 1.7.0(valibot@1.5.0(typescript@7.0.2))
-      tmcp: 1.20.0(typescript@7.0.2)
+      tmcp: 1.20.1(typescript@7.0.2)
       valibot: 1.5.0(typescript@7.0.2)
 
-  '@tmcp/session-manager@0.3.0(tmcp@1.20.0(typescript@7.0.2))':
+  '@tmcp/session-manager@0.3.0(tmcp@1.20.1(typescript@7.0.2))':
     dependencies:
       json-rpc-2.0: 1.7.1
-      tmcp: 1.20.0(typescript@7.0.2)
+      tmcp: 1.20.1(typescript@7.0.2)
 
-  '@tmcp/transport-stdio@0.5.0(tmcp@1.20.0(typescript@7.0.2))':
+  '@tmcp/transport-stdio@0.5.0(tmcp@1.20.1(typescript@7.0.2))':
     dependencies:
-      '@tmcp/session-manager': 0.3.0(tmcp@1.20.0(typescript@7.0.2))
-      tmcp: 1.20.0(typescript@7.0.2)
+      '@tmcp/session-manager': 0.3.0(tmcp@1.20.1(typescript@7.0.2))
+      tmcp: 1.20.1(typescript@7.0.2)
 
   '@twinkleplop/bash@0.1.7':
     dependencies:
@@ -3703,6 +3706,8 @@ snapshots:
   '@types/estree@1.0.9': {}
 
   '@types/geojson@7946.0.16': {}
+
+  '@types/json-schema@7.0.15': {}
 
   '@types/node@24.19.2':
     dependencies:
@@ -4919,9 +4924,10 @@ snapshots:
 
   tinyrainbow@3.2.0: {}
 
-  tmcp@1.20.0(typescript@7.0.2):
+  tmcp@1.20.1(typescript@7.0.2):
     dependencies:
       '@standard-schema/spec': 1.1.0
+      '@types/json-schema': 7.0.15
       json-rpc-2.0: 1.7.1
       sqids: 0.3.0
       uri-template-matcher: 1.1.2
