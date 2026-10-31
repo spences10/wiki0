@@ -1,5 +1,12 @@
 # @wiki0/ui
 
+## 0.1.3
+
+### Patch Changes
+
+- 6a6a90b: Replace $effect in docs UI with derived fetches,
+  attachments and callbacks; fix palette search state.
+
 ## 0.1.2
 
 ### Patch Changes
