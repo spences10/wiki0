@@ -18,31 +18,23 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
+	import { Fetched } from '#lib/fetched.svelte.js';
 	import { encode_doc_path } from '#lib/router.js';
 	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 
-	let status = $state.raw<StatusResponse | null>(null);
-	let chunks = $state.raw<DocumentChunks[]>([]);
-	let error = $state<unknown>(null);
-
-	$effect(() => {
+	let request: Fetched<[StatusResponse, DocumentChunks[]]> | null =
+		null;
+	const status_request = $derived.by(() => {
 		void app.version;
-		let cancelled = false;
-		Promise.all([api.status(), api.all_chunks().catch(() => [])])
-			.then(([status_result, chunk_result]) => {
-				if (cancelled) return;
-				status = status_result;
-				chunks = chunk_result;
-				error = null;
-			})
-			.catch((caught: unknown) => {
-				if (!cancelled) error = caught;
-			});
-		return () => {
-			cancelled = true;
-		};
+		return (request = new Fetched(
+			Promise.all([api.status(), api.all_chunks().catch(() => [])]),
+			request,
+		));
 	});
+	const status = $derived(status_request.value?.[0] ?? null);
+	const chunks = $derived(status_request.value?.[1] ?? []);
+	const error = $derived(status_request.error);
 
 	const tokens = $derived(
 		chunks.flatMap((document) =>

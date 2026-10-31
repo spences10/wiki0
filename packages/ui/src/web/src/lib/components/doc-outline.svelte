@@ -15,7 +15,8 @@
 		Math.min(...headings.map((heading) => heading.depth)),
 	);
 
-	$effect(() => {
+	// Re-runs when the container or headings change.
+	function follow_headings() {
 		if (!container) return;
 		const elements = headings
 			.map((heading) =>
@@ -36,10 +37,14 @@
 		);
 		for (const element of elements) observer.observe(element);
 		return () => observer.disconnect();
-	});
+	}
 </script>
 
-<nav aria-label="On this page" class="space-y-2">
+<nav
+	aria-label="On this page"
+	class="space-y-2"
+	{@attach follow_headings}
+>
 	<h2
 		class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
 	>

@@ -12,52 +12,30 @@
 	import * as Collapsible from '#lib/components/ui/collapsible/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
+	import { Fetched } from '#lib/fetched.svelte.js';
 	import { encode_doc_path, hit_href } from '#lib/router.js';
 	import { router } from '#lib/router.svelte.js';
-	import type { SearchResponse } from '@wiki0/core';
 	import ChartBarIcon from '@lucide/svelte/icons/chart-bar';
 	import FilePenIcon from '@lucide/svelte/icons/file-pen';
 	import HistoryIcon from '@lucide/svelte/icons/history';
 	import SearchIcon from '@lucide/svelte/icons/search';
+	import type { SearchResponse } from '@wiki0/core';
 
 	let { query }: { query: string } = $props();
 
-	let draft = $state('');
-	let response = $state.raw<SearchResponse | null>(null);
-	let error = $state<unknown>(null);
-	let loading = $state(false);
+	// Follows the URL's query; typing overrides it until the next search.
+	let draft = $derived(query);
 
-	$effect(() => {
-		draft = query;
-	});
-
-	$effect(() => {
+	let request: Fetched<SearchResponse> | null = null;
+	const search = $derived.by(() => {
 		const current = query.trim();
 		void app.version;
-		if (!current) {
-			response = null;
-			return;
-		}
-		let cancelled = false;
-		loading = true;
-		api
-			.search(current, 20)
-			.then((result) => {
-				if (!cancelled) {
-					response = result;
-					error = null;
-				}
-			})
-			.catch((caught: unknown) => {
-				if (!cancelled) error = caught;
-			})
-			.finally(() => {
-				if (!cancelled) loading = false;
-			});
-		return () => {
-			cancelled = true;
-		};
+		if (!current) return (request = null);
+		return (request = new Fetched(api.search(current, 20), request));
 	});
+	const response = $derived(search?.value ?? null);
+	const error = $derived(search?.error ?? null);
+	const loading = $derived(search?.loading ?? false);
 
 	function submit(event: SubmitEvent) {
 		event.preventDefault();

@@ -12,7 +12,6 @@
 	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import { router } from '#lib/router.svelte.js';
 	import { sidebar_width } from '#lib/sidebar-width.svelte.js';
-	import { theme } from '#lib/theme.svelte.js';
 	import DocsView from '#lib/views/docs-view.svelte';
 	import KeyRoundIcon from '@lucide/svelte/icons/key-round';
 	import SearchIcon from '@lucide/svelte/icons/search';
@@ -23,8 +22,6 @@
 	const load_search = () => import('#lib/views/search-view.svelte');
 
 	let palette_open = $state(false);
-
-	$effect(() => theme.apply());
 
 	onMount(() => {
 		void app.load();

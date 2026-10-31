@@ -9,32 +9,19 @@
 	import * as Select from '#lib/components/ui/select/index.js';
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
+	import { Fetched } from '#lib/fetched.svelte.js';
 	import type { GraphResult } from '@wiki0/core';
 
-	let graph = $state.raw<GraphResult | null>(null);
-	let error = $state<unknown>(null);
+	let request: Fetched<GraphResult> | null = null;
+	const graph_request = $derived.by(() => {
+		void app.version;
+		return (request = new Fetched(api.graph(), request));
+	});
+	const graph = $derived(graph_request.value);
+	const error = $derived(graph_request.error);
 	let group_by = $state<'doc_type' | 'status' | 'folder'>('folder');
 	let show_unresolved = $state(true);
 	let show_orphans = $state(true);
-
-	$effect(() => {
-		void app.version;
-		let cancelled = false;
-		api
-			.graph()
-			.then((result) => {
-				if (!cancelled) {
-					graph = result;
-					error = null;
-				}
-			})
-			.catch((caught: unknown) => {
-				if (!cancelled) error = caught;
-			});
-		return () => {
-			cancelled = true;
-		};
-	});
 
 	const group_labels = {
 		folder: 'Colour by folder',

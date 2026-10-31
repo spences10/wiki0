@@ -10,33 +10,20 @@
 	import * as Select from '#lib/components/ui/select/index.js';
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 	import * as Table from '#lib/components/ui/table/index.js';
+	import { Fetched } from '#lib/fetched.svelte.js';
 	import { encode_doc_path } from '#lib/router.js';
 	import type { LintResult, LintSeverity } from '@wiki0/core';
 
-	let result = $state.raw<LintResult | null>(null);
-	let error = $state<unknown>(null);
+	let request: Fetched<LintResult> | null = null;
+	const lint_request = $derived.by(() => {
+		void app.version;
+		return (request = new Fetched(api.lint(), request));
+	});
+	const result = $derived(lint_request.value);
+	const error = $derived(lint_request.error);
 	let rule = $state('all');
 	let severity = $state<'all' | LintSeverity>('all');
 	let path_filter = $state('');
-
-	$effect(() => {
-		void app.version;
-		let cancelled = false;
-		api
-			.lint()
-			.then((lint) => {
-				if (!cancelled) {
-					result = lint;
-					error = null;
-				}
-			})
-			.catch((caught: unknown) => {
-				if (!cancelled) error = caught;
-			});
-		return () => {
-			cancelled = true;
-		};
-	});
 
 	const rules = $derived(
 		[

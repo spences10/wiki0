@@ -10,20 +10,20 @@
 	import * as Empty from '#lib/components/ui/empty/index.js';
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 	import { home_document } from '#lib/doc-tree.js';
+	import { Fetched } from '#lib/fetched.svelte.js';
 	import { handle_copy_click } from '#lib/markdown/code-block.js';
 	import { render_document } from '#lib/markdown/render.js';
 	import { encode_doc_path, parse_line_range } from '#lib/router.js';
-	import { router } from '#lib/router.svelte.js';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import FilePenIcon from '@lucide/svelte/icons/file-pen';
+	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
+	import HistoryIcon from '@lucide/svelte/icons/history';
+	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import type {
 		BacklinkResult,
 		DocumentContent,
 		DocumentLink,
 	} from '@wiki0/core';
-	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
-	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
-	import FilePenIcon from '@lucide/svelte/icons/file-pen';
-	import HistoryIcon from '@lucide/svelte/icons/history';
-	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import { tick } from 'svelte';
 
 	type Loaded = {
@@ -58,47 +58,32 @@
 		path ?? home_document(app.documents)?.path ?? null,
 	);
 
-	let loaded = $state.raw<Loaded | null>(null);
-	let error = $state<unknown>(null);
-	let loading = $state(false);
-	let article = $state<HTMLElement>();
-	let asset_urls: string[] = [];
-
-	$effect(() => {
+	let request: Fetched<Loaded> | null = null;
+	const doc_request = $derived.by(() => {
 		const current = target;
 		void app.version;
-		if (!current) return;
-		let cancelled = false;
-		loading = true;
-		Promise.all([
-			api.doc(current),
-			api.links(current),
-			api.backlinks(current),
-			load_highlighter(),
-		])
-			.then(([document, links, backlinks, module]) => {
-				if (cancelled) return;
-				loaded = {
-					path: current,
-					document,
-					links,
-					backlinks,
-					highlight: module.highlight_code,
-				};
-				error = null;
-			})
-			.catch((caught: unknown) => {
-				if (cancelled) return;
-				loaded = null;
-				error = caught;
-			})
-			.finally(() => {
-				if (!cancelled) loading = false;
-			});
-		return () => {
-			cancelled = true;
-		};
+		if (!current) return (request = null);
+		return (request = new Fetched(
+			Promise.all([
+				api.doc(current),
+				api.links(current),
+				api.backlinks(current),
+				load_highlighter(),
+			]).then(([document, links, backlinks, module]) => ({
+				path: current,
+				document,
+				links,
+				backlinks,
+				highlight: module.highlight_code,
+			})),
+			request,
+		));
 	});
+	const loaded = $derived(doc_request?.value ?? null);
+	const error = $derived(doc_request?.error ?? null);
+	const loading = $derived(doc_request?.loading ?? false);
+	let article = $state<HTMLElement>();
+	let asset_urls: string[] = [];
 
 	const summary = $derived(
 		app.documents.find((document) => document.path === loaded?.path),
@@ -223,15 +208,22 @@
 		scroll_to?.scrollIntoView({ block: 'start' });
 	}
 
-	$effect(() => {
-		if (!article || !rendered || !loaded) return;
-		void load_assets(article, loaded.path);
-		void place(article, fragment, highlight);
-	});
-
-	$effect(() => () => {
-		for (const url of asset_urls) URL.revokeObjectURL(url);
-	});
+	// Re-runs when the rendered document, fragment or highlight changes.
+	// Waits a tick so the {@html} content is in the article.
+	function prepare_article(container: HTMLElement) {
+		if (!rendered || !loaded) return;
+		const doc_path = loaded.path;
+		const fragment_value = fragment;
+		const range = highlight;
+		void tick().then(() => {
+			void load_assets(container, doc_path);
+			void place(container, fragment_value, range);
+		});
+		return () => {
+			for (const url of asset_urls.splice(0))
+				URL.revokeObjectURL(url);
+		};
+	}
 
 	function doc_href(doc_path: string, anchor = '') {
 		return `/docs/${encode_doc_path(doc_path)}${anchor}`;
@@ -284,7 +276,7 @@
 		class:opacity-60={loading}
 	>
 		<div class="min-w-0">
-			<header class="mx-auto mb-8 max-w-[46rem] space-y-3">
+			<header class="mx-auto mb-8 max-w-184 space-y-3">
 				<Breadcrumb.Root>
 					<Breadcrumb.List>
 						{#each segments as segment, index (index)}
@@ -365,6 +357,7 @@
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 			<article
 				bind:this={article}
+				{@attach prepare_article}
 				class={[
 					'prose mx-auto',
 					is_markdown ? '' : 'whitespace-pre-wrap',

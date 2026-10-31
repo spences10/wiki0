@@ -5,7 +5,6 @@
 	import { hit_href } from '#lib/router.js';
 	import { router } from '#lib/router.svelte.js';
 	import { theme } from '#lib/theme.svelte.js';
-	import type { SearchHit } from '@wiki0/core';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import MoonIcon from '@lucide/svelte/icons/moon';
@@ -13,6 +12,7 @@
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import SunIcon from '@lucide/svelte/icons/sun';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
+	import type { SearchHit } from '@wiki0/core';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
 
@@ -20,6 +20,7 @@
 	let hits = $state.raw<SearchHit[]>([]);
 	let searching = $state(false);
 	let request = 0;
+	let timer: ReturnType<typeof setTimeout> | undefined;
 
 	// Search runs on the server, so results come from core's ranking;
 	// titles are matched locally as well for jumping straight to a doc.
@@ -35,15 +36,19 @@
 			.slice(0, 8);
 	});
 
-	$effect(() => {
-		const current = query.trim();
+	// Runs on each keystroke, searching once typing pauses.
+	function set_query(value: string) {
+		query = value;
+		clearTimeout(timer);
+		const current = value.trim();
 		const id = ++request;
 		if (current.length < 2) {
 			hits = [];
+			searching = false;
 			return;
 		}
 		searching = true;
-		const timer = setTimeout(() => {
+		timer = setTimeout(() => {
 			api
 				.search(current, 8)
 				.then((response) => {
@@ -56,8 +61,7 @@
 					if (id === request) searching = false;
 				});
 		}, 150);
-		return () => clearTimeout(timer);
-	});
+	}
 
 	function go(href: string) {
 		open = false;
@@ -84,7 +88,10 @@
 	title="Search docs"
 	description="Search this project's docs and jump to the section"
 >
-	<Command.Input bind:value={query} placeholder="Search docs…" />
+	<Command.Input
+		bind:value={() => query, set_query}
+		placeholder="Search docs…"
+	/>
 	<Command.List class="max-h-[min(60vh,32rem)]">
 		<Command.Empty>
 			{searching ? 'Searching…' : 'Nothing matches that.'}
