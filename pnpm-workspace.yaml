@@ -44,7 +44,7 @@ catalog:
   '@twinkleplop/yaml': ^0.1.7
   '@types/d3-force': ^3.0.10
   '@types/d3-scale': ^4.0.9
-  '@types/node': ^24.0.0
+  '@types/node': ^26.0.0
   '@typescript/native': npm:typescript@^7.0.2
   bits-ui: ^2.20.0
   citty: ^0.2.2
