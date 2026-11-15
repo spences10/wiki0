@@ -307,7 +307,7 @@ catalogs:
       version: 2.0.0
     layerchart:
       specifier: ^2.7.0
-      version: 2.10.0
+      version: 2.10.1
     mammoth:
       specifier: ^1.13.0
       version: 1.13.0
@@ -470,7 +470,7 @@ importers:
         version: 4.0.3
       layerchart:
         specifier: 'catalog:'
-        version: 2.10.0(svelte@5.57.3)
+        version: 2.10.1(svelte@5.57.3)
       playwright:
         specifier: 'catalog:'
         version: 1.65.0
@@ -711,7 +711,7 @@ importers:
         version: 4.0.3
       layerchart:
         specifier: 'catalog:'
-        version: 2.10.0(svelte@5.57.3)
+        version: 2.10.1(svelte@5.57.3)
       marked:
         specifier: 'catalog:'
         version: 18.2.0
@@ -886,9 +886,6 @@ packages:
 
   '@layerstack/svelte-state@0.1.0-next.25':
     resolution: {integrity: sha512-K+SO4dYd2D9OSCnj92Ugo6i5OfVKZoHHA1DA7gs2ynigylRKInicniGI/OmRpp+002n3mhE/i2r3Kfctj8eAdw==}
-
-  '@layerstack/tailwind@2.0.0-next.21':
-    resolution: {integrity: sha512-Qgp2EpmEHmjtura8MQzWicR6ztBRSsRvddakFtx9ShrLMz6jWzd6bCMVVRu44Q3ZOrtXmSu4QxjCZWu1ytvuPg==}
 
   '@layerstack/utils@2.0.0-next.19':
     resolution: {integrity: sha512-HyXCEz9pge4rFWklrSgFr3YIwdE1gP8WM6GPetmnKPDfYLF1/oetRFKI9FqiE+dw4brnULGPKJsVhjM3vQfD4A==}
@@ -2333,8 +2330,8 @@ packages:
   launch-editor@2.14.1:
     resolution: {integrity: sha512-QWBrQsMpH7gPr965dsKD/3cKWiNoTjpATQf++Xq63N6sKRGMwlVXz41O1IZTMfZQgBctD/K5Zt06+/I6pP6+HA==}
 
-  layerchart@2.10.0:
-    resolution: {integrity: sha512-CEI4y7iMwbxxSfQeo4sMOUtGghxsXb4inR/W9q+4gMXTAld/r40rx2ZgdJd78ZmNggvFgxiVQxjmyWzBegXsZw==}
+  layerchart@2.10.1:
+    resolution: {integrity: sha512-/W1zMbcQdvcUoeMWoBVbIEymLtr7ZCA0bptIFfzPWym/hTid/3sWnrK2qhflNdvPTel4mvr4drvhB6RDlcJxEQ==}
     peerDependencies:
       svelte: ^5.57.0
 
@@ -3053,13 +3050,6 @@ snapshots:
   '@layerstack/svelte-state@0.1.0-next.25':
     dependencies:
       '@layerstack/utils': 2.0.0-next.19
-
-  '@layerstack/tailwind@2.0.0-next.21':
-    dependencies:
-      '@layerstack/utils': 2.0.0-next.19
-      clsx: 2.1.1
-      d3-array: 3.2.4
-      tailwind-merge: 3.7.0
 
   '@layerstack/utils@2.0.0-next.19':
     dependencies:
@@ -4172,13 +4162,13 @@ snapshots:
       picocolors: 1.1.1
       shell-quote: 1.10.0
 
-  layerchart@2.10.0(svelte@5.57.3):
+  layerchart@2.10.1(svelte@5.57.3):
     dependencies:
       '@dagrejs/dagre': 2.0.4
       '@layerstack/svelte-actions': 1.0.1-next.20
       '@layerstack/svelte-state': 0.1.0-next.25
-      '@layerstack/tailwind': 2.0.0-next.21
       '@layerstack/utils': 2.0.0-next.19
+      clsx: 2.1.1
       d3-array: 3.2.4
       d3-chord: 3.0.1
       d3-color: 3.1.0
