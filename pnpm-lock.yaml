@@ -316,7 +316,7 @@ catalogs:
       version: 2.0.0
     layerchart:
       specifier: ^2.7.0
-      version: 2.10.1
+      version: 2.11.0
     mammoth:
       specifier: ^1.13.0
       version: 1.13.0
@@ -476,7 +476,7 @@ importers:
         version: 4.0.3
       layerchart:
         specifier: 'catalog:'
-        version: 2.10.1(svelte@5.57.3)
+        version: 2.11.0(svelte@5.57.3)
       playwright:
         specifier: 'catalog:'
         version: 1.65.1
@@ -717,7 +717,7 @@ importers:
         version: 4.0.3
       layerchart:
         specifier: 'catalog:'
-        version: 2.10.1(svelte@5.57.3)
+        version: 2.11.0(svelte@5.57.3)
       marked:
         specifier: 'catalog:'
         version: 18.2.1
@@ -2358,8 +2358,8 @@ packages:
   launch-editor@2.14.1:
     resolution: {integrity: sha512-QWBrQsMpH7gPr965dsKD/3cKWiNoTjpATQf++Xq63N6sKRGMwlVXz41O1IZTMfZQgBctD/K5Zt06+/I6pP6+HA==}
 
-  layerchart@2.10.1:
-    resolution: {integrity: sha512-/W1zMbcQdvcUoeMWoBVbIEymLtr7ZCA0bptIFfzPWym/hTid/3sWnrK2qhflNdvPTel4mvr4drvhB6RDlcJxEQ==}
+  layerchart@2.11.0:
+    resolution: {integrity: sha512-j8yFwfF+DbP5stsIfts14c+8gV8cUFTs43yNu0lAZut1EqWaK5Kaa3WT/HxNOVxcxHB+7lpOL9r+doD4P8ekow==}
     peerDependencies:
       svelte: ^5.57.0
 
@@ -4219,7 +4219,7 @@ snapshots:
       picocolors: 1.1.1
       shell-quote: 1.10.0
 
-  layerchart@2.10.1(svelte@5.57.3):
+  layerchart@2.11.0(svelte@5.57.3):
     dependencies:
       '@dagrejs/dagre': 2.0.4
       '@layerstack/svelte-actions': 1.0.1-next.20
