@@ -238,7 +238,7 @@ catalogs:
       version: 0.2.2
     '@twinkleplop/go':
       specifier: ^0.1.7
-      version: 0.1.7
+      version: 0.1.8
     '@twinkleplop/graphql':
       specifier: ^0.2.1
       version: 0.2.1
@@ -645,7 +645,7 @@ importers:
         version: 0.2.2
       '@twinkleplop/go':
         specifier: 'catalog:'
-        version: 0.1.7
+        version: 0.1.8
       '@twinkleplop/graphql':
         specifier: 'catalog:'
         version: 0.2.1
@@ -1578,8 +1578,8 @@ packages:
   '@twinkleplop/dockerfile@0.2.2':
     resolution: {integrity: sha512-QtuE6WRWjUIRp7MCwDE6XF3Ug1Qcs5jd8p9n4Mn9BJ7PA2FZRHji8fdcs7PauqVHK0POPI5JGYhHJ9ShBKEZvA==}
 
-  '@twinkleplop/go@0.1.7':
-    resolution: {integrity: sha512-Jc45EY94XcA8KyRhE4Pzy1OCU+2XNsIMx8AnRVNoLHuNwUQUjDVd7nOc/IdKp6siU2jTD+FpQz+IfyoG8e+2ow==}
+  '@twinkleplop/go@0.1.8':
+    resolution: {integrity: sha512-MJYIw+COehNkaMMGeXIXXGNE3tWwgGp6C1ln2OjbSmbvpYuXOnHDFngiki2VCyGl1p1Ntvg4lSFQkcrm9oRuzw==}
 
   '@twinkleplop/graphql@0.2.1':
     resolution: {integrity: sha512-hZeiawkMElrRICfncl5X4oW6lO+YXgwqIRMwvSHNzH/J7cpi6gHrZnwnDT5Ave4xJDTaPGj+93wB4jzW3OjTGg==}
@@ -3539,9 +3539,9 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.2
 
-  '@twinkleplop/go@0.1.7':
+  '@twinkleplop/go@0.1.8':
     dependencies:
-      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/graphql@0.2.1':
     dependencies:
