@@ -223,7 +223,7 @@ catalogs:
       version: 0.1.8
     '@twinkleplop/c':
       specifier: ^0.2.1
-      version: 0.2.1
+      version: 0.2.2
     '@twinkleplop/cpp':
       specifier: ^0.2.1
       version: 0.2.1
@@ -630,7 +630,7 @@ importers:
         version: 0.1.8
       '@twinkleplop/c':
         specifier: 'catalog:'
-        version: 0.2.1
+        version: 0.2.2
       '@twinkleplop/cpp':
         specifier: 'catalog:'
         version: 0.2.1
@@ -1556,6 +1556,9 @@ packages:
 
   '@twinkleplop/c@0.2.1':
     resolution: {integrity: sha512-6ci5JLOw6TppOaFemiC5GtojUpB1/4Iw6JF3DVQbXBFna2DeoewJ26QtyHm0Uh+iHmtpY0pfWY0fz5fpjeRTjA==}
+
+  '@twinkleplop/c@0.2.2':
+    resolution: {integrity: sha512-r1J5Ka3SARUtBGblNKXTwZ1dRizuBnLu1LkBx7j60bUUZ2Q6RI3xV3eWRlvlYKTtkp2RO45vuieIUO2F3xHDxA==}
 
   '@twinkleplop/core@0.3.1':
     resolution: {integrity: sha512-fMbce7NcJlVROsyI34tz3DCWkAWRWLRlBNCbgwz36mm6yoEO09eyafi8JRN5HJGQIzMr0qjXQ3t3asc7MFSh8Q==}
@@ -3510,6 +3513,10 @@ snapshots:
   '@twinkleplop/c@0.2.1':
     dependencies:
       '@twinkleplop/core': 0.3.1
+
+  '@twinkleplop/c@0.2.2':
+    dependencies:
+      '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/core@0.3.1': {}
 
