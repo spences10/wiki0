@@ -226,7 +226,7 @@ catalogs:
       version: 0.2.2
     '@twinkleplop/cpp':
       specifier: ^0.2.1
-      version: 0.2.1
+      version: 0.2.2
     '@twinkleplop/css':
       specifier: ^0.1.7
       version: 0.1.7
@@ -633,7 +633,7 @@ importers:
         version: 0.2.2
       '@twinkleplop/cpp':
         specifier: 'catalog:'
-        version: 0.2.1
+        version: 0.2.2
       '@twinkleplop/css':
         specifier: 'catalog:'
         version: 0.1.7
@@ -1554,9 +1554,6 @@ packages:
   '@twinkleplop/bash@0.1.8':
     resolution: {integrity: sha512-7YQWMDIyHTWz8HUSM+0PxpTkpY9uX4koSi5+JcBSgImLjSdBnwvkXAY6uAVy2yKKvZjMuwMPyja9Z874/COzTA==}
 
-  '@twinkleplop/c@0.2.1':
-    resolution: {integrity: sha512-6ci5JLOw6TppOaFemiC5GtojUpB1/4Iw6JF3DVQbXBFna2DeoewJ26QtyHm0Uh+iHmtpY0pfWY0fz5fpjeRTjA==}
-
   '@twinkleplop/c@0.2.2':
     resolution: {integrity: sha512-r1J5Ka3SARUtBGblNKXTwZ1dRizuBnLu1LkBx7j60bUUZ2Q6RI3xV3eWRlvlYKTtkp2RO45vuieIUO2F3xHDxA==}
 
@@ -1566,8 +1563,8 @@ packages:
   '@twinkleplop/core@0.3.2':
     resolution: {integrity: sha512-K4sKQFqTSpEjFz4eCmJGQA6ivtZgpBKdZzu3AzKIP5jwstJWHPI5eWtJgfv6vTsxDVHr3WY02gXnwL3+Rzndhg==}
 
-  '@twinkleplop/cpp@0.2.1':
-    resolution: {integrity: sha512-npIX8+BmvTzUI5XGbYFgfz3M9Q4TxdNu7wlzS+0rsxqnUXkusQ6iYEvtQh4vjXOQRQywgYrzbgp5A0euKZYLnA==}
+  '@twinkleplop/cpp@0.2.2':
+    resolution: {integrity: sha512-xALrIf20zkj0pXc1ML5DnRJpGfrEbykI3+OVlD5my1uwVT6b1uz6vntSWVxqwRzECs0yVjQYCOZG0/Gys6LtbQ==}
 
   '@twinkleplop/css@0.1.7':
     resolution: {integrity: sha512-eznre7EgC0IBE3/jqAUKXG2S4iWLczOSAxwLnknS+9BQQGuD82u2A2rCok94E+nMpjkeshhbSvnQxDSEo8YpUA==}
@@ -3510,10 +3507,6 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.2
 
-  '@twinkleplop/c@0.2.1':
-    dependencies:
-      '@twinkleplop/core': 0.3.1
-
   '@twinkleplop/c@0.2.2':
     dependencies:
       '@twinkleplop/core': 0.3.2
@@ -3522,10 +3515,10 @@ snapshots:
 
   '@twinkleplop/core@0.3.2': {}
 
-  '@twinkleplop/cpp@0.2.1':
+  '@twinkleplop/cpp@0.2.2':
     dependencies:
-      '@twinkleplop/c': 0.2.1
-      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/c': 0.2.2
+      '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/css@0.1.7':
     dependencies:
