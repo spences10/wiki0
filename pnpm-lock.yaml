@@ -235,7 +235,7 @@ catalogs:
       version: 0.1.7
     '@twinkleplop/dockerfile':
       specifier: ^0.2.1
-      version: 0.2.1
+      version: 0.2.2
     '@twinkleplop/go':
       specifier: ^0.1.7
       version: 0.1.7
@@ -642,7 +642,7 @@ importers:
         version: 0.1.7
       '@twinkleplop/dockerfile':
         specifier: 'catalog:'
-        version: 0.2.1
+        version: 0.2.2
       '@twinkleplop/go':
         specifier: 'catalog:'
         version: 0.1.7
@@ -1560,6 +1560,9 @@ packages:
   '@twinkleplop/core@0.3.1':
     resolution: {integrity: sha512-fMbce7NcJlVROsyI34tz3DCWkAWRWLRlBNCbgwz36mm6yoEO09eyafi8JRN5HJGQIzMr0qjXQ3t3asc7MFSh8Q==}
 
+  '@twinkleplop/core@0.3.2':
+    resolution: {integrity: sha512-K4sKQFqTSpEjFz4eCmJGQA6ivtZgpBKdZzu3AzKIP5jwstJWHPI5eWtJgfv6vTsxDVHr3WY02gXnwL3+Rzndhg==}
+
   '@twinkleplop/cpp@0.2.1':
     resolution: {integrity: sha512-npIX8+BmvTzUI5XGbYFgfz3M9Q4TxdNu7wlzS+0rsxqnUXkusQ6iYEvtQh4vjXOQRQywgYrzbgp5A0euKZYLnA==}
 
@@ -1569,8 +1572,8 @@ packages:
   '@twinkleplop/diff@0.1.7':
     resolution: {integrity: sha512-ubzYKJwtndkWPyDUSKIm9k5/cv/TEJt8qDe8HJcA/e9S+cxQJqMNWcIQ46hz7ASh+yhV0rAvHjytSROfA+xK+w==}
 
-  '@twinkleplop/dockerfile@0.2.1':
-    resolution: {integrity: sha512-F+boDOGsbKiC4TbGqb8CE3VmvMdpyHgISJinUSPAP/iBPRxutax4fYztmvGSSysf67SQYXdiwarB9HcJVzJ8yA==}
+  '@twinkleplop/dockerfile@0.2.2':
+    resolution: {integrity: sha512-QtuE6WRWjUIRp7MCwDE6XF3Ug1Qcs5jd8p9n4Mn9BJ7PA2FZRHji8fdcs7PauqVHK0POPI5JGYhHJ9ShBKEZvA==}
 
   '@twinkleplop/go@0.1.7':
     resolution: {integrity: sha512-Jc45EY94XcA8KyRhE4Pzy1OCU+2XNsIMx8AnRVNoLHuNwUQUjDVd7nOc/IdKp6siU2jTD+FpQz+IfyoG8e+2ow==}
@@ -3510,6 +3513,8 @@ snapshots:
 
   '@twinkleplop/core@0.3.1': {}
 
+  '@twinkleplop/core@0.3.2': {}
+
   '@twinkleplop/cpp@0.2.1':
     dependencies:
       '@twinkleplop/c': 0.2.1
@@ -3523,9 +3528,9 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.1
 
-  '@twinkleplop/dockerfile@0.2.1':
+  '@twinkleplop/dockerfile@0.2.2':
     dependencies:
-      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/go@0.1.7':
     dependencies:
