@@ -262,7 +262,7 @@ catalogs:
       version: 0.2.1
     '@twinkleplop/python':
       specifier: ^0.1.7
-      version: 0.1.7
+      version: 0.1.8
     '@twinkleplop/rust':
       specifier: ^0.1.7
       version: 0.1.7
@@ -669,7 +669,7 @@ importers:
         version: 0.2.1
       '@twinkleplop/python':
         specifier: 'catalog:'
-        version: 0.1.7
+        version: 0.1.8
       '@twinkleplop/rust':
         specifier: 'catalog:'
         version: 0.1.7
@@ -1608,8 +1608,8 @@ packages:
   '@twinkleplop/markdown@0.2.2':
     resolution: {integrity: sha512-ZUlqqJsLwQcGce932GjcyPwOSk2C2fxlmSGVOUP8gi2p6wZ3WMxqH/7LELoEBoARyX6uE6ajfFBK5tgv2MI95g==}
 
-  '@twinkleplop/python@0.1.7':
-    resolution: {integrity: sha512-C3DJhERSppC9qUoux4l+b88Jv0PXEkooSuYcbqTsQ3FKRALu+Ksy2ukqs9ncVkk/gVqgHT21xnR+udMR/3y+1g==}
+  '@twinkleplop/python@0.1.8':
+    resolution: {integrity: sha512-Du17Wr9xLYZccA9onbFlNjUkqS/WoAhjKGbB4NtwjlvLic1Rqqu7QsQw/VrbX861ryGOHefdNU/ANVqkasFXtg==}
 
   '@twinkleplop/rust@0.1.7':
     resolution: {integrity: sha512-xCSZtBzqrtg9ZTp4rBI/Wj+SezlQgC33JD5rokTpjiOJCgkCRudHvHqMpp8JUN+n1rN3evqe+HVRQNvuU5xhIw==}
@@ -3593,9 +3593,9 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.2
 
-  '@twinkleplop/python@0.1.7':
+  '@twinkleplop/python@0.1.8':
     dependencies:
-      '@twinkleplop/core': 0.3.1
+      '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/rust@0.1.7':
     dependencies:
