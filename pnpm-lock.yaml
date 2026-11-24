@@ -336,8 +336,8 @@ catalogs:
       specifier: ^1.9.1
       version: 1.9.1
     svead:
-      specifier: ^0.1.0
-      version: 0.1.1
+      specifier: ^0.2.0
+      version: 0.2.0
     svelte:
       specifier: ^5.57.2
       version: 5.59.1
@@ -482,7 +482,7 @@ importers:
         version: 1.65.1
       svead:
         specifier: 'catalog:'
-        version: 0.1.1(svelte@5.59.1)
+        version: 0.2.0(svelte@5.59.1)
       svelte:
         specifier: 'catalog:'
         version: 5.59.1
@@ -2680,8 +2680,8 @@ packages:
   style-to-object@1.0.14:
     resolution: {integrity: sha512-LIN7rULI0jBscWQYaSswptyderlarFkjQ+t79nzty8tcIAceVomEVlLzH5VP4Cmsv6MtKhs7qaAiwlcp+Mgaxw==}
 
-  svead@0.1.1:
-    resolution: {integrity: sha512-hqC5EcPPh6n/B3nIDsPvsVL9ABtppdhLh/+5mrIKmvuRMTbPnICvkFH7cJ3JYt/cttA9gcCWH4JvZPG3tw6YRA==}
+  svead@0.2.0:
+    resolution: {integrity: sha512-optJ8XN04jDy2p6ZKu6IKZYjP/IqZ3b0dUWDzr4r7fjTv+s/E8wis4KaUeHYB+8cDeSYjPwSFB/+eHfaUlzuOg==}
     engines: {node: '>=24.15.0'}
     peerDependencies:
       svelte: ^5.0.0
@@ -2887,10 +2887,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zimmerframe@1.1.4:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
@@ -4590,7 +4592,7 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.7
 
-  svead@0.1.1(svelte@5.59.1):
+  svead@0.2.0(svelte@5.59.1):
     dependencies:
       schema-dts: 2.1.0
       svelte: 5.59.1
