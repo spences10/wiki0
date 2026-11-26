@@ -332,7 +332,7 @@ catalogs:
       version: 1.13.0
     marked:
       specifier: ^18.1.1
-      version: 18.2.1
+      version: 18.3.0
     pdf-parse:
       specifier: ^2.4.5
       version: 2.4.5
@@ -556,7 +556,7 @@ importers:
         version: 1.13.0
       marked:
         specifier: 'catalog:'
-        version: 18.2.1
+        version: 18.3.0
       pdf-parse:
         specifier: 'catalog:'
         version: 2.4.5
@@ -730,7 +730,7 @@ importers:
         version: 2.11.0(svelte@5.59.1)
       marked:
         specifier: 'catalog:'
-        version: 18.2.1
+        version: 18.3.0
       shadcn-svelte:
         specifier: 'catalog:'
         version: 1.8.1(svelte@5.59.1)
@@ -1566,9 +1566,6 @@ packages:
 
   '@twinkleplop/c@0.2.2':
     resolution: {integrity: sha512-r1J5Ka3SARUtBGblNKXTwZ1dRizuBnLu1LkBx7j60bUUZ2Q6RI3xV3eWRlvlYKTtkp2RO45vuieIUO2F3xHDxA==}
-
-  '@twinkleplop/core@0.3.1':
-    resolution: {integrity: sha512-fMbce7NcJlVROsyI34tz3DCWkAWRWLRlBNCbgwz36mm6yoEO09eyafi8JRN5HJGQIzMr0qjXQ3t3asc7MFSh8Q==}
 
   '@twinkleplop/core@0.3.2':
     resolution: {integrity: sha512-K4sKQFqTSpEjFz4eCmJGQA6ivtZgpBKdZzu3AzKIP5jwstJWHPI5eWtJgfv6vTsxDVHr3WY02gXnwL3+Rzndhg==}
@@ -2477,8 +2474,8 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
-  marked@18.2.1:
-    resolution: {integrity: sha512-ii4bxCTCqqwpT86XZWgJNs+ZnAIZksmLGYMViWA7PDIXYIeNo1x6cDdX3JOip9NM/cI6p8z57FxliACboTruMA==}
+  marked@18.3.0:
+    resolution: {integrity: sha512-ed8zmPXlBb3UfGXN5iHMQyMhFpdqLgoV5umUXx/Q1R+FW3q8VpqpyoKUwlENL9appo2UMvNLURDVaT3AMOryGA==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -3523,8 +3520,6 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.2
 
-  '@twinkleplop/core@0.3.1': {}
-
   '@twinkleplop/core@0.3.2': {}
 
   '@twinkleplop/cpp@0.2.2':
@@ -4355,7 +4350,7 @@ snapshots:
       underscore: 1.13.8
       xmlbuilder: 10.1.1
 
-  marked@18.2.1: {}
+  marked@18.3.0: {}
 
   memoize@10.2.0:
     dependencies:
