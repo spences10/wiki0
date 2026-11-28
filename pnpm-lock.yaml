@@ -230,7 +230,7 @@ catalogs:
       version: 0.5.2
     '@twinkleplop/bash':
       specifier: ^0.1.7
-      version: 0.1.8
+      version: 0.1.10
     '@twinkleplop/c':
       specifier: ^0.2.1
       version: 0.2.2
@@ -450,7 +450,7 @@ importers:
         version: 4.3.5(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.10)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
       '@twinkleplop/bash':
         specifier: 'catalog:'
-        version: 0.1.8
+        version: 0.1.10
       '@twinkleplop/json':
         specifier: 'catalog:'
         version: 0.1.8
@@ -637,7 +637,7 @@ importers:
         version: 4.3.5(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.10)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
       '@twinkleplop/bash':
         specifier: 'catalog:'
-        version: 0.1.8
+        version: 0.1.10
       '@twinkleplop/c':
         specifier: 'catalog:'
         version: 0.2.2
@@ -1561,14 +1561,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@twinkleplop/bash@0.1.8':
-    resolution: {integrity: sha512-7YQWMDIyHTWz8HUSM+0PxpTkpY9uX4koSi5+JcBSgImLjSdBnwvkXAY6uAVy2yKKvZjMuwMPyja9Z874/COzTA==}
+  '@twinkleplop/bash@0.1.10':
+    resolution: {integrity: sha512-l07rw+wyWy91QpPWiKY/80S/uEQH/GsglexfJv0rdYxA93OImWu/hnx/sIJkFyGN2arsz58GiAw7U40jxHm53Q==}
 
   '@twinkleplop/c@0.2.2':
     resolution: {integrity: sha512-r1J5Ka3SARUtBGblNKXTwZ1dRizuBnLu1LkBx7j60bUUZ2Q6RI3xV3eWRlvlYKTtkp2RO45vuieIUO2F3xHDxA==}
 
   '@twinkleplop/core@0.3.2':
     resolution: {integrity: sha512-K4sKQFqTSpEjFz4eCmJGQA6ivtZgpBKdZzu3AzKIP5jwstJWHPI5eWtJgfv6vTsxDVHr3WY02gXnwL3+Rzndhg==}
+
+  '@twinkleplop/core@0.4.1':
+    resolution: {integrity: sha512-NOErtBHmvj2HHQZut5auMTiPRNQO5/FO6IUtVunoRiaPV6bSmO+DYUPwo2AJck6NnaH9/iteD9uk8Pt1Liso8w==}
 
   '@twinkleplop/cpp@0.2.2':
     resolution: {integrity: sha512-xALrIf20zkj0pXc1ML5DnRJpGfrEbykI3+OVlD5my1uwVT6b1uz6vntSWVxqwRzECs0yVjQYCOZG0/Gys6LtbQ==}
@@ -3464,15 +3467,17 @@ snapshots:
   '@tsrs/win32-x64@7.1.0-beta.tsrs4':
     optional: true
 
-  '@twinkleplop/bash@0.1.8':
+  '@twinkleplop/bash@0.1.10':
     dependencies:
-      '@twinkleplop/core': 0.3.2
+      '@twinkleplop/core': 0.4.1
 
   '@twinkleplop/c@0.2.2':
     dependencies:
       '@twinkleplop/core': 0.3.2
 
   '@twinkleplop/core@0.3.2': {}
+
+  '@twinkleplop/core@0.4.1': {}
 
   '@twinkleplop/cpp@0.2.2':
     dependencies:
