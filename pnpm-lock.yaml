@@ -236,7 +236,7 @@ catalogs:
       version: 0.2.2
     '@twinkleplop/cpp':
       specifier: ^0.2.1
-      version: 0.2.2
+      version: 0.2.4
     '@twinkleplop/css':
       specifier: ^0.1.7
       version: 0.1.8
@@ -643,7 +643,7 @@ importers:
         version: 0.2.2
       '@twinkleplop/cpp':
         specifier: 'catalog:'
-        version: 0.2.2
+        version: 0.2.4
       '@twinkleplop/css':
         specifier: 'catalog:'
         version: 0.1.8
@@ -1567,11 +1567,17 @@ packages:
   '@twinkleplop/c@0.2.2':
     resolution: {integrity: sha512-r1J5Ka3SARUtBGblNKXTwZ1dRizuBnLu1LkBx7j60bUUZ2Q6RI3xV3eWRlvlYKTtkp2RO45vuieIUO2F3xHDxA==}
 
+  '@twinkleplop/c@0.2.4':
+    resolution: {integrity: sha512-51vh5DzfaUnYuTNxvmPIq5NvDmFkY/BVcDyF33VsPNiwVegMs84Se/8gkhbt/olgbzz58SpJwH2k4deRNr4eDQ==}
+
   '@twinkleplop/core@0.3.2':
     resolution: {integrity: sha512-K4sKQFqTSpEjFz4eCmJGQA6ivtZgpBKdZzu3AzKIP5jwstJWHPI5eWtJgfv6vTsxDVHr3WY02gXnwL3+Rzndhg==}
 
-  '@twinkleplop/cpp@0.2.2':
-    resolution: {integrity: sha512-xALrIf20zkj0pXc1ML5DnRJpGfrEbykI3+OVlD5my1uwVT6b1uz6vntSWVxqwRzECs0yVjQYCOZG0/Gys6LtbQ==}
+  '@twinkleplop/core@0.4.1':
+    resolution: {integrity: sha512-NOErtBHmvj2HHQZut5auMTiPRNQO5/FO6IUtVunoRiaPV6bSmO+DYUPwo2AJck6NnaH9/iteD9uk8Pt1Liso8w==}
+
+  '@twinkleplop/cpp@0.2.4':
+    resolution: {integrity: sha512-4Byuj/nzljBS3e5cTAnrBvMsnfoSy2OCFya2QzQo1FhBWpI6nyO79/1dCjdo9PVXfu+vTjtvepz4f3alSyB+FA==}
 
   '@twinkleplop/css@0.1.8':
     resolution: {integrity: sha512-OwPt+cYSOUP3sVXq7Zt6pWVY4ce87t1EUgyHakhz36TGxYitnIA7DXeFmoyHCnFW8ZjfNjKCa8HAwARLTZstmQ==}
@@ -3472,12 +3478,18 @@ snapshots:
     dependencies:
       '@twinkleplop/core': 0.3.2
 
+  '@twinkleplop/c@0.2.4':
+    dependencies:
+      '@twinkleplop/core': 0.4.1
+
   '@twinkleplop/core@0.3.2': {}
 
-  '@twinkleplop/cpp@0.2.2':
+  '@twinkleplop/core@0.4.1': {}
+
+  '@twinkleplop/cpp@0.2.4':
     dependencies:
-      '@twinkleplop/c': 0.2.2
-      '@twinkleplop/core': 0.3.2
+      '@twinkleplop/c': 0.2.4
+      '@twinkleplop/core': 0.4.1
 
   '@twinkleplop/css@0.1.8':
     dependencies:
